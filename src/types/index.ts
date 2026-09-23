@@ -39,7 +39,7 @@ export const createNovelSchema = z.object({
   target_word_count: z.coerce.number().int().min(1000, "Target minimal 1,000 kata").default(50000),
 });
 
-export type CreateNovelInput = z.infer<typeof createNovelSchema>;
+export type CreateNovelInput = z.input<typeof createNovelSchema>;
 
 export const updateNovelSchema = createNovelSchema.partial().extend({
   status: z.enum(["planning", "in_progress", "first_draft", "revising", "completed", "archived"]).optional(),
@@ -99,7 +99,7 @@ export const createChapterSchema = z.object({
   status: z.enum(["planned", "draft", "in_progress", "completed", "revising"]).default("planned"),
 });
 
-export type CreateChapterInput = z.infer<typeof createChapterSchema>;
+export type CreateChapterInput = z.input<typeof createChapterSchema>;
 
 export const updateChapterSchema = createChapterSchema.partial();
 export type UpdateChapterInput = z.infer<typeof updateChapterSchema>;
@@ -134,7 +134,7 @@ export const createSceneSchema = z.object({
   status: z.enum(["planned", "draft", "in_progress", "completed", "revising"]).default("planned"),
 });
 
-export type CreateSceneInput = z.infer<typeof createSceneSchema>;
+export type CreateSceneInput = z.input<typeof createSceneSchema>;
 
 export const updateSceneSchema = createSceneSchema.partial();
 export type UpdateSceneInput = z.infer<typeof updateSceneSchema>;
@@ -162,7 +162,7 @@ export const createSceneVersionSchema = z.object({
   notes: z.string().max(300, "Catatan versi maksimal 300 karakter").optional().nullable(),
 });
 
-export type CreateSceneVersionInput = z.infer<typeof createSceneVersionSchema>;
+export type CreateSceneVersionInput = z.input<typeof createSceneVersionSchema>;
 
 // Composite Hierarchy Tree Types (for Outline View)
 export interface ChapterWithScenes extends Chapter {
@@ -227,7 +227,7 @@ export const createCharacterSchema = z.object({
   character_arc: z.string().optional().nullable(),
 });
 
-export type CreateCharacterInput = z.infer<typeof createCharacterSchema>;
+export type CreateCharacterInput = z.input<typeof createCharacterSchema>;
 
 export const updateCharacterSchema = createCharacterSchema.partial();
 export type UpdateCharacterInput = z.infer<typeof updateCharacterSchema>;
@@ -274,7 +274,7 @@ export const createRelationshipSchema = z
     path: ["to_character_id"],
   });
 
-export type CreateRelationshipInput = z.infer<typeof createRelationshipSchema>;
+export type CreateRelationshipInput = z.input<typeof createRelationshipSchema>;
 
 export const updateRelationshipSchema = z.object({
   relationship_type: z
@@ -332,7 +332,7 @@ export const createWorldRuleSchema = z.object({
   importance: z.coerce.number().int().min(1).max(5).default(3),
 });
 
-export type CreateWorldRuleInput = z.infer<typeof createWorldRuleSchema>;
+export type CreateWorldRuleInput = z.input<typeof createWorldRuleSchema>;
 
 export const updateWorldRuleSchema = createWorldRuleSchema.partial();
 export type UpdateWorldRuleInput = z.infer<typeof updateWorldRuleSchema>;
@@ -354,7 +354,7 @@ export const createWorldLoreSchema = z.object({
   content: z.string().min(1, "Konten lore wajib diisi"),
 });
 
-export type CreateWorldLoreInput = z.infer<typeof createWorldLoreSchema>;
+export type CreateWorldLoreInput = z.input<typeof createWorldLoreSchema>;
 
 export const updateWorldLoreSchema = createWorldLoreSchema.partial();
 export type UpdateWorldLoreInput = z.infer<typeof updateWorldLoreSchema>;
@@ -459,7 +459,7 @@ export const createStoryMemorySchema = z.object({
   tags: z.array(z.string()).optional().default([]),
 });
 
-export type CreateStoryMemoryInput = z.infer<typeof createStoryMemorySchema>;
+export type CreateStoryMemoryInput = z.input<typeof createStoryMemorySchema>;
 
 export const updateStoryMemorySchema = createStoryMemorySchema.partial().extend({
   status: z.enum(["proposed", "confirmed", "rejected", "archived"]).optional(),

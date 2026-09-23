@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 import { NovelRepository } from "@/features/novels/repository";
 import { ChapterRepository } from "@/features/chapters/repository";
+import { countWords } from "@/lib/words";
 import type { Scene, CreateSceneInput, UpdateSceneInput } from "@/types";
 
 // In-memory store for local dev mode when PostgreSQL/Supabase is not connected
@@ -268,8 +269,7 @@ export class SceneRepository {
     if (!scene) return null;
 
     // Calculate word count
-    const trimmed = content.trim();
-    const wordCount = trimmed ? trimmed.split(/\s+/).length : 0;
+    const wordCount = countWords(content);
 
     const supabase = await createClient();
 

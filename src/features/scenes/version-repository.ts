@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { isSupabaseConfigured } from "@/lib/supabase/client";
 import { SceneRepository } from "@/features/scenes/repository";
+import { countWords } from "@/lib/words";
 import type { SceneVersion, CreateSceneVersionInput } from "@/types";
 
 // In-memory store for local dev mode when PostgreSQL/Supabase is not connected
@@ -97,8 +98,7 @@ export class SceneVersionRepository {
       throw new Error("Akses ditolak: Adegan tidak ditemukan.");
     }
 
-    const trimmed = input.content.trim();
-    const wordCount = trimmed ? trimmed.split(/\s+/).length : 0;
+    const wordCount = countWords(input.content);
     const now = new Date().toISOString();
 
     const existingVersions = await this.findManyByScene(sceneId, novelId, userId);

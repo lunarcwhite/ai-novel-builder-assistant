@@ -549,7 +549,7 @@ export class WorldLoreRepository {
     const newLore: WorldLore = {
       id: `lore_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
       novel_id: novelId,
-      category: input.category,
+      category: input.category ?? "general",
       title: input.title,
       content: input.content,
       created_at: new Date().toISOString(),

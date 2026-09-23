@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect } from "react";
 import { useEditor, EditorContent, BubbleMenu } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
@@ -20,6 +20,7 @@ import {
   Link as LinkIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { countWords } from "@/lib/words";
 
 interface TipTapEditorProps {
   initialContent: string;
@@ -34,12 +35,6 @@ export default function TipTapEditor({
   placeholder = "Mulai menulis naskah adegan ini...",
   editable = true,
 }: TipTapEditorProps) {
-  const calculateWordCount = useCallback((text: string): number => {
-    const trimmed = text.trim();
-    if (!trimmed) return 0;
-    return trimmed.split(/\s+/).filter(Boolean).length;
-  }, []);
-
   const editor = useEditor({
     immediatelyRender: false,
     editable,
@@ -69,8 +64,7 @@ export default function TipTapEditor({
     },
     onUpdate: ({ editor: ed }) => {
       const html = ed.getHTML();
-      const text = ed.getText();
-      const words = calculateWordCount(text);
+      const words = countWords(ed.getText());
       onChange(html, words);
     },
   });
