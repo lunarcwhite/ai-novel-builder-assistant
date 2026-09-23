@@ -1,17 +1,22 @@
+import React from "react";
+import Link from "next/link";
 import { requireAuth } from "@/server/auth/guards";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { NovelService } from "@/features/novels/service";
+import { deleteNovelAction } from "@/server/actions/novels";
+import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { 
   Plus, 
   BookOpen, 
-  ShieldCheck, 
-  UserCheck, 
-  Layers
+  Trash2, 
+  FileText, 
+  ArrowRight
 } from "lucide-react";
 
 export default async function WorkspacePage() {
   const user = await requireAuth();
+  const novels = await NovelService.listUserNovels(user.id);
 
   return (
     <div className="space-y-8">
@@ -25,96 +30,145 @@ export default async function WorkspacePage() {
             <span className="text-xs text-muted-foreground">ID Penulis: {user.id}</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-serif font-normal text-foreground">
-            Selamat datang di Studio, {user.displayName}
+            Koleksi Novel, {user.displayName}
           </h1>
           <p className="text-sm text-muted-foreground leading-relaxed">
-            Ini adalah ruang kerja pribadi Anda. Semua draf naskah, karakter, dan memori cerita terisolasi khusus untuk akun Anda.
+            Kelola karya fiksi Anda, tentukan premis cerita, dan buka studio penulisan dengan Story Intelligence.
           </p>
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
-          <Button className="text-xs flex items-center gap-1.5 shadow-subtle">
-            <Plus className="w-4 h-4" />
-            Novel Baru (Phase 2)
-          </Button>
+          <Link href="/workspace/new">
+            <Button className="text-xs flex items-center gap-1.5 shadow-subtle">
+              <Plus className="w-4 h-4" />
+              Buat Novel Baru
+            </Button>
+          </Link>
         </div>
       </div>
 
-      {/* Auth & Security Status Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="border-border/80">
-          <CardHeader className="p-5 pb-3">
-            <div className="w-8 h-8 rounded-md bg-primary/10 text-primary flex items-center justify-center mb-1">
-              <UserCheck className="w-4 h-4" />
-            </div>
-            <CardTitle className="text-base font-medium">Profil Penulis Aktif</CardTitle>
-            <CardDescription className="text-xs">Identitas dan data sesi author</CardDescription>
-          </CardHeader>
-          <CardContent className="p-5 pt-0 text-xs space-y-2 text-muted-foreground">
-            <div className="flex justify-between py-1 border-b border-border/40">
-              <span>Nama Tampilan:</span>
-              <span className="font-medium text-foreground">{user.displayName}</span>
-            </div>
-            <div className="flex justify-between py-1 border-b border-border/40">
-              <span>Email:</span>
-              <span className="font-medium text-foreground">{user.email}</span>
-            </div>
-            <div className="flex justify-between py-1">
-              <span>Status Akun:</span>
-              <span className="text-emerald-600 dark:text-emerald-400 font-medium">Terverifikasi</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/80">
-          <CardHeader className="p-5 pb-3">
-            <div className="w-8 h-8 rounded-md bg-primary/10 text-primary flex items-center justify-center mb-1">
-              <ShieldCheck className="w-4 h-4" />
-            </div>
-            <CardTitle className="text-base font-medium">Isolasi Tenant & Naskah</CardTitle>
-            <CardDescription className="text-xs">Aturan keamanan Rule 5.3 AGENTS.md</CardDescription>
-          </CardHeader>
-          <CardContent className="p-5 pt-0 text-xs space-y-2 text-muted-foreground">
-            <p>
-              Setiap entitas cerita (Novel, Bab, Scene, Karakter) terverifikasi server-side melalui <code className="text-foreground">requireNovelAccess()</code>.
-            </p>
-            <div className="pt-1 flex items-center gap-1.5 text-[11px] text-emerald-600 dark:text-emerald-400">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Otorisasi Server-Side Aktif</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/80">
-          <CardHeader className="p-5 pb-3">
-            <div className="w-8 h-8 rounded-md bg-primary/10 text-primary flex items-center justify-center mb-1">
-              <Layers className="w-4 h-4" />
-            </div>
-            <CardTitle className="text-base font-medium">Tahap Selanjutnya: Phase 2</CardTitle>
-            <CardDescription className="text-xs">Persiapan Manajemen Koleksi Novel</CardDescription>
-          </CardHeader>
-          <CardContent className="p-5 pt-0 text-xs space-y-2 text-muted-foreground">
-            <p>
-              Setelah autentikasi dan profil pengguna selesai, langkah selanjutnya adalah membangun migrasi dan repositori <code className="text-foreground">novels</code>.
-            </p>
-            <div className="pt-1 text-[11px] text-primary font-medium">
-              Siap untuk implementasi Phase 2
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Empty State / Novel Library Placeholder */}
-      <div className="border border-dashed border-border/80 rounded-xl p-10 text-center space-y-3 bg-card/30">
-        <div className="w-12 h-12 rounded-full bg-muted/60 text-muted-foreground flex items-center justify-center mx-auto">
-          <BookOpen className="w-6 h-6" />
+      {/* Novel Library Grid */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold tracking-wider uppercase text-muted-foreground flex items-center gap-2">
+            <BookOpen className="w-4 h-4 text-primary" />
+            Karya Aktif ({novels.length})
+          </h2>
         </div>
-        <div className="space-y-1">
-          <h3 className="font-serif text-lg font-medium">Belum Ada Novel yang Dibuat</h3>
-          <p className="text-xs text-muted-foreground max-w-sm mx-auto">
-            Sistem otentikasi Phase 1 telah aktif dan siap menampung data novel Anda yang akan dibangun di Phase 2.
-          </p>
-        </div>
+
+        {novels.length === 0 ? (
+          /* Empty State */
+          <div className="border border-dashed border-border/80 rounded-xl p-12 text-center space-y-4 bg-card/30">
+            <div className="w-12 h-12 rounded-full bg-muted/60 text-muted-foreground flex items-center justify-center mx-auto">
+              <BookOpen className="w-6 h-6" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="font-serif text-lg font-medium">Belum Ada Novel di Perpustakaan</h3>
+              <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed">
+                Mulai petualangan kreatif Anda hari ini. Buat novel pertama Anda dan susun fondasi ceritanya.
+              </p>
+            </div>
+            <Link href="/workspace/new" className="inline-block pt-2">
+              <Button size="sm" className="text-xs flex items-center gap-1.5">
+                <Plus className="w-4 h-4" />
+                Mulai Rancang Novel Pertama
+              </Button>
+            </Link>
+          </div>
+        ) : (
+          /* Novel Cards Grid */
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {novels.map((novel) => {
+              const { progressPercent, readingTimeMinutes } = NovelService.calculateStats(
+                novel.word_count,
+                novel.target_word_count
+              );
+
+              return (
+                <Card
+                  key={novel.id}
+                  className="border-border/80 shadow-subtle hover:shadow-paper hover:border-primary/40 transition-all flex flex-col justify-between group"
+                >
+                  <CardHeader className="p-5 pb-3 space-y-2.5">
+                    <div className="flex items-start justify-between gap-2">
+                      <Badge variant="accent" className="capitalize text-[10px]">
+                        {novel.status.replace("_", " ")}
+                      </Badge>
+                      {novel.genre && (
+                        <span className="text-[11px] text-muted-foreground font-medium truncate max-w-[130px]">
+                          {novel.genre}
+                        </span>
+                      )}
+                    </div>
+
+                    <div>
+                      <Link href={`/workspace/${novel.id}`}>
+                        <CardTitle className="font-serif text-lg font-medium group-hover:text-primary transition-colors cursor-pointer line-clamp-1">
+                          {novel.title}
+                        </CardTitle>
+                      </Link>
+                      {novel.premise ? (
+                        <p className="text-xs text-muted-foreground line-clamp-2 mt-1.5 italic font-serif leading-relaxed">
+                          &ldquo;{novel.premise}&rdquo;
+                        </p>
+                      ) : (
+                        <p className="text-xs text-muted-foreground/60 mt-1.5 italic">
+                          Belum ada premis tertulis.
+                        </p>
+                      )}
+                    </div>
+                  </CardHeader>
+
+                  <CardContent className="p-5 pt-0 space-y-3">
+                    {/* Progress Bar */}
+                    <div className="space-y-1 pt-2 border-t border-border/40">
+                      <div className="flex justify-between text-[11px] text-muted-foreground">
+                        <span className="flex items-center gap-1">
+                          <FileText className="w-3 h-3" />
+                          {novel.word_count.toLocaleString()} / {novel.target_word_count.toLocaleString()} kata
+                        </span>
+                        <span>{progressPercent}%</span>
+                      </div>
+                      <div className="w-full bg-border/60 h-1 rounded-full overflow-hidden">
+                        <div
+                          className="bg-primary h-full rounded-full transition-all"
+                          style={{ width: `${progressPercent}%` }}
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+
+                  <CardFooter className="p-4 px-5 border-t border-border/40 flex items-center justify-between text-xs bg-muted/10">
+                    <span className="text-[11px] text-muted-foreground">
+                      ±{readingTimeMinutes} mnt baca
+                    </span>
+
+                    <div className="flex items-center gap-2">
+                      <form action={deleteNovelAction}>
+                        <input type="hidden" name="id" value={novel.id} />
+                        <Button
+                          type="submit"
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 px-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      </form>
+
+                      <Link href={`/workspace/${novel.id}`}>
+                        <Button size="sm" variant="default" className="text-xs h-8 flex items-center gap-1">
+                          Buka Studio
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Button>
+                      </Link>
+                    </div>
+                  </CardFooter>
+                </Card>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

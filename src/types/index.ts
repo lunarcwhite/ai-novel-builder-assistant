@@ -3,6 +3,8 @@
  * Derived from docs/database-schema.md
  */
 
+import { z } from "zod";
+
 export type UUID = string;
 
 export type NovelStatus = "planning" | "in_progress" | "first_draft" | "revising" | "completed" | "archived";
@@ -11,16 +13,38 @@ export interface Novel {
   id: UUID;
   user_id: UUID;
   title: string;
-  subtitle?: string | null;
-  logline?: string | null;
-  synopsis?: string | null;
+  slug: string;
   genre?: string | null;
-  target_word_count: number;
-  current_word_count: number;
   status: NovelStatus;
+  premise?: string | null;
+  theme?: string | null;
+  tone?: string | null;
+  target_audience?: string | null;
+  description?: string | null;
+  word_count: number;
+  target_word_count: number;
   created_at: string;
   updated_at: string;
 }
+
+export const createNovelSchema = z.object({
+  title: z.string().min(1, "Judul novel wajib diisi").max(150, "Judul maksimal 150 karakter"),
+  genre: z.string().optional().nullable(),
+  premise: z.string().optional().nullable(),
+  theme: z.string().optional().nullable(),
+  tone: z.string().optional().nullable(),
+  target_audience: z.string().optional().nullable(),
+  description: z.string().optional().nullable(),
+  target_word_count: z.coerce.number().int().min(1000, "Target minimal 1,000 kata").default(50000),
+});
+
+export type CreateNovelInput = z.infer<typeof createNovelSchema>;
+
+export const updateNovelSchema = createNovelSchema.partial().extend({
+  status: z.enum(["planning", "in_progress", "first_draft", "revising", "completed", "archived"]).optional(),
+});
+
+export type UpdateNovelInput = z.infer<typeof updateNovelSchema>;
 
 export interface Act {
   id: UUID;
