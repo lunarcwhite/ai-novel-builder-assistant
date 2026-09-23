@@ -3,14 +3,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAuth } from "@/server/auth/guards";
 import { NovelService } from "@/features/novels/service";
+import { StructureService } from "@/features/structure/service";
 import { deleteNovelAction } from "@/server/actions/novels";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { 
   ArrowLeft, 
-  BookOpen, 
-  Feather, 
   Users, 
   BrainCircuit, 
   Compass, 
@@ -21,6 +20,8 @@ import {
   BarChart3
 } from "lucide-react";
 import NovelEditDialog from "./edit-dialog";
+import OutlineTree from "@/components/outline/outline-tree";
+import { formatNumber } from "@/lib/utils";
 
 interface PageProps {
   params: Promise<{ novelId: string }>;
@@ -35,8 +36,14 @@ export default async function NovelWorkspacePage({ params }: PageProps) {
     notFound();
   }
 
+  // Retrieve complete hierarchical structure
+  const structure = await StructureService.getNovelStructureTree(novelId, user.id);
+
+  // Live word count preferring actual scene manuscript words if structured
+  const effectiveWordCount = structure.totalWords > 0 ? structure.totalWords : novel.word_count;
+
   const { progressPercent, readingTimeMinutes } = NovelService.calculateStats(
-    novel.word_count,
+    effectiveWordCount,
     novel.target_word_count
   );
 
@@ -103,7 +110,7 @@ export default async function NovelWorkspacePage({ params }: PageProps) {
                 Jumlah Kata:
               </span>
               <span className="font-semibold text-foreground">
-                {novel.word_count.toLocaleString()}
+                {formatNumber(effectiveWordCount)}
               </span>
             </div>
 
@@ -113,7 +120,7 @@ export default async function NovelWorkspacePage({ params }: PageProps) {
                 Target Kata:
               </span>
               <span className="font-semibold text-foreground">
-                {novel.target_word_count.toLocaleString()}
+                {formatNumber(novel.target_word_count)}
               </span>
             </div>
 
@@ -134,66 +141,44 @@ export default async function NovelWorkspacePage({ params }: PageProps) {
         </div>
       </div>
 
-      {/* Story Structure & Future Phase Subsystems */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Story Overview */}
-        <Card className="border-border/80 md:col-span-2">
-          <CardHeader className="p-5 pb-3">
-            <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-              <Compass className="w-4 h-4 text-primary" />
-              Fondasi Naratif Novel
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-5 pt-1 space-y-4 text-xs">
-            <div className="space-y-1">
-              <span className="font-medium text-foreground">Premis Cerita:</span>
-              <p className="text-muted-foreground leading-relaxed">
-                {novel.premise || "Belum ada premis yang ditulis. Klik tombol 'Edit Informasi' di atas untuk melengkapinya."}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-border/40">
-              <div>
-                <span className="text-muted-foreground">Tema Inti:</span>
-                <p className="font-medium text-foreground mt-0.5">{novel.theme || "—"}</p>
-              </div>
-              <div>
-                <span className="text-muted-foreground">Nada (Tone):</span>
-                <p className="font-medium text-foreground mt-0.5">{novel.tone || "—"}</p>
-              </div>
-              <div>
-                <span className="text-muted-foreground">Target Pembaca:</span>
-                <p className="font-medium text-foreground mt-0.5">{novel.target_audience || "—"}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Phase 3 Teaser: Acts & Chapters */}
-        <Card className="border-border/80">
-          <CardHeader className="p-5 pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-primary" />
-                Struktur Cerita
-              </CardTitle>
-              <Badge variant="outline" className="text-[10px]">Phase 3</Badge>
-            </div>
-          </CardHeader>
-          <CardContent className="p-5 pt-1 space-y-3 text-xs text-muted-foreground">
-            <p>
-              Hierarki Act, Chapter, dan Scene akan aktif di tahap selanjutnya (Phase 3).
+      {/* Narrative Foundation Card */}
+      <Card className="border-border/80">
+        <CardHeader className="p-5 pb-3">
+          <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+            <Compass className="w-4 h-4 text-primary" />
+            Fondasi Naratif Novel
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-5 pt-1 space-y-4 text-xs">
+          <div className="space-y-1">
+            <span className="font-medium text-foreground">Premis Cerita:</span>
+            <p className="text-muted-foreground leading-relaxed">
+              {novel.premise || "Belum ada premis yang ditulis. Klik tombol 'Edit Informasi' di atas untuk melengkapinya."}
             </p>
-            <div className="p-3 rounded-md bg-muted/40 border border-border/40 space-y-1 text-[11px]">
-              <div className="font-medium text-foreground flex items-center gap-1.5">
-                <Feather className="w-3.5 h-3.5 text-primary" />
-                Bab & Naskah
-              </div>
-              <p>Mendukung pembagian Act I, II, III dan perincian adegan demi adegan.</p>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
 
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-border/40">
+            <div>
+              <span className="text-muted-foreground">Tema Inti:</span>
+              <p className="font-medium text-foreground mt-0.5">{novel.theme || "—"}</p>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Nada (Tone):</span>
+              <p className="font-medium text-foreground mt-0.5">{novel.tone || "—"}</p>
+            </div>
+            <div>
+              <span className="text-muted-foreground">Target Pembaca:</span>
+              <p className="font-medium text-foreground mt-0.5">{novel.target_audience || "—"}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Main Narrative Structure (Phase 3 Core Feature) */}
+      <OutlineTree novelId={novel.id} structure={structure} />
+
+      {/* Future Phase Subsystems */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
         {/* Phase 5 Teaser: Character Bible */}
         <Card className="border-border/80">
           <CardHeader className="p-5 pb-3">
@@ -247,7 +232,7 @@ export default async function NovelWorkspacePage({ params }: PageProps) {
               <span>Naskah Aman & Terisolasi</span>
             </div>
             <p className="text-[11px]">
-              Setiap perubahan selalu diverifikasi kepemilikannya oleh sistem.
+              Setiap babak, bab, dan adegan diverifikasi kepemilikannya sebelum disimpan.
             </p>
           </CardContent>
         </Card>

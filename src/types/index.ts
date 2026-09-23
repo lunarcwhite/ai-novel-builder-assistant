@@ -7,6 +7,7 @@ import { z } from "zod";
 
 export type UUID = string;
 
+// Novel Domain
 export type NovelStatus = "planning" | "in_progress" | "first_draft" | "revising" | "completed" | "archived";
 
 export interface Novel {
@@ -46,49 +47,115 @@ export const updateNovelSchema = createNovelSchema.partial().extend({
 
 export type UpdateNovelInput = z.infer<typeof updateNovelSchema>;
 
+// Act Domain (Babak Cerita)
 export interface Act {
   id: UUID;
   novel_id: UUID;
   title: string;
-  act_number: number;
-  order_index: number;
-  summary?: string | null;
+  description?: string | null;
+  position: number;
   created_at: string;
   updated_at: string;
 }
+
+export const createActSchema = z.object({
+  title: z.string().min(1, "Judul babak/act wajib diisi").max(150, "Judul maksimal 150 karakter"),
+  description: z.string().optional().nullable(),
+});
+
+export type CreateActInput = z.infer<typeof createActSchema>;
+
+export const updateActSchema = createActSchema.partial();
+export type UpdateActInput = z.infer<typeof updateActSchema>;
+
+// Chapter Domain (Bab Cerita)
+export type ChapterStatus = "planned" | "draft" | "in_progress" | "completed" | "revising";
 
 export interface Chapter {
   id: UUID;
   novel_id: UUID;
   act_id?: UUID | null;
-  chapter_number: number;
-  order_index: number;
   title: string;
   summary?: string | null;
-  status: "draft" | "in_review" | "completed";
+  objective?: string | null;
+  conflict?: string | null;
+  emotional_beat?: string | null;
+  outcome?: string | null;
+  position: number;
+  status: ChapterStatus;
   word_count: number;
   created_at: string;
   updated_at: string;
 }
+
+export const createChapterSchema = z.object({
+  title: z.string().min(1, "Judul bab wajib diisi").max(150, "Judul bab maksimal 150 karakter"),
+  act_id: z.string().optional().nullable(),
+  summary: z.string().optional().nullable(),
+  objective: z.string().optional().nullable(),
+  conflict: z.string().optional().nullable(),
+  emotional_beat: z.string().optional().nullable(),
+  outcome: z.string().optional().nullable(),
+  status: z.enum(["planned", "draft", "in_progress", "completed", "revising"]).default("planned"),
+});
+
+export type CreateChapterInput = z.infer<typeof createChapterSchema>;
+
+export const updateChapterSchema = createChapterSchema.partial();
+export type UpdateChapterInput = z.infer<typeof updateChapterSchema>;
+
+// Scene Domain (Adegan Naskah)
+export type SceneStatus = "planned" | "draft" | "in_progress" | "completed" | "revising";
 
 export interface Scene {
   id: UUID;
   novel_id: UUID;
   chapter_id: UUID;
-  order_index: number;
   title: string;
-  slug?: string | null;
+  summary?: string | null;
+  purpose?: string | null;
   pov_character_id?: UUID | null;
   location_id?: UUID | null;
-  timeline_order: number;
-  content_json?: Record<string, unknown> | null;
-  content_text?: string | null;
+  position: number;
+  status: SceneStatus;
+  content?: string | null;
   word_count: number;
-  status: "draft" | "review" | "final";
   created_at: string;
   updated_at: string;
 }
 
+export const createSceneSchema = z.object({
+  title: z.string().min(1, "Judul adegan wajib diisi").max(150, "Judul adegan maksimal 150 karakter"),
+  chapter_id: z.string().min(1, "Bab harus dipilih"),
+  summary: z.string().optional().nullable(),
+  purpose: z.string().optional().nullable(),
+  status: z.enum(["planned", "draft", "in_progress", "completed", "revising"]).default("planned"),
+});
+
+export type CreateSceneInput = z.infer<typeof createSceneSchema>;
+
+export const updateSceneSchema = createSceneSchema.partial();
+export type UpdateSceneInput = z.infer<typeof updateSceneSchema>;
+
+// Composite Hierarchy Tree Types (for Outline View)
+export interface ChapterWithScenes extends Chapter {
+  scenes: Scene[];
+}
+
+export interface ActWithChapters extends Act {
+  chapters: ChapterWithScenes[];
+}
+
+export interface NovelStructureTree {
+  acts: ActWithChapters[];
+  unassignedChapters: ChapterWithScenes[];
+  totalActs: number;
+  totalChapters: number;
+  totalScenes: number;
+  totalWords: number;
+}
+
+// Future Domains (Phase 5 & 6 Placeholders)
 export interface Character {
   id: UUID;
   novel_id: UUID;
