@@ -129,6 +129,8 @@ export const createSceneSchema = z.object({
   chapter_id: z.string().min(1, "Bab harus dipilih"),
   summary: z.string().optional().nullable(),
   purpose: z.string().optional().nullable(),
+  pov_character_id: z.string().optional().nullable(),
+  location_id: z.string().optional().nullable(),
   status: z.enum(["planned", "draft", "in_progress", "completed", "revising"]).default("planned"),
 });
 
@@ -180,23 +182,212 @@ export interface NovelStructureTree {
   totalWords: number;
 }
 
-// Future Domains (Phase 5 & 6 Placeholders)
+// -------------------------------------------------------------
+// Phase 5 — Characters & World Domains
+// -------------------------------------------------------------
+
+// 1. Characters Domain
+export type CharacterRole = "protagonist" | "antagonist" | "deuteragonist" | "supporting" | "minor";
+
 export interface Character {
   id: UUID;
   novel_id: UUID;
   name: string;
-  full_name?: string | null;
-  role: "protagonist" | "antagonist" | "deuteragonist" | "supporting" | "minor";
-  archetype?: string | null;
-  short_description?: string | null;
-  background?: string | null;
+  role: CharacterRole;
+  age?: string | null;
+  occupation?: string | null;
+  description?: string | null;
+  personality?: string | null;
+  motivation?: string | null;
   goal?: string | null;
-  internal_conflict?: string | null;
-  external_conflict?: string | null;
+  fear?: string | null;
+  strengths?: string | null;
+  weaknesses?: string | null;
+  secret?: string | null;
+  backstory?: string | null;
+  character_arc?: string | null;
   created_at: string;
   updated_at: string;
 }
 
+export const createCharacterSchema = z.object({
+  name: z.string().min(1, "Nama karakter wajib diisi").max(100, "Nama maksimal 100 karakter"),
+  role: z.enum(["protagonist", "antagonist", "deuteragonist", "supporting", "minor"]).default("supporting"),
+  age: z.string().max(50, "Usia maksimal 50 karakter").optional().nullable(),
+  occupation: z.string().max(100, "Profesi maksimal 100 karakter").optional().nullable(),
+  description: z.string().optional().nullable(),
+  personality: z.string().optional().nullable(),
+  motivation: z.string().optional().nullable(),
+  goal: z.string().optional().nullable(),
+  fear: z.string().optional().nullable(),
+  strengths: z.string().optional().nullable(),
+  weaknesses: z.string().optional().nullable(),
+  secret: z.string().optional().nullable(),
+  backstory: z.string().optional().nullable(),
+  character_arc: z.string().optional().nullable(),
+});
+
+export type CreateCharacterInput = z.infer<typeof createCharacterSchema>;
+
+export const updateCharacterSchema = createCharacterSchema.partial();
+export type UpdateCharacterInput = z.infer<typeof updateCharacterSchema>;
+
+// 2. Character Relationships Domain
+export type RelationshipType =
+  | "ally"
+  | "rival"
+  | "enemy"
+  | "mentor"
+  | "family"
+  | "love_interest"
+  | "friend"
+  | "custom";
+
+export interface CharacterRelationship {
+  id: UUID;
+  novel_id: UUID;
+  from_character_id: UUID;
+  to_character_id: UUID;
+  relationship_type: RelationshipType;
+  description?: string | null;
+  history?: string | null;
+  current_state?: string | null;
+  from_character_name?: string;
+  to_character_name?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export const createRelationshipSchema = z
+  .object({
+    from_character_id: z.string().min(1, "Karakter asal harus dipilih"),
+    to_character_id: z.string().min(1, "Karakter target harus dipilih"),
+    relationship_type: z
+      .enum(["ally", "rival", "enemy", "mentor", "family", "love_interest", "friend", "custom"])
+      .default("friend"),
+    description: z.string().optional().nullable(),
+    history: z.string().optional().nullable(),
+    current_state: z.string().optional().nullable(),
+  })
+  .refine((data) => data.from_character_id !== data.to_character_id, {
+    message: "Karakter tidak dapat memiliki relasi dengan dirinya sendiri",
+    path: ["to_character_id"],
+  });
+
+export type CreateRelationshipInput = z.infer<typeof createRelationshipSchema>;
+
+export const updateRelationshipSchema = z.object({
+  relationship_type: z
+    .enum(["ally", "rival", "enemy", "mentor", "family", "love_interest", "friend", "custom"])
+    .optional(),
+  description: z.string().optional().nullable(),
+  history: z.string().optional().nullable(),
+  current_state: z.string().optional().nullable(),
+});
+
+export type UpdateRelationshipInput = z.infer<typeof updateRelationshipSchema>;
+
+// 3. Locations Domain
+export interface Location {
+  id: UUID;
+  novel_id: UUID;
+  name: string;
+  description?: string | null;
+  geography?: string | null;
+  atmosphere?: string | null;
+  notes?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export const createLocationSchema = z.object({
+  name: z.string().min(1, "Nama lokasi wajib diisi").max(120, "Nama lokasi maksimal 120 karakter"),
+  description: z.string().optional().nullable(),
+  geography: z.string().optional().nullable(),
+  atmosphere: z.string().optional().nullable(),
+  notes: z.string().optional().nullable(),
+});
+
+export type CreateLocationInput = z.infer<typeof createLocationSchema>;
+
+export const updateLocationSchema = createLocationSchema.partial();
+export type UpdateLocationInput = z.infer<typeof updateLocationSchema>;
+
+// 4. World Rules Domain
+export interface WorldRule {
+  id: UUID;
+  novel_id: UUID;
+  title: string;
+  rule: string;
+  description?: string | null;
+  importance: number; // 1 to 5
+  created_at: string;
+  updated_at: string;
+}
+
+export const createWorldRuleSchema = z.object({
+  title: z.string().min(1, "Judul aturan wajib diisi").max(150, "Judul aturan maksimal 150 karakter"),
+  rule: z.string().min(1, "Isi kaidah/aturan wajib diisi"),
+  description: z.string().optional().nullable(),
+  importance: z.coerce.number().int().min(1).max(5).default(3),
+});
+
+export type CreateWorldRuleInput = z.infer<typeof createWorldRuleSchema>;
+
+export const updateWorldRuleSchema = createWorldRuleSchema.partial();
+export type UpdateWorldRuleInput = z.infer<typeof updateWorldRuleSchema>;
+
+// 5. World Lore Domain
+export interface WorldLore {
+  id: UUID;
+  novel_id: UUID;
+  category: string;
+  title: string;
+  content: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export const createWorldLoreSchema = z.object({
+  category: z.string().min(1, "Kategori wajib diisi").default("general"),
+  title: z.string().min(1, "Judul lore wajib diisi").max(150, "Judul lore maksimal 150 karakter"),
+  content: z.string().min(1, "Konten lore wajib diisi"),
+});
+
+export type CreateWorldLoreInput = z.infer<typeof createWorldLoreSchema>;
+
+export const updateWorldLoreSchema = createWorldLoreSchema.partial();
+export type UpdateWorldLoreInput = z.infer<typeof updateWorldLoreSchema>;
+
+// 6. Scene Context & Linking Domain
+export interface SceneCharacter {
+  id: UUID;
+  novel_id: UUID;
+  scene_id: UUID;
+  character_id: UUID;
+  role_in_scene?: string | null;
+  created_at: string;
+}
+
+export interface SceneContextData {
+  pov_character_id?: UUID | null;
+  pov_character?: Character | null;
+  location_id?: UUID | null;
+  location?: Location | null;
+  involved_characters: Character[];
+}
+
+export const updateSceneContextSchema = z.object({
+  pov_character_id: z.string().uuid().nullable().optional(),
+  location_id: z.string().uuid().nullable().optional(),
+  character_ids: z.array(z.string().uuid()).default([]),
+});
+
+export type UpdateSceneContextInput = z.infer<typeof updateSceneContextSchema>;
+
+// -------------------------------------------------------------
+// Future Phase 6 Placeholder (Story Memory)
+// -------------------------------------------------------------
 export interface StoryMemory {
   id: UUID;
   novel_id: UUID;

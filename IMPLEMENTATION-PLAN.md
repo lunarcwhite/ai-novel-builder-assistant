@@ -684,7 +684,7 @@ If this is not reliable, do not proceed to AI.
 
 ---
 
-# PHASE 5 — Characters & World
+# PHASE 5 — Characters & World [COMPLETED]
 
 ## Goal
 
@@ -769,18 +769,19 @@ Characters involved may initially be inferred from content later; manual selecti
 
 ---
 
-## PHASE 5 EXIT CRITERIA
+## PHASE 5 EXIT CRITERIA [VERIFIED]
 
 User can construct:
 
 ```text
-Characters
-Relationships
-Locations
-World Rules
+[x] Characters (CRUD, Psychological Profile, 3-Stage Arc, Manuscript Appearances)
+[x] Relationships (Bidirectional links, Relationship Types, Dynamic State)
+[x] Locations (CRUD, Atmosphere, Significance, Linked Scenes)
+[x] World Rules (CRUD, Strictness/Importance Levels 1–5, Limitations)
+[x] World Lore (Lore Articles, Categories, Cross-tags)
 ```
 
-and connect them to scenes.
+and connect them to scenes (POV Character, Primary Location, Characters Involved in Scene Context Inspector).
 
 ---
 

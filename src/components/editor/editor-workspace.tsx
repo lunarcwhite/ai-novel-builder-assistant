@@ -1,20 +1,34 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import type { Scene, Chapter, Novel, NovelStructureTree, SceneVersion } from "@/types";
+import type {
+  Scene,
+  Chapter,
+  Novel,
+  NovelStructureTree,
+  SceneVersion,
+  Character,
+  Location,
+  SceneContextData,
+} from "@/types";
 import { saveSceneContentAction } from "@/server/actions/editor";
+import { updateSceneContextAction } from "@/server/actions/characters";
 import TipTapEditor from "./tiptap-editor";
 import SceneNavigator from "./scene-navigator";
 import AIPanelPlaceholder from "./ai-panel-placeholder";
 import EditorHeader, { SaveStatus } from "./editor-header";
 import VersionHistoryDrawer from "./version-history-drawer";
-import { formatNumber } from "@/lib/utils";
+import { formatNumber, cn } from "@/lib/utils";
 import {
   Minimize2,
   Info,
   CheckCircle2,
   ChevronDown,
   ChevronUp,
+  Users,
+  MapPin,
+  Check,
+  Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -24,6 +38,9 @@ interface EditorWorkspaceProps {
   scene: Scene;
   structure: NovelStructureTree;
   initialVersions: SceneVersion[];
+  characters?: Character[];
+  locations?: Location[];
+  initialContext?: SceneContextData;
 }
 
 export default function EditorWorkspace({
@@ -32,12 +49,28 @@ export default function EditorWorkspace({
   scene,
   structure,
   initialVersions,
+  characters = [],
+  locations = [],
+  initialContext,
 }: EditorWorkspaceProps) {
   // Manuscript Content & Metrics State
   const [content, setContent] = useState<string>(scene.content || "");
   const [sceneWordCount, setSceneWordCount] = useState<number>(scene.word_count || 0);
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("saved");
   const [lastSavedAt, setLastSavedAt] = useState<Date | null>(new Date(scene.updated_at));
+
+  // Scene Context Linking State (Phase 5)
+  const [povCharId, setPovCharId] = useState<string>(
+    initialContext?.pov_character_id || scene.pov_character_id || ""
+  );
+  const [locationId, setLocationId] = useState<string>(
+    initialContext?.location_id || scene.location_id || ""
+  );
+  const [involvedCharIds, setInvolvedCharIds] = useState<string[]>(
+    initialContext?.involved_characters.map((c) => c.id) || []
+  );
+  const [isSavingContext, setIsSavingContext] = useState<boolean>(false);
+  const [contextSavedNotice, setContextSavedNotice] = useState<boolean>(false);
 
   // Local draft recovery state
   const [recoveredDraft, setRecoveredDraft] = useState<string | null>(null);
@@ -125,6 +158,30 @@ export default function EditorWorkspace({
     executeSave(latestContentRef.current);
   };
 
+  // Phase 5: Scene Context Linking Handler
+  const handleSaveSceneContext = async (
+    newPov: string,
+    newLoc: string,
+    newInvolved: string[]
+  ) => {
+    setIsSavingContext(true);
+    try {
+      const res = await updateSceneContextAction(novel.id, scene.id, {
+        pov_character_id: newPov || null,
+        location_id: newLoc || null,
+        character_ids: newInvolved,
+      });
+      if (res.success) {
+        setContextSavedNotice(true);
+        setTimeout(() => setContextSavedNotice(false), 2500);
+      }
+    } catch {
+      // ignore
+    } finally {
+      setIsSavingContext(false);
+    }
+  };
+
   // Keyboard shortcut for Focus Mode (Escape to exit)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -145,6 +202,9 @@ export default function EditorWorkspace({
     0,
     (structure.totalWords || novel.word_count) - (scene.word_count || 0) + sceneWordCount
   );
+
+  const currentPovChar = characters.find((c) => c.id === povCharId);
+  const currentLoc = locations.find((l) => l.id === locationId);
 
   return (
     <div className="relative flex flex-col h-[calc(100vh-4rem)] -m-4 sm:-m-8 bg-background overflow-hidden">
@@ -254,19 +314,42 @@ export default function EditorWorkspace({
             {!isFocusMode && (
               <div className="space-y-3 pb-6 border-b border-border/60">
                 <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2">
-                  <div className="space-y-1">
+                  <div className="space-y-1.5">
                     <span className="text-xs uppercase tracking-widest text-muted-foreground font-serif">
                       {chapter.title}
                     </span>
                     <h1 className="text-2xl sm:text-3xl font-serif font-medium text-foreground tracking-tight">
                       {scene.title}
                     </h1>
+
+                    {/* Context Badges (POV & Location) */}
+                    {(currentPovChar || currentLoc || involvedCharIds.length > 0) && (
+                      <div className="flex items-center gap-2 flex-wrap text-xs pt-0.5">
+                        {currentPovChar && (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-accent/15 text-accent text-[11px] font-medium border border-accent/30">
+                            <Users className="w-3 h-3" />
+                            <span>POV: {currentPovChar.name}</span>
+                          </span>
+                        )}
+                        {currentLoc && (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-muted/70 text-muted-foreground text-[11px] font-medium border border-border/60">
+                            <MapPin className="w-3 h-3 text-primary" />
+                            <span>{currentLoc.name}</span>
+                          </span>
+                        )}
+                        {involvedCharIds.length > 0 && (
+                          <span className="text-[11px] text-muted-foreground">
+                            • {involvedCharIds.length} karakter terlibat
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   <button
                     type="button"
                     onClick={() => setShowSceneDetails(!showSceneDetails)}
-                    className="text-xs text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1 self-start sm:self-auto"
+                    className="text-xs text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1 self-start sm:self-auto shrink-0"
                   >
                     <span>Detail Adegan</span>
                     {showSceneDetails ? (
@@ -277,9 +360,9 @@ export default function EditorWorkspace({
                   </button>
                 </div>
 
-                {/* Collapsible Scene Info / Purpose Card */}
+                {/* Collapsible Scene Info & Context Linking Card */}
                 {showSceneDetails && (
-                  <div className="p-3.5 rounded-lg bg-muted/30 border border-border/60 space-y-2 text-xs text-muted-foreground animate-in fade-in">
+                  <div className="p-4 rounded-lg bg-muted/30 border border-border/60 space-y-4 text-xs text-muted-foreground animate-in fade-in">
                     {scene.purpose && (
                       <div>
                         <span className="font-semibold text-foreground">Tujuan Adegan:</span>
@@ -292,6 +375,113 @@ export default function EditorWorkspace({
                         <p className="mt-0.5 leading-relaxed italic">{scene.summary}</p>
                       </div>
                     )}
+
+                    {/* Phase 5: Scene Context Linking Controls */}
+                    <div className="pt-3 border-t border-border/50 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="text-[11px] font-semibold uppercase tracking-wider text-foreground flex items-center gap-1.5">
+                          <Sparkles className="w-3.5 h-3.5 text-primary" />
+                          <span>Konteks Adegan (Tautan Karakter & Lokasi)</span>
+                        </div>
+                        {contextSavedNotice && (
+                          <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1 animate-in fade-in">
+                            <Check className="w-3 h-3" />
+                            Konteks diperbarui
+                          </span>
+                        )}
+                        {isSavingContext && (
+                          <span className="text-[10px] text-muted-foreground">Menyimpan...</span>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {/* POV Selector */}
+                        <div className="space-y-1">
+                          <label className="text-[11px] font-medium text-foreground">
+                            Karakter Sudut Pandang (POV)
+                          </label>
+                          <select
+                            value={povCharId}
+                            disabled={isSavingContext}
+                            onChange={(e) => {
+                              const newPov = e.target.value;
+                              setPovCharId(newPov);
+                              handleSaveSceneContext(newPov, locationId, involvedCharIds);
+                            }}
+                            className="w-full h-8 px-2.5 rounded-md border border-input bg-background text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                          >
+                            <option value="">— Belum Ditentukan —</option>
+                            {characters.map((c) => (
+                              <option key={c.id} value={c.id}>
+                                {c.name} ({c.role})
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Location Selector */}
+                        <div className="space-y-1">
+                          <label className="text-[11px] font-medium text-foreground">
+                            Lokasi Kejadian
+                          </label>
+                          <select
+                            value={locationId}
+                            disabled={isSavingContext}
+                            onChange={(e) => {
+                              const newLoc = e.target.value;
+                              setLocationId(newLoc);
+                              handleSaveSceneContext(povCharId, newLoc, involvedCharIds);
+                            }}
+                            className="w-full h-8 px-2.5 rounded-md border border-input bg-background text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                          >
+                            <option value="">— Belum Ditentukan —</option>
+                            {locations.map((l) => (
+                              <option key={l.id} value={l.id}>
+                                {l.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Involved Characters Multi-Toggle */}
+                      {characters.length > 0 && (
+                        <div className="space-y-1.5 pt-1">
+                          <label className="text-[11px] font-medium text-foreground">
+                            Karakter yang Terlibat / Hadir di Adegan Ini:
+                          </label>
+                          <div className="flex flex-wrap gap-1.5">
+                            {characters.map((c) => {
+                              const isPresent = involvedCharIds.includes(c.id);
+                              return (
+                                <button
+                                  key={c.id}
+                                  type="button"
+                                  disabled={isSavingContext}
+                                  onClick={() => {
+                                    const nextInvolved = isPresent
+                                      ? involvedCharIds.filter((id) => id !== c.id)
+                                      : [...involvedCharIds, c.id];
+                                    setInvolvedCharIds(nextInvolved);
+                                    handleSaveSceneContext(povCharId, locationId, nextInvolved);
+                                  }}
+                                  className={cn(
+                                    "px-2.5 py-1 rounded-md text-[11px] font-medium transition-all flex items-center gap-1.5 border",
+                                    isPresent
+                                      ? "bg-primary text-primary-foreground border-primary shadow-subtle"
+                                      : "bg-muted/40 text-muted-foreground hover:text-foreground border-border/70 hover:bg-muted/70"
+                                  )}
+                                >
+                                  {isPresent && <Check className="w-3 h-3" />}
+                                  <span>{c.name}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
                     <div className="pt-2 border-t border-border/40 flex flex-wrap gap-4 text-[11px]">
                       <span>Status: <strong className="capitalize text-foreground">{scene.status}</strong></span>
                       <span>Total Bab: <strong className="text-foreground">{formatNumber(chapterEffectiveWords)} kata</strong></span>

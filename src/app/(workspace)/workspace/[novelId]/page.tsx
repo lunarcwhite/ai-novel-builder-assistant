@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import { requireAuth } from "@/server/auth/guards";
 import { NovelService } from "@/features/novels/service";
 import { StructureService } from "@/features/structure/service";
+import { CharacterService } from "@/features/characters/service";
+import { WorldService } from "@/features/world/service";
 import { deleteNovelAction } from "@/server/actions/novels";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -16,12 +18,14 @@ import {
   FileText, 
   Trash2, 
   CheckCircle2, 
-  Sparkles,
   BarChart3,
-  Feather
+  Feather,
+  Globe,
+  ArrowRight
 } from "lucide-react";
 import NovelEditDialog from "./edit-dialog";
 import OutlineTree from "@/components/outline/outline-tree";
+import NovelNavigationBar from "@/components/novel-navigation-bar";
 import { formatNumber } from "@/lib/utils";
 
 interface PageProps {
@@ -37,8 +41,13 @@ export default async function NovelWorkspacePage({ params }: PageProps) {
     notFound();
   }
 
-  // Retrieve complete hierarchical structure
-  const structure = await StructureService.getNovelStructureTree(novelId, user.id);
+  // Retrieve complete hierarchical structure & story knowledge in parallel
+  const [structure, characters, locations, worldRules] = await Promise.all([
+    StructureService.getNovelStructureTree(novelId, user.id),
+    CharacterService.getCharacters(novelId, user.id),
+    WorldService.getLocations(novelId, user.id),
+    WorldService.getWorldRules(novelId, user.id),
+  ]);
 
   // First available scene for quick continue writing
   const firstScene =
@@ -53,8 +62,11 @@ export default async function NovelWorkspacePage({ params }: PageProps) {
     novel.target_word_count
   );
 
+  const protagonist = characters.find((c) => c.role === "protagonist");
+  const antagonist = characters.find((c) => c.role === "antagonist");
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Top Breadcrumb & Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -81,6 +93,9 @@ export default async function NovelWorkspacePage({ params }: PageProps) {
           </form>
         </div>
       </div>
+
+      {/* Sub-Navigation Bar */}
+      <NovelNavigationBar novelId={novel.id} firstSceneId={firstScene?.id} />
 
       {/* Novel Master Header Card */}
       <div className="rounded-xl border border-border/80 bg-card p-6 md:p-8 shadow-paper relative overflow-hidden">
@@ -195,28 +210,89 @@ export default async function NovelWorkspacePage({ params }: PageProps) {
       {/* Main Narrative Structure (Phase 3 Core Feature) */}
       <OutlineTree novelId={novel.id} structure={structure} />
 
-      {/* Future Phase Subsystems */}
+      {/* Story Knowledge & Bible Subsystems (Phase 5 Active) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
-        {/* Phase 5 Teaser: Character Bible */}
-        <Card className="border-border/80">
+        {/* Character Studio Card (Phase 5 Active) */}
+        <Card className="border-border/80 flex flex-col justify-between shadow-subtle hover:border-accent/60 transition-all">
           <CardHeader className="p-5 pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
                 <Users className="w-4 h-4 text-primary" />
-                Character Bible
+                Character Studio
               </CardTitle>
-              <Badge variant="outline" className="text-[10px]">Phase 5</Badge>
+              <Badge variant="accent" className="text-[10px]">Aktif</Badge>
             </div>
           </CardHeader>
-          <CardContent className="p-5 pt-1 space-y-2 text-xs text-muted-foreground">
-            <p>
-              Pelacak tokoh, motivasi, peta relasi antar karakter, dan POV.
-            </p>
+          <CardContent className="p-5 pt-1 space-y-3 text-xs flex-1 flex flex-col justify-between">
+            <div className="space-y-2 text-muted-foreground">
+              <p>
+                {characters.length > 0
+                  ? `Tersedia ${characters.length} tokoh cerita dengan busur karakter dan peta relasi.`
+                  : "Mulai rancang tokoh cerita, motivasi, dan busur emosional."}
+              </p>
+              {protagonist && (
+                <div className="text-[11px] text-foreground">
+                  <span className="text-muted-foreground">Protagonis:</span> {protagonist.name}
+                  {antagonist && (
+                    <>
+                      {" "}• <span className="text-muted-foreground">Antagonis:</span> {antagonist.name}
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="pt-2 border-t border-border/40">
+              <Link
+                href={`/workspace/${novel.id}/characters`}
+                className="inline-flex items-center gap-1.5 text-xs text-primary font-medium hover:underline"
+              >
+                <span>Buka Character Studio</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
           </CardContent>
         </Card>
 
-        {/* Phase 6 Teaser: Story Memory */}
-        <Card className="border-border/80">
+        {/* Worldbuilding Studio Card (Phase 5 Active) */}
+        <Card className="border-border/80 flex flex-col justify-between shadow-subtle hover:border-accent/60 transition-all">
+          <CardHeader className="p-5 pb-3">
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
+                <Globe className="w-4 h-4 text-primary" />
+                World Studio
+              </CardTitle>
+              <Badge variant="accent" className="text-[10px]">Aktif</Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="p-5 pt-1 space-y-3 text-xs flex-1 flex flex-col justify-between">
+            <div className="space-y-2 text-muted-foreground">
+              <p>
+                {locations.length > 0 || worldRules.length > 0
+                  ? `${locations.length} lokasi geografis dan ${worldRules.length} aturan dunia tersimpan.`
+                  : "Katalog lokasi, hukum semesta cerita, dan ensiklopedia lore."}
+              </p>
+              <div className="flex items-center gap-3 text-[11px] text-foreground">
+                <span>{locations.length} Lokasi</span>
+                <span>•</span>
+                <span>{worldRules.length} Aturan Dunia</span>
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-border/40">
+              <Link
+                href={`/workspace/${novel.id}/world`}
+                className="inline-flex items-center gap-1.5 text-xs text-primary font-medium hover:underline"
+              >
+                <span>Buka World Studio</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Phase 6 Teaser: Story Memory & Safety */}
+        <Card className="border-border/80 flex flex-col justify-between">
           <CardHeader className="p-5 pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
@@ -226,35 +302,19 @@ export default async function NovelWorkspacePage({ params }: PageProps) {
               <Badge variant="outline" className="text-[10px]">Phase 6</Badge>
             </div>
           </CardHeader>
-          <CardContent className="p-5 pt-1 space-y-2 text-xs text-muted-foreground">
+          <CardContent className="p-5 pt-1 space-y-3 text-xs text-muted-foreground flex-1 flex flex-col justify-between">
             <p>
-              Penyimpanan fakta dunia, hukum sihir/lore, dan kronologi kejadian naskah.
+              Penyimpanan fakta dinamis dunia, hukum lore, dan kronologi kejadian naskah berbasis retrieval semantik.
             </p>
-          </CardContent>
-        </Card>
 
-        {/* Manuscript Safety info */}
-        <Card className="border-border/80">
-          <CardHeader className="p-5 pb-3">
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-primary" />
-                Manuscript Safety
-              </CardTitle>
-              <Badge variant="outline" className="text-[10px]">Aktif</Badge>
+            <div className="pt-2 border-t border-border/40 flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium text-[11px]">
+              <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+              <span>Naskah & Entitas Aman</span>
             </div>
-          </CardHeader>
-          <CardContent className="p-5 pt-1 space-y-2 text-xs text-muted-foreground">
-            <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium">
-              <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>Naskah Aman & Terisolasi</span>
-            </div>
-            <p className="text-[11px]">
-              Setiap babak, bab, dan adegan diverifikasi kepemilikannya sebelum disimpan.
-            </p>
           </CardContent>
         </Card>
       </div>
     </div>
   );
 }
+

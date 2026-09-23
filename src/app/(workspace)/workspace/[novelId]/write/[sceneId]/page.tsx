@@ -5,6 +5,8 @@ import { NovelService } from "@/features/novels/service";
 import { ChapterService } from "@/features/chapters/service";
 import { SceneService } from "@/features/scenes/service";
 import { StructureService } from "@/features/structure/service";
+import { CharacterService } from "@/features/characters/service";
+import { WorldService } from "@/features/world/service";
 import EditorWorkspace from "@/components/editor/editor-workspace";
 
 interface SceneEditorPageProps {
@@ -39,6 +41,13 @@ export default async function SceneEditorPage({ params }: SceneEditorPageProps) 
   // 5. Fetch initial version snapshots for this scene
   const initialVersions = await SceneService.getSceneVersions(sceneId, novelId, user.id);
 
+  // 6. Fetch Characters, Locations, and current Scene Context (Phase 5 Linking)
+  const [characters, locations, sceneContext] = await Promise.all([
+    CharacterService.getCharacters(novelId, user.id),
+    WorldService.getLocations(novelId, user.id),
+    CharacterService.getSceneContext(sceneId, novelId, user.id),
+  ]);
+
   return (
     <EditorWorkspace
       novel={novel}
@@ -46,6 +55,9 @@ export default async function SceneEditorPage({ params }: SceneEditorPageProps) 
       scene={scene}
       structure={structure}
       initialVersions={initialVersions}
+      characters={characters}
+      locations={locations}
+      initialContext={sceneContext}
     />
   );
 }

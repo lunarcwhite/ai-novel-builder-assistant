@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 
-export async function POST(request: NextRequest) {
+async function handleDemoAuth(request: NextRequest) {
   const cookieStore = await cookies();
   const demoUser = {
     id: "usr_demo_author_01",
@@ -16,6 +16,15 @@ export async function POST(request: NextRequest) {
     sameSite: "lax",
   });
 
-  const redirectUrl = new URL("/workspace", request.url);
+  const redirectTo = request.nextUrl.searchParams.get("redirectTo") || "/workspace";
+  const redirectUrl = new URL(redirectTo, request.url);
   return NextResponse.redirect(redirectUrl, 303);
+}
+
+export async function POST(request: NextRequest) {
+  return handleDemoAuth(request);
+}
+
+export async function GET(request: NextRequest) {
+  return handleDemoAuth(request);
 }
