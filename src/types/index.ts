@@ -499,3 +499,127 @@ export interface MemoryDeduplicationCheckResult {
   warningMessage?: string;
 }
 
+// -------------------------------------------------------------
+// Phase 7 Domain: AI Assistant
+// -------------------------------------------------------------
+
+export type AIOperation =
+  | "brainstorm"
+  | "continue_scene"
+  | "rewrite"
+  | "expand"
+  | "shorten"
+  | "improve_prose"
+  | "improve_dialogue"
+  | "summarize"
+  | "critique"
+  | "ask";
+
+export const aiOperationSchema = z.enum([
+  "brainstorm",
+  "continue_scene",
+  "rewrite",
+  "expand",
+  "shorten",
+  "improve_prose",
+  "improve_dialogue",
+  "summarize",
+  "critique",
+  "ask",
+]);
+
+export type AIOperationInput = z.infer<typeof aiOperationSchema>;
+
+export const askAISchema = z.object({
+  operation: aiOperationSchema,
+  userQuery: z
+    .string()
+    .min(1, "Pertanyaan atau instruksi wajib diisi.")
+    .max(2000, "Instruksi maksimal 2.000 karakter."),
+  selectedText: z.string().max(8000, "Teks terpilih maksimal 8.000 karakter.").optional().nullable(),
+  conversationId: z.string().min(1).max(100).nullable().optional(),
+});
+
+export type AskAIInput = z.infer<typeof askAISchema>;
+
+export const applySuggestionSchema = z.object({
+  mode: z.enum(["insert", "replace"]),
+  finalContent: z
+    .string()
+    .min(1, "Konten akhir tidak boleh kosong.")
+    .max(200000, "Konten akhir terlalu besar."),
+  operation: aiOperationSchema.optional(),
+});
+
+export type ApplySuggestionInput = z.infer<typeof applySuggestionSchema>;
+
+export type AIMessageRole = "system" | "user" | "assistant";
+
+export interface AIConversation {
+  id: UUID;
+  novel_id: UUID;
+  user_id: UUID;
+  title?: string | null;
+  context: {
+    chapter_id?: UUID;
+    scene_id?: UUID;
+    selected_text?: boolean;
+    operation?: AIOperation;
+    [key: string]: unknown;
+  };
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AIMessageRow {
+  id: UUID;
+  conversation_id: UUID;
+  role: AIMessageRole;
+  content: string;
+  metadata: {
+    operation?: AIOperation;
+    model?: string;
+    input_tokens?: number;
+    output_tokens?: number;
+    scene_id?: UUID;
+    chapter_id?: UUID;
+    [key: string]: unknown;
+  };
+  created_at: string;
+}
+
+export interface AIUsageLog {
+  id: UUID;
+  user_id: UUID;
+  novel_id?: UUID | null;
+  provider: string;
+  model: string;
+  operation: string;
+  input_tokens: number;
+  output_tokens: number;
+  estimated_cost?: number | null;
+  latency_ms?: number | null;
+  status: string;
+  created_at: string;
+}
+
+export interface AIUsageStats {
+  totalRequests: number;
+  totalInputTokens: number;
+  totalOutputTokens: number;
+  totalEstimatedCost: number;
+  byOperation: Record<string, number>;
+}
+
+export interface AISuggestionResult {
+  text: string;
+  operation: AIOperation;
+  provider: string;
+  model: string;
+  inputTokens: number;
+  outputTokens: number;
+  latencyMs: number;
+  conversationId: string;
+  messageId: string;
+}
+

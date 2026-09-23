@@ -873,7 +873,7 @@ The system can:
 
 ---
 
-# PHASE 7 — AI Assistant
+# PHASE 7 — AI Assistant [COMPLETED]
 
 ## Goal
 
@@ -1043,17 +1043,17 @@ Do not log manuscript unnecessarily.
 
 User can:
 
+Implemented: `src/server/ai/` (providers, prompts, context-resolver, context-builder), `src/features/ai/` (AIService, repositories), `src/server/actions/ai.ts`, `src/components/editor/ai-assistant.tsx`, migration `008_ai_assistant.sql`.
+
 ```text
-Open scene
- ↓
-Ask AI
- ↓
-AI retrieves relevant story context
- ↓
-AI responds
- ↓
-User decides what to insert
+[x] Open scene
+[x] Ask AI (10 operations)
+[x] AI retrieves relevant story context (layered, budgeted)
+[x] AI responds (OpenAI / Anthropic / local-dev offline)
+[x] User decides: Insert / Replace / Copy / Dismiss (versioned, reversible)
 ```
+
+Verified: 67 tests pass (19 new AI), lint clean, typecheck clean, build clean.
 
 ---
 

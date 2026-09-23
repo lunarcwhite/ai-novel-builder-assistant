@@ -12,7 +12,7 @@ import type {
   SceneContextData,
   StoryMemory,
 } from "@/types";
-import { saveSceneContentAction } from "@/server/actions/editor";
+import { saveSceneContentAction, getSceneVersionsAction } from "@/server/actions/editor";
 import { updateSceneContextAction } from "@/server/actions/characters";
 import TipTapEditor from "./tiptap-editor";
 import SceneNavigator from "./scene-navigator";
@@ -20,6 +20,7 @@ import AIPanelPlaceholder from "./ai-panel-placeholder";
 import EditorHeader, { SaveStatus } from "./editor-header";
 import VersionHistoryDrawer from "./version-history-drawer";
 import { formatNumber, cn } from "@/lib/utils";
+import { countWords } from "@/lib/words";
 import {
   Minimize2,
   Info,
@@ -531,6 +532,17 @@ export default function EditorWorkspace({
             currentWordCount={sceneWordCount}
             relevantMemories={relevantMemories}
             onCollapse={() => setShowRightPanel(false)}
+            editorHtml={content}
+            onApplyContent={(finalHtml) => {
+              setContent(finalHtml);
+              setSceneWordCount(countWords(finalHtml));
+              handleEditorChange(finalHtml, countWords(finalHtml));
+              // Refresh version list so the auto-checkpoint (ai_insert/ai_replace)
+              // created by applySuggestionAction appears in the drawer.
+              getSceneVersionsAction(novel.id, scene.id).then((res) => {
+                if (res.success && res.versions) setVersions(res.versions);
+              });
+            }}
           />
         )}
       </div>

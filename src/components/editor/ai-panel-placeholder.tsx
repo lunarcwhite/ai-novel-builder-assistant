@@ -8,13 +8,12 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { formatNumber } from "@/lib/utils";
 import { quickAddSceneMemoryAction, type MemoryActionResult } from "@/server/actions/memories";
+import AIAssistant from "./ai-assistant";
 import {
   Sparkles,
   PanelRightClose,
   Compass,
-  Wand2,
   CheckCircle2,
-  Lock,
   BrainCircuit,
   Plus,
   Star,
@@ -30,6 +29,10 @@ interface AIPanelPlaceholderProps {
   currentWordCount: number;
   relevantMemories?: StoryMemory[];
   onCollapse?: () => void;
+  /** Live editor HTML — forwarded to AIAssistant for Insert/Replace. */
+  editorHtml: string;
+  /** Called after the server persists applied AI content. */
+  onApplyContent: (finalHtml: string) => void;
 }
 
 export default function AIPanelPlaceholder({
@@ -39,6 +42,8 @@ export default function AIPanelPlaceholder({
   currentWordCount,
   relevantMemories = [],
   onCollapse,
+  editorHtml,
+  onApplyContent,
 }: AIPanelPlaceholderProps) {
   const [isQuickAddOpen, setIsQuickAddOpen] = useState<boolean>(false);
   const [quickFactContent, setQuickFactContent] = useState<string>("");
@@ -241,38 +246,14 @@ export default function AIPanelPlaceholder({
           </div>
         </div>
 
-        {/* AI Assistant Teaser (Phase 7 Blueprint) */}
-        <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 space-y-3 relative overflow-hidden">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5 text-primary font-medium">
-              <Wand2 className="w-4 h-4" />
-              <span>AI Writing Companion</span>
-            </div>
-            <Lock className="w-3.5 h-3.5 text-muted-foreground" />
-          </div>
-
-          <p className="text-[11px] text-muted-foreground leading-relaxed">
-            AI Assistant akan diaktifkan di <strong>Phase 7</strong> setelah Story Memory dan Character Bible siap, sehingga setiap saran memahami konteks naskah secara utuh.
-          </p>
-
-          {/* Action teasers (disabled) */}
-          <div className="space-y-1.5 pt-2">
-            <div className="p-2 rounded bg-background/60 border border-border/50 text-[11px] text-muted-foreground flex items-center justify-between opacity-75">
-              <span>Lanjutkan Adegan</span>
-              <Badge variant="outline" className="text-[9px]">Soon</Badge>
-            </div>
-
-            <div className="p-2 rounded bg-background/60 border border-border/50 text-[11px] text-muted-foreground flex items-center justify-between opacity-75">
-              <span>Tingkatkan Dialog & Ketegangan</span>
-              <Badge variant="outline" className="text-[9px]">Soon</Badge>
-            </div>
-
-            <div className="p-2 rounded bg-background/60 border border-border/50 text-[11px] text-muted-foreground flex items-center justify-between opacity-75">
-              <span>Audit Konsistensi Karakter</span>
-              <Badge variant="outline" className="text-[9px]">Phase 8</Badge>
-            </div>
-          </div>
-        </div>
+        {/* AI Assistant (Phase 7 — live) */}
+        <AIAssistant
+          novel={novel}
+          chapter={chapter}
+          scene={scene}
+          editorHtml={editorHtml}
+          onApplyContent={onApplyContent}
+        />
 
         {/* Manuscript Safety Note */}
         <div className="p-3 rounded-lg bg-muted/40 border border-border/60 text-[11px] text-muted-foreground space-y-1.5">
