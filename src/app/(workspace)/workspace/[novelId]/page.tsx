@@ -17,7 +17,8 @@ import {
   Trash2, 
   CheckCircle2, 
   Sparkles,
-  BarChart3
+  BarChart3,
+  Feather
 } from "lucide-react";
 import NovelEditDialog from "./edit-dialog";
 import OutlineTree from "@/components/outline/outline-tree";
@@ -38,6 +39,11 @@ export default async function NovelWorkspacePage({ params }: PageProps) {
 
   // Retrieve complete hierarchical structure
   const structure = await StructureService.getNovelStructureTree(novelId, user.id);
+
+  // First available scene for quick continue writing
+  const firstScene =
+    structure.acts.flatMap((a) => a.chapters).flatMap((c) => c.scenes)[0] ||
+    structure.unassignedChapters.flatMap((c) => c.scenes)[0];
 
   // Live word count preferring actual scene manuscript words if structured
   const effectiveWordCount = structure.totalWords > 0 ? structure.totalWords : novel.word_count;
@@ -79,7 +85,7 @@ export default async function NovelWorkspacePage({ params }: PageProps) {
       {/* Novel Master Header Card */}
       <div className="rounded-xl border border-border/80 bg-card p-6 md:p-8 shadow-paper relative overflow-hidden">
         <div className="flex flex-col md:flex-row md:items-start justify-between gap-6">
-          <div className="space-y-3 max-w-2xl">
+          <div className="space-y-4 max-w-2xl">
             <div className="flex flex-wrap items-center gap-2">
               <Badge variant="accent" className="capitalize text-[10px]">
                 {novel.status.replace("_", " ")}
@@ -99,6 +105,18 @@ export default async function NovelWorkspacePage({ params }: PageProps) {
               <p className="text-sm text-muted-foreground leading-relaxed italic font-serif">
                 &ldquo;{novel.premise}&rdquo;
               </p>
+            )}
+
+            {firstScene && (
+              <div className="pt-1">
+                <Link
+                  href={`/workspace/${novel.id}/write/${firstScene.id}`}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-medium shadow-subtle transition-all group"
+                >
+                  <Feather className="w-3.5 h-3.5 group-hover:rotate-12 transition-transform" />
+                  <span>Lanjut Menulis: {firstScene.title}</span>
+                </Link>
+              </div>
             )}
           </div>
 

@@ -137,6 +137,31 @@ export type CreateSceneInput = z.infer<typeof createSceneSchema>;
 export const updateSceneSchema = createSceneSchema.partial();
 export type UpdateSceneInput = z.infer<typeof updateSceneSchema>;
 
+// Scene Version Domain (Riwayat & Snapshot Versi Naskah)
+export type ChangeType = "manual" | "ai_insert" | "ai_replace" | "restore" | "import" | "checkpoint";
+
+export interface SceneVersion {
+  id: UUID;
+  scene_id: UUID;
+  version_number: number;
+  title?: string | null;
+  content: string;
+  word_count: number;
+  created_by?: UUID | null;
+  change_type: ChangeType;
+  notes?: string | null;
+  created_at: string;
+}
+
+export const createSceneVersionSchema = z.object({
+  title: z.string().max(100, "Label versi maksimal 100 karakter").optional().nullable(),
+  content: z.string(),
+  change_type: z.enum(["manual", "ai_insert", "ai_replace", "restore", "import", "checkpoint"]).default("manual"),
+  notes: z.string().max(300, "Catatan versi maksimal 300 karakter").optional().nullable(),
+});
+
+export type CreateSceneVersionInput = z.infer<typeof createSceneVersionSchema>;
+
 // Composite Hierarchy Tree Types (for Outline View)
 export interface ChapterWithScenes extends Chapter {
   scenes: Scene[];

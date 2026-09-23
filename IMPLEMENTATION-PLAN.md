@@ -525,13 +525,13 @@ Navigate
 
 ---
 
-# PHASE 4 — Writing Editor
+# PHASE 4 — Writing Editor [COMPLETED]
 
 ## Goal
 
 User dapat benar-benar menulis novel.
 
-This is the first major product milestone.
+This is the first major product milestone. Status: **COMPLETED**.
 
 ---
 

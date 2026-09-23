@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useTransition } from "react";
+import Link from "next/link";
 import type { NovelStructureTree, Chapter, Scene } from "@/types";
 import {
   deleteActAction,
@@ -445,12 +446,16 @@ export default function OutlineTree({ novelId, structure }: OutlineTreeProps) {
                                       key={scene.id}
                                       className="p-2.5 rounded-md border border-border/50 bg-card flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs hover:border-border transition-colors"
                                     >
-                                      <div className="space-y-0.5 flex-1">
+                                      <div className="space-y-0.5 flex-1 min-w-0">
                                         <div className="flex items-center gap-2">
                                           <Feather className="w-3 h-3 text-primary shrink-0" />
-                                          <span className="font-medium text-foreground">
+                                          <Link
+                                            href={`/workspace/${novelId}/write/${scene.id}`}
+                                            className="font-medium text-foreground hover:text-primary transition-colors truncate hover:underline"
+                                            title="Tulis Naskah Adegan"
+                                          >
                                             {scene.title}
-                                          </span>
+                                          </Link>
                                           {getStatusBadge(scene.status)}
                                           <span className="text-[10px] text-muted-foreground">
                                             {formatNumber(scene.word_count)} Kata
@@ -465,7 +470,15 @@ export default function OutlineTree({ novelId, structure }: OutlineTreeProps) {
                                       </div>
 
                                       {/* Scene Actions */}
-                                      <div className="flex items-center gap-1 self-end sm:self-auto pl-5 sm:pl-0">
+                                      <div className="flex items-center gap-1.5 self-end sm:self-auto pl-5 sm:pl-0">
+                                        <Link
+                                          href={`/workspace/${novelId}/write/${scene.id}`}
+                                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-primary/10 hover:bg-primary/20 text-primary text-xs font-medium transition-colors"
+                                          title="Tulis Naskah Adegan Ini"
+                                        >
+                                          <Feather className="w-3 h-3" />
+                                          <span>Tulis</span>
+                                        </Link>
                                         <Button
                                           variant="ghost"
                                           size="sm"
