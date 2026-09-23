@@ -1,16 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import { 
   BookOpen, 
   Feather, 
   Sparkles, 
-  Layers, 
   Users, 
   BrainCircuit, 
   Clock, 
   CheckCircle2, 
-  ShieldCheck,
+  ShieldCheck, 
   Code2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -73,13 +73,16 @@ export default function HomePage() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <div className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground px-2 py-1 rounded border border-border/40">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>Stack Ready</span>
-          </div>
-          <Button size="sm" variant="default" className="text-xs">
-            Start Writing
-          </Button>
+          <Link href="/login">
+            <Button size="sm" variant="ghost" className="text-xs">
+              Masuk
+            </Button>
+          </Link>
+          <Link href="/workspace">
+            <Button size="sm" variant="default" className="text-xs">
+              Mulai Menulis
+            </Button>
+          </Link>
         </div>
       </header>
 
@@ -273,22 +276,22 @@ export default function HomePage() {
                 </CardHeader>
               </Card>
 
-              <Card className="border-border">
+              <Card className="border-primary/40 bg-primary/5">
                 <CardHeader className="p-5 pb-3">
                   <div className="flex items-center justify-between">
-                    <Badge variant="outline" className="text-xs">Phase 1 • Next Up</Badge>
-                    <Clock className="w-4 h-4 text-muted-foreground" />
+                    <Badge variant="default" className="text-xs">Phase 1 • Completed</Badge>
+                    <CheckCircle2 className="w-5 h-5 text-primary" />
                   </div>
                   <CardTitle className="text-base font-semibold mt-2">Authentication & User Profiles</CardTitle>
-                  <CardDescription className="text-xs">Integrasi login, sign up, session management, dan isolasi tenant per-penulis.</CardDescription>
+                  <CardDescription className="text-xs">Integrasi login, sign up, session guard middleware, dan isolasi tenant per-penulis.</CardDescription>
                 </CardHeader>
               </Card>
 
               <Card className="border-border">
                 <CardHeader className="p-5 pb-3">
                   <div className="flex items-center justify-between">
-                    <Badge variant="outline" className="text-xs">Phase 2 • Planned</Badge>
-                    <Layers className="w-4 h-4 text-muted-foreground" />
+                    <Badge variant="outline" className="text-xs">Phase 2 • Next Up</Badge>
+                    <Clock className="w-4 h-4 text-muted-foreground" />
                   </div>
                   <CardTitle className="text-base font-semibold mt-2">Novel Library & Workspace Frame</CardTitle>
                   <CardDescription className="text-xs">Manajemen perpustakaan novel, detail metadata, dan shell ruang kerja interaktif.</CardDescription>
