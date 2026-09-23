@@ -785,151 +785,90 @@ and connect them to scenes (POV Character, Primary Location, Characters Involved
 
 ---
 
-# PHASE 6 — Story Memory
+# PHASE 6 — Story Memory [COMPLETED]
 
 ## Goal
 
 Build the foundation that makes AI context-aware.
 
-This is the second major architectural milestone.
+This is the second major architectural milestone. Status: **COMPLETED**.
 
 ---
 
 ## Task 6.1 — Story Memory Table
 
-Implement:
-
-```text
-story_memories
-```
+Implemented in `src/db/migrations/006_story_memories.sql`:
+- Table `story_memories` with `pgvector` support and cosine similarity index.
+- RPC function `match_story_memories`.
 
 ---
 
 ## Task 6.2 — Memory UI
 
-Display:
-
-```text
-Confirmed
-Proposed
-Rejected
-Archived
-```
+Implemented in `src/app/(workspace)/workspace/[novelId]/memories/`:
+- Status tabs: `Confirmed`, `Proposed`, `Rejected`, `Archived`.
+- Type filter pills (Karakter, Relasi, Dunia, Kronologi, Plot, Fakta Umum).
+- Live stats counter bar.
 
 ---
 
 ## Task 6.3 — Manual Memory Creation
 
-User can explicitly save:
-
-```text
-Story Fact
-Character Fact
-World Fact
-Timeline Fact
-Plot Fact
-Relationship Fact
-```
+Implemented in `MemoryFormDialog`:
+- Story Fact, Character Fact, World Fact, Timeline Fact, Plot Fact, Relationship Fact.
+- Importance level 1–5.
+- Authority status lifecycle.
 
 ---
 
 ## Task 6.4 — Embedding Infrastructure
 
-Implement:
-
-```text
-EmbeddingService
-```
-
-Provider abstraction:
-
-```text
-EmbeddingProvider
-```
-
-Do not tightly couple this to one AI provider.
+Implemented in `src/server/ai/embeddings.ts`:
+- Provider abstraction `EmbeddingProvider`.
+- `OpenAIEmbeddingProvider` (1536-dim).
+- `LocalDevEmbeddingProvider` (deterministic 1536-dim feature-hashed vectorizer for zero-config offline dev).
+- `EmbeddingService` with cosine similarity math.
 
 ---
 
 ## Task 6.5 — Vector Storage
 
-Store embedding in:
-
-```text
-story_memories.embedding
-```
-
-Create vector index.
+Implemented in `story_memories.embedding` (PostgreSQL vector(1536)) and in-memory vector store.
 
 ---
 
 ## Task 6.6 — Semantic Retrieval
 
-Implement:
-
-```text
-MemoryRepository.searchSimilar()
-```
-
-Input:
-
-```text
-novel_id
-query_embedding
-filters
-limit
-```
+Implemented in `MemoryRepository.searchSimilar()` and interactive "Uji Retrieval Semantik" sandbox in the Memory Studio.
 
 ---
 
 ## Task 6.7 — Memory Deduplication
 
-When creating a new memory:
-
-```text
-candidate
- ↓
-similarity search
- ↓
-possible duplicate?
-```
-
-If yes:
-
-```text
-show conflict/duplicate
-```
-
-Do not automatically overwrite.
+Implemented in `MemoryRepository.checkDuplicate()` and real-time duplicate warning indicator in the creation dialog.
 
 ---
 
-## Task 6.8 — Memory Source
+## Task 6.8 — Memory Source & Editor Integration
 
-Every proposed memory should identify source:
-
-```text
-chapter
-scene
-manual
-```
+Implemented in `src/components/editor/ai-panel-placeholder.tsx` and `getSceneRelevantMemories`:
+- Source traceability to scenes, chapters, characters, and rules.
+- Scene Relevant Memories displayed in the Writing Editor.
+- Quick add fact button directly linked to the current scene.
 
 ---
 
-## PHASE 6 EXIT CRITERIA
+## PHASE 6 EXIT CRITERIA [VERIFIED]
 
 The system can:
 
 ```text
-Create memory
- ↓
-Embed
- ↓
-Store
- ↓
-Search semantically
- ↓
-Show source
+[x] Create memory
+[x] Embed (1536-dim vector)
+[x] Store (dual-mode pgvector + local dev)
+[x] Search semantically (cosine similarity ranking)
+[x] Show source (attribution badge & scene navigation)
+[x] Deduplicate & detect conflicts
 ```
 
 ---

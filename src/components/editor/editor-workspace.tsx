@@ -10,6 +10,7 @@ import type {
   Character,
   Location,
   SceneContextData,
+  StoryMemory,
 } from "@/types";
 import { saveSceneContentAction } from "@/server/actions/editor";
 import { updateSceneContextAction } from "@/server/actions/characters";
@@ -41,6 +42,7 @@ interface EditorWorkspaceProps {
   characters?: Character[];
   locations?: Location[];
   initialContext?: SceneContextData;
+  relevantMemories?: StoryMemory[];
 }
 
 export default function EditorWorkspace({
@@ -52,6 +54,7 @@ export default function EditorWorkspace({
   characters = [],
   locations = [],
   initialContext,
+  relevantMemories = [],
 }: EditorWorkspaceProps) {
   // Manuscript Content & Metrics State
   const [content, setContent] = useState<string>(scene.content || "");
@@ -526,6 +529,7 @@ export default function EditorWorkspace({
             chapter={chapter}
             scene={scene}
             currentWordCount={sceneWordCount}
+            relevantMemories={relevantMemories}
             onCollapse={() => setShowRightPanel(false)}
           />
         )}

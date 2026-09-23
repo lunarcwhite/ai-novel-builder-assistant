@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, Users, Globe, Feather } from "lucide-react";
+import { BookOpen, Users, Globe, Feather, BrainCircuit } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface NovelNavigationBarProps {
@@ -20,6 +20,7 @@ export default function NovelNavigationBar({
   const isOverview = pathname === `/workspace/${novelId}`;
   const isCharacters = pathname.startsWith(`/workspace/${novelId}/characters`);
   const isWorld = pathname.startsWith(`/workspace/${novelId}/world`);
+  const isMemories = pathname.startsWith(`/workspace/${novelId}/memories`);
 
   const tabs = [
     {
@@ -39,6 +40,12 @@ export default function NovelNavigationBar({
       href: `/workspace/${novelId}/world`,
       active: isWorld,
       icon: Globe,
+    },
+    {
+      label: "Memori Cerita",
+      href: `/workspace/${novelId}/memories`,
+      active: isMemories,
+      icon: BrainCircuit,
     },
   ];
 

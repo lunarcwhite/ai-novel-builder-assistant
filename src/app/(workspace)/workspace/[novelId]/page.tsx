@@ -6,6 +6,7 @@ import { NovelService } from "@/features/novels/service";
 import { StructureService } from "@/features/structure/service";
 import { CharacterService } from "@/features/characters/service";
 import { WorldService } from "@/features/world/service";
+import { MemoryService } from "@/features/memories/service";
 import { deleteNovelAction } from "@/server/actions/novels";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -17,7 +18,6 @@ import {
   Compass, 
   FileText, 
   Trash2, 
-  CheckCircle2, 
   BarChart3,
   Feather,
   Globe,
@@ -42,11 +42,12 @@ export default async function NovelWorkspacePage({ params }: PageProps) {
   }
 
   // Retrieve complete hierarchical structure & story knowledge in parallel
-  const [structure, characters, locations, worldRules] = await Promise.all([
+  const [structure, characters, locations, worldRules, memoryStats] = await Promise.all([
     StructureService.getNovelStructureTree(novelId, user.id),
     CharacterService.getCharacters(novelId, user.id),
     WorldService.getLocations(novelId, user.id),
     WorldService.getWorldRules(novelId, user.id),
+    MemoryService.getStats(novelId, user.id),
   ]);
 
   // First available scene for quick continue writing
@@ -291,25 +292,41 @@ export default async function NovelWorkspacePage({ params }: PageProps) {
           </CardContent>
         </Card>
 
-        {/* Phase 6 Teaser: Story Memory & Safety */}
-        <Card className="border-border/80 flex flex-col justify-between">
+        {/* Story Memory Studio Card */}
+        <Card className="border-border/80 flex flex-col justify-between hover:border-border transition-colors">
           <CardHeader className="p-5 pb-3">
             <div className="flex items-center justify-between">
               <CardTitle className="text-sm font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-2">
                 <BrainCircuit className="w-4 h-4 text-primary" />
                 Story Memory
               </CardTitle>
-              <Badge variant="outline" className="text-[10px]">Phase 6</Badge>
+              <Badge variant="outline" className="text-[10px] bg-primary/5 text-primary border-primary/20">
+                Phase 6 Aktif
+              </Badge>
             </div>
           </CardHeader>
           <CardContent className="p-5 pt-1 space-y-3 text-xs text-muted-foreground flex-1 flex flex-col justify-between">
-            <p>
-              Penyimpanan fakta dinamis dunia, hukum lore, dan kronologi kejadian naskah berbasis retrieval semantik.
-            </p>
+            <div className="space-y-2">
+              <p>
+                {memoryStats.total > 0
+                  ? `${memoryStats.confirmed} fakta kanon terkonfirmasi dan ${memoryStats.proposed} usulan baru tersimpan.`
+                  : "Basis pengetahuan kanon cerita, fakta karakter, dan retrieval semantik."}
+              </p>
+              <div className="flex items-center gap-3 text-[11px] text-foreground">
+                <span>{memoryStats.confirmed} Terkonfirmasi</span>
+                <span>•</span>
+                <span>{memoryStats.proposed} Usulan</span>
+              </div>
+            </div>
 
-            <div className="pt-2 border-t border-border/40 flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-medium text-[11px]">
-              <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
-              <span>Naskah & Entitas Aman</span>
+            <div className="pt-2 border-t border-border/40">
+              <Link
+                href={`/workspace/${novel.id}/memories`}
+                className="inline-flex items-center gap-1.5 text-xs text-primary font-medium hover:underline"
+              >
+                <span>Buka Memory Studio</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
             </div>
           </CardContent>
         </Card>

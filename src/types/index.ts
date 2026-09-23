@@ -386,17 +386,116 @@ export const updateSceneContextSchema = z.object({
 export type UpdateSceneContextInput = z.infer<typeof updateSceneContextSchema>;
 
 // -------------------------------------------------------------
-// Future Phase 6 Placeholder (Story Memory)
+// Phase 6 Domain: Story Memory
 // -------------------------------------------------------------
+export type MemoryType =
+  | "character_fact"
+  | "relationship_fact"
+  | "world_fact"
+  | "timeline_fact"
+  | "plot_fact"
+  | "story_fact";
+
+export type MemoryStatus = "proposed" | "confirmed" | "rejected" | "archived";
+
+export type MemorySourceType =
+  | "manual"
+  | "scene"
+  | "chapter"
+  | "character"
+  | "world_rule"
+  | "timeline_event"
+  | "ai_extraction";
+
+export interface MemoryMetadata {
+  character_ids?: UUID[];
+  location_ids?: UUID[];
+  chapter_number?: number;
+  confidence?: number;
+  tags?: string[];
+  duplicate_of_id?: UUID;
+  [key: string]: unknown;
+}
+
 export interface StoryMemory {
   id: UUID;
   novel_id: UUID;
-  memory_type: "fact" | "rule" | "relationship" | "decision" | "secret" | "promise" | "state_change";
-  source_type: "author" | "scene" | "ai_extraction";
-  source_scene_id?: UUID | null;
+  type: MemoryType;
   content: string;
-  confidence: number;
-  status: "proposed" | "confirmed" | "rejected";
+  importance: number; // 1 to 5
+  status: MemoryStatus;
+  source_type: MemorySourceType;
+  source_id?: UUID | null;
+  metadata: MemoryMetadata;
+  embedding?: number[] | null;
   created_at: string;
   updated_at: string;
 }
+
+export const createStoryMemorySchema = z.object({
+  type: z.enum([
+    "character_fact",
+    "relationship_fact",
+    "world_fact",
+    "timeline_fact",
+    "plot_fact",
+    "story_fact",
+  ]),
+  content: z.string().min(1, "Konten memori cerita wajib diisi"),
+  importance: z.coerce.number().int().min(1).max(5).default(3),
+  status: z.enum(["proposed", "confirmed", "rejected", "archived"]).default("confirmed"),
+  source_type: z.enum([
+    "manual",
+    "scene",
+    "chapter",
+    "character",
+    "world_rule",
+    "timeline_event",
+    "ai_extraction",
+  ]).default("manual"),
+  source_id: z.string().uuid().nullable().optional(),
+  character_ids: z.array(z.string().uuid()).optional().default([]),
+  location_ids: z.array(z.string().uuid()).optional().default([]),
+  tags: z.array(z.string()).optional().default([]),
+});
+
+export type CreateStoryMemoryInput = z.infer<typeof createStoryMemorySchema>;
+
+export const updateStoryMemorySchema = createStoryMemorySchema.partial().extend({
+  status: z.enum(["proposed", "confirmed", "rejected", "archived"]).optional(),
+});
+
+export type UpdateStoryMemoryInput = z.infer<typeof updateStoryMemorySchema>;
+
+export interface MemoryRetrievalFilters {
+  query?: string;
+  types?: MemoryType[];
+  statuses?: MemoryStatus[];
+  minImportance?: number;
+  characterIds?: UUID[];
+  locationIds?: UUID[];
+  limit?: number;
+  threshold?: number;
+}
+
+export interface MemorySearchResult {
+  memory: StoryMemory;
+  similarity: number; // 0 to 1
+  matchedReason?: string;
+}
+
+export interface MemoryStats {
+  total: number;
+  confirmed: number;
+  proposed: number;
+  rejected: number;
+  archived: number;
+}
+
+export interface MemoryDeduplicationCheckResult {
+  isDuplicate: boolean;
+  score: number;
+  existingMemory?: StoryMemory;
+  warningMessage?: string;
+}
+

@@ -1,9 +1,13 @@
 "use client";
 
-import React from "react";
-import type { Scene, Chapter, Novel } from "@/types";
+import React, { useState, useActionState, useEffect } from "react";
+import Link from "next/link";
+import type { Scene, Chapter, Novel, StoryMemory, MemoryType } from "@/types";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { formatNumber } from "@/lib/utils";
+import { quickAddSceneMemoryAction, type MemoryActionResult } from "@/server/actions/memories";
 import {
   Sparkles,
   PanelRightClose,
@@ -11,14 +15,20 @@ import {
   Wand2,
   CheckCircle2,
   Lock,
+  BrainCircuit,
+  Plus,
+  Star,
+  ExternalLink,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 
 interface AIPanelPlaceholderProps {
   novel: Novel;
   chapter: Chapter;
   scene: Scene;
   currentWordCount: number;
+  relevantMemories?: StoryMemory[];
   onCollapse?: () => void;
 }
 
@@ -27,8 +37,26 @@ export default function AIPanelPlaceholder({
   chapter,
   scene,
   currentWordCount,
+  relevantMemories = [],
   onCollapse,
 }: AIPanelPlaceholderProps) {
+  const [isQuickAddOpen, setIsQuickAddOpen] = useState<boolean>(false);
+  const [quickFactContent, setQuickFactContent] = useState<string>("");
+  const [quickFactType, setQuickFactType] = useState<MemoryType>("story_fact");
+  const quickFactImportance = 3;
+
+  const [state, formAction, isPending] = useActionState<MemoryActionResult | null, FormData>(
+    quickAddSceneMemoryAction,
+    null
+  );
+
+  useEffect(() => {
+    if (state?.success) {
+      setQuickFactContent("");
+      setIsQuickAddOpen(false);
+    }
+  }, [state]);
+
   return (
     <aside className="w-80 shrink-0 border-l border-border/80 bg-sidebar/40 flex flex-col h-full overflow-hidden select-none transition-all">
       {/* Header */}
@@ -39,7 +67,7 @@ export default function AIPanelPlaceholder({
             Konteks & AI Assistant
           </span>
           <Badge variant="outline" className="text-[10px] h-4 px-1 py-0">
-            Phase 7
+            Phase 6/7
           </Badge>
         </div>
 
@@ -56,7 +84,7 @@ export default function AIPanelPlaceholder({
         )}
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-5 text-xs">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 text-xs">
         {/* Story Context Inspector Card */}
         <div className="rounded-lg border border-border/80 bg-card p-3.5 space-y-3 shadow-2xs">
           <div className="flex items-center justify-between">
@@ -103,6 +131,112 @@ export default function AIPanelPlaceholder({
               <span className="font-semibold text-foreground">
                 {formatNumber(currentWordCount)} kata
               </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Phase 6 Feature: Scene Relevant Story Memories */}
+        <div className="rounded-lg border border-border/80 bg-card p-3.5 space-y-3 shadow-2xs">
+          <div className="flex items-center justify-between">
+            <span className="font-semibold text-foreground flex items-center gap-1.5 uppercase tracking-wider text-[11px] text-muted-foreground">
+              <BrainCircuit className="w-3.5 h-3.5 text-primary" />
+              Memori Relevan Adegan
+            </span>
+            <Link
+              href={`/workspace/${novel.id}/memories`}
+              className="text-[10px] text-primary hover:underline inline-flex items-center gap-0.5"
+            >
+              <span>Studio</span>
+              <ExternalLink className="w-2.5 h-2.5" />
+            </Link>
+          </div>
+
+          <div className="space-y-2 pt-1 border-t border-border/40">
+            {relevantMemories.length === 0 ? (
+              <p className="text-[11px] text-muted-foreground italic leading-relaxed">
+                Belum ada memori terkonfirmasi yang terkait langsung dengan karakter atau lokasi adegan ini.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {relevantMemories.slice(0, 4).map((mem) => (
+                  <div
+                    key={mem.id}
+                    className="p-2 rounded-md bg-muted/40 border border-border/60 space-y-1 text-[11px]"
+                  >
+                    <div className="flex items-center justify-between text-[10px]">
+                      <Badge variant="outline" className="text-[9px] py-0 px-1">
+                        {mem.type.replace("_fact", "")}
+                      </Badge>
+                      <div className="flex items-center text-amber-500">
+                        {Array.from({ length: mem.importance }).map((_, i) => (
+                          <Star key={i} className="w-2 h-2 fill-amber-500" />
+                        ))}
+                      </div>
+                    </div>
+                    <p className="text-foreground leading-relaxed line-clamp-2">
+                      {mem.content}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Quick Add Fact Accordion */}
+            <div className="pt-2 border-t border-border/40">
+              <button
+                type="button"
+                onClick={() => setIsQuickAddOpen((prev) => !prev)}
+                className="w-full py-1 text-[11px] text-primary font-medium flex items-center justify-between hover:underline"
+              >
+                <span className="flex items-center gap-1">
+                  <Plus className="w-3 h-3" />
+                  Catat Fakta Baru dari Adegan
+                </span>
+                {isQuickAddOpen ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+              </button>
+
+              {isQuickAddOpen && (
+                <form action={formAction} className="mt-2 space-y-2 p-2.5 rounded-lg bg-muted/30 border border-border/70">
+                  <input type="hidden" name="novel_id" value={novel.id} />
+                  <input type="hidden" name="scene_id" value={scene.id} />
+                  <input type="hidden" name="type" value={quickFactType} />
+                  <input type="hidden" name="importance" value={quickFactImportance} />
+
+                  {state?.error && (
+                    <div className="text-[10px] text-destructive">{state.error}</div>
+                  )}
+
+                  <div className="space-y-1">
+                    <span className="text-[10px] text-muted-foreground block">Isi Fakta Baru:</span>
+                    <Textarea
+                      name="content"
+                      value={quickFactContent}
+                      onChange={(e) => setQuickFactContent(e.target.value)}
+                      placeholder="Contoh: Kaelen menemukan segel rahasia ordo di balik tumpukan buku tua..."
+                      rows={2}
+                      required
+                      className="text-xs resize-none h-16"
+                    />
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2">
+                    <select
+                      value={quickFactType}
+                      onChange={(e) => setQuickFactType(e.target.value as MemoryType)}
+                      className="h-7 text-[10px] rounded border border-input bg-background px-2"
+                    >
+                      <option value="story_fact">Fakta Cerita</option>
+                      <option value="character_fact">Fakta Karakter</option>
+                      <option value="world_fact">Fakta Dunia</option>
+                      <option value="plot_fact">Fakta Plot</option>
+                    </select>
+
+                    <Button type="submit" size="sm" className="h-7 text-[11px] px-2.5" disabled={isPending}>
+                      {isPending ? "Menyimpan..." : "Simpan Fakta"}
+                    </Button>
+                  </div>
+                </form>
+              )}
             </div>
           </div>
         </div>
