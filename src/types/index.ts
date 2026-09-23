@@ -1,0 +1,95 @@
+/**
+ * Novel Builder - Global Types & Domain Definitions
+ * Derived from docs/database-schema.md
+ */
+
+export type UUID = string;
+
+export type NovelStatus = "planning" | "in_progress" | "first_draft" | "revising" | "completed" | "archived";
+
+export interface Novel {
+  id: UUID;
+  user_id: UUID;
+  title: string;
+  subtitle?: string | null;
+  logline?: string | null;
+  synopsis?: string | null;
+  genre?: string | null;
+  target_word_count: number;
+  current_word_count: number;
+  status: NovelStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Act {
+  id: UUID;
+  novel_id: UUID;
+  title: string;
+  act_number: number;
+  order_index: number;
+  summary?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Chapter {
+  id: UUID;
+  novel_id: UUID;
+  act_id?: UUID | null;
+  chapter_number: number;
+  order_index: number;
+  title: string;
+  summary?: string | null;
+  status: "draft" | "in_review" | "completed";
+  word_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Scene {
+  id: UUID;
+  novel_id: UUID;
+  chapter_id: UUID;
+  order_index: number;
+  title: string;
+  slug?: string | null;
+  pov_character_id?: UUID | null;
+  location_id?: UUID | null;
+  timeline_order: number;
+  content_json?: Record<string, unknown> | null;
+  content_text?: string | null;
+  word_count: number;
+  status: "draft" | "review" | "final";
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Character {
+  id: UUID;
+  novel_id: UUID;
+  name: string;
+  full_name?: string | null;
+  role: "protagonist" | "antagonist" | "deuteragonist" | "supporting" | "minor";
+  archetype?: string | null;
+  short_description?: string | null;
+  background?: string | null;
+  goal?: string | null;
+  internal_conflict?: string | null;
+  external_conflict?: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface StoryMemory {
+  id: UUID;
+  novel_id: UUID;
+  memory_type: "fact" | "rule" | "relationship" | "decision" | "secret" | "promise" | "state_change";
+  source_type: "author" | "scene" | "ai_extraction";
+  source_scene_id?: UUID | null;
+  content: string;
+  confidence: number;
+  status: "proposed" | "confirmed" | "rejected";
+  created_at: string;
+  updated_at: string;
+}

@@ -1,0 +1,114 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light Mode - Warm Editorial Paper (#F8F7F4 base) */
+    --background: 40 18% 97%;
+    --foreground: 0 0% 12%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 12%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 12%;
+
+    --primary: 32 23% 35%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 40 13% 92%;
+    --secondary-foreground: 0 0% 12%;
+
+    --muted: 40 13% 92%;
+    --muted-foreground: 40 2% 42%;
+
+    --accent: 32 23% 35%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 38 12% 89%;
+    --input: 38 12% 89%;
+    --ring: 32 23% 35%;
+
+    --radius: 0.375rem;
+
+    --sidebar-background: 40 15% 95%;
+    --sidebar-foreground: 0 0% 12%;
+    --sidebar-border: 38 12% 89%;
+    --sidebar-accent: 40 13% 90%;
+  }
+
+  .dark {
+    /* Dark Mode - Deep Literary Studio (#151515 base) */
+    --background: 0 0% 8%;
+    --foreground: 45 10% 94%;
+
+    --card: 0 0% 11%;
+    --card-foreground: 45 10% 94%;
+
+    --popover: 0 0% 11%;
+    --popover-foreground: 45 10% 94%;
+
+    --primary: 35 29% 59%;
+    --primary-foreground: 0 0% 8%;
+
+    --secondary: 60 3% 14%;
+    --secondary-foreground: 45 10% 94%;
+
+    --muted: 60 3% 14%;
+    --muted-foreground: 43 5% 63%;
+
+    --accent: 35 29% 59%;
+    --accent-foreground: 0 0% 8%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 60 2% 19%;
+    --input: 60 2% 19%;
+    --ring: 35 29% 59%;
+
+    --sidebar-background: 0 0% 10%;
+    --sidebar-foreground: 45 10% 94%;
+    --sidebar-border: 60 2% 19%;
+    --sidebar-accent: 60 3% 16%;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased font-sans;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Subtle, distraction-free scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground));
+}
+
+/* Manuscript typography & prose container */
+.manuscript-text {
+  font-family: var(--font-serif), Georgia, Cambria, "Times New Roman", serif;
+  line-height: 1.85;
+  letter-spacing: 0.01em;
+}
