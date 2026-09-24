@@ -924,7 +924,7 @@ interface AIProvider {
 
 ## Task 7.2 — Provider Implementation
 
-Implement the first provider.
+Implement OpenAI + Anthropic providers plus a deterministic local-dev fallback.
 
 Keep provider-specific code isolated.
 
@@ -950,6 +950,7 @@ improve_prose
 improve_dialogue
 summarize
 critique
+ask
 ```
 
 ---
@@ -1066,11 +1067,9 @@ Do not log manuscript unnecessarily.
 
 ---
 
-## PHASE 7 EXIT CRITERIA
+## PHASE 7 EXIT CRITERIA [VERIFIED]
 
-User can:
-
-Implemented: `src/server/ai/` (providers, prompts, context-resolver, context-builder), `src/features/ai/` (AIService, repositories), `src/server/actions/ai.ts`, `src/components/editor/ai-assistant.tsx`, migration `008_ai_assistant.sql`.
+A user can:
 
 ```text
 [x] Open scene
@@ -1080,7 +1079,12 @@ Implemented: `src/server/ai/` (providers, prompts, context-resolver, context-bui
 [x] User decides: Insert / Replace / Copy / Dismiss (versioned, reversible)
 ```
 
-Verified: 67 tests pass (19 new AI), lint clean, typecheck clean, build clean.
+Verified: `src/server/ai/` (providers, prompts, context-resolver,
+context-builder), `src/features/ai/` (AIService, repositories),
+`src/server/actions/ai.ts`, `src/components/editor/ai-assistant.tsx`,
+migration `008_ai_assistant.sql`, AI tests (`tests/feature/ai.test.ts`:
+ask flow, manuscript safety, apply checkpoint; `tests/unit/ai.test.ts`:
+contracts, budget, providers).
 
 ---
 
