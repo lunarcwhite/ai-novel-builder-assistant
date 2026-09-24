@@ -187,3 +187,47 @@ export function buildStoryDoctorPrompt(observations: StoryDoctorObservationBrief
     'Jawab HANYA dengan JSON: {"enrichments": [{"index": 0, "refined_observation": "...", "interpretation": "...", "suggestion": "..."}]}.',
   ].join("\n");
 }
+
+// ---------------------------------------------------------------
+// Phase 9 — Summary synthesis (Task 9.4)
+// SOUL.md #6/#8: the candidate is a proposal for the author, never
+// an auto-applied fact. The model compresses child summaries — it
+// must never invent new story facts.
+// ---------------------------------------------------------------
+
+export const SUMMARY_SYNTHESIS_SYSTEM = [
+  "Kamu adalah peringkas cerita yang cermat dan rendah hati.",
+  "Tugasmu: padatkan ringkasan anak menjadi satu ringkasan level di atasnya.",
+  "Aturan:",
+  "1. Hanya gunakan materi yang diberikan — JANGAN mengarang kejadian, nama, atau fakta baru.",
+  "2. Bila materi tipis atau kosong, ringkas apa adanya secara singkat; jangan mengisi kekosongan dengan karangan.",
+  "3. Pertahankan nama tokoh dan istilah dunia persis seperti di sumber.",
+  "4. 2–5 kalimat, Bahasa Indonesia, nada netral.",
+  "5. Kembalikan JSON valid saja: {\"summary\": \"...\"}.",
+].join("\n");
+
+export interface SummarySourceBrief {
+  label: string;
+  text: string;
+}
+
+export interface SummarySynthesisBrief {
+  level: string;
+  title: string;
+  existing: string | null;
+  sources: SummarySourceBrief[];
+}
+
+export function buildSummarySynthesisPrompt(brief: SummarySynthesisBrief): string {
+  const blocks = brief.sources.map((s) => `- ${s.label}: ${s.text}`);
+  return [
+    `Buat ringkasan level ${brief.level} untuk "${brief.title}".`,
+    brief.existing ? `Ringkasan penulis saat ini (pertahankan maksudnya): ${brief.existing}` : "",
+    "Materi anak:",
+    ...blocks,
+    "",
+    'Jawab HANYA dengan JSON: {"summary": "..."}.',
+  ]
+    .filter((l) => l !== "")
+    .join("\n");
+}

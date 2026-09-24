@@ -109,6 +109,7 @@ function fixtureCtx(overrides: Partial<ResolvedStoryContext> = {}): ResolvedStor
     povCharacter: null,
     location: null,
     involvedCharacters: [],
+    act: null,
     relevantMemories: [
       {
         id: "mem_1",

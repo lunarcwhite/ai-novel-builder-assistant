@@ -1,9 +1,10 @@
 /**
- * Context Builder (Phase 7 — Task 7.5)
+ * Context Builder (Phase 7 — Task 7.5, extended Task 9.4)
  * Builds the layered prompt sections:
- * SYSTEM / NOVEL / CURRENT CHAPTER / CURRENT SCENE / CHARACTERS /
- * WORLD / MEMORIES / USER REQUEST. Respects a character budget;
- * scene content is the first thing cut, never the operation instruction.
+ * SYSTEM / NOVEL / CURRENT ACT / CURRENT CHAPTER / CURRENT SCENE /
+ * CHARACTERS / WORLD / MEMORIES / PLOT THREADS / TIMELINE / USER REQUEST.
+ * Respects a character budget; scene content is the first thing cut,
+ * never the operation instruction.
  */
 
 import type { AIOperation } from "@/types";
@@ -26,6 +27,13 @@ const MIN_SCENE_CHARS = 500;
 function line(label: string, value: string | null | undefined): string {
   if (!value) return "";
   return `${label}: ${value}\n`;
+}
+
+/** Clip one context layer to a fixed budget (whitespace-folded). */
+function clipLayer(text: string | null | undefined, max: number): string {
+  const t = (text || "").replace(/\s+/g, " ").trim();
+  if (!t) return "";
+  return t.length > max ? t.slice(0, max).trimEnd() + "…" : t;
 }
 
 export function buildPrompt(
@@ -67,6 +75,15 @@ function renderUser(ctx: ResolvedStoryContext, userQuery: string, operation: AIO
     parts.push(`${line("Bab", ctx.chapter.title)}${line("Ringkasan", ctx.chapter.summary)}${line("Tujuan", ctx.chapter.objective)}${line("Konflik", ctx.chapter.conflict)}`);
   }
 
+  // Task 9.4: the owning act layer (description doubles as act summary).
+  if (ctx.act) {
+    const actText = clipLayer(ctx.act.description, 500);
+    if (actText) {
+      parts.push("CURRENT ACT");
+      parts.push(`${line("Babak", ctx.act.title)}${line("Gambaran", actText)}`);
+    }
+  }
+
   if (ctx.scene) {
     const s = ctx.scene;
     const plain = (s.content || "").replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
@@ -102,6 +119,33 @@ function renderUser(ctx: ResolvedStoryContext, userQuery: string, operation: AIO
   if (ctx.relevantMemories.length > 0) {
     parts.push("MEMORI CERITA TERKONFIRMASI (fakta mapan — hormati; status: confirmed)");
     parts.push(ctx.relevantMemories.map((m) => `- [${m.type}] ${m.content}`).join("\n"));
+  }
+
+  // Task 9.4: long-novel context layers — plot threads + timeline, capped.
+  if (ctx.plotThreads.length > 0) {
+    parts.push("PLOT THREADS AKTIF (jangan selesaikan diam-diam)");
+    parts.push(
+      ctx.plotThreads
+        .map((t) => `- [${t.status}] ${t.title}${t.description ? `: ${clipLayer(t.description, 160)}` : ""}`)
+        .join("\n")
+    );
+  }
+
+  if (ctx.timeline.length > 0) {
+    parts.push("TIMELINE (urutan kejadian — hormati)");
+    parts.push(
+      ctx.timeline
+        .map((e) => {
+          const when =
+            e.date_precision === "relative"
+              ? e.relative_time || "waktu relatif"
+              : e.date_precision === "unknown"
+                ? "waktu belum pasti"
+                : e.date_value || e.date_precision;
+          return `- ${e.title} (${when})`;
+        })
+        .join("\n")
+    );
   }
 
   if (operation !== "continue_scene" && ctx.selectedText) {

@@ -814,3 +814,71 @@ export const runStoryDoctorSchema = z.object({
 
 export type RunStoryDoctorInput = z.infer<typeof runStoryDoctorSchema>;
 
+// -------------------------------------------------------------
+// Phase 9 Domain: Hierarchical Summaries (Task 9.4)
+// -------------------------------------------------------------
+// SOUL.md #10/#11: summaries are layered context (Scene ->
+// Chapter -> Act -> Novel), never a dump of the whole novel.
+// Scene/chapter layers use the existing summary columns; act/novel
+// layers reuse the existing description columns.
+// ponytail: promote act/novel to dedicated summary columns only
+// when authors need synopsis-vs-description as separate semantics.
+export const summaryLevelSchema = z.enum(["scene", "chapter", "act", "novel"]);
+
+export type SummaryLevel = z.infer<typeof summaryLevelSchema>;
+
+export interface SummaryNode {
+  level: SummaryLevel;
+  id: string;
+  title: string;
+  /** Author-owned text (summary/description column) or null when empty. */
+  authorText: string | null;
+  /** Deterministic rollup from children ("" when no material yet). */
+  derivedText: string;
+  wordCount: number;
+  childrenTotal: number;
+  childrenWithText: number;
+}
+
+export interface ChapterSummaryNode extends SummaryNode {
+  level: "chapter";
+  scenes: SummaryNode[];
+}
+
+export interface ActSummaryNode extends SummaryNode {
+  level: "act";
+  chapters: ChapterSummaryNode[];
+}
+
+export interface SummaryHierarchy {
+  novel: SummaryNode;
+  acts: ActSummaryNode[];
+  unassignedChapters: ChapterSummaryNode[];
+  coverage: {
+    scenes: { total: number; withText: number };
+    chapters: { total: number; withText: number };
+    acts: { total: number; withText: number };
+    novel: boolean;
+  };
+}
+
+export const synthesizeSummarySchema = z.object({
+  level: summaryLevelSchema,
+  id: z.string().min(1).max(100),
+  withAI: z.boolean().optional().default(true),
+});
+
+export type SynthesizeSummaryInput = z.infer<typeof synthesizeSummarySchema>;
+
+export const applySummarySchema = z.object({
+  level: summaryLevelSchema,
+  id: z.string().min(1).max(100),
+  text: z
+    .string()
+    .trim()
+    .min(1, "Ringkasan tidak boleh kosong.")
+    .max(5000, "Ringkasan maksimal 5.000 karakter."),
+});
+
+export type ApplySummaryInput = z.infer<typeof applySummarySchema>;
+
