@@ -1366,11 +1366,30 @@ Export must respect:
 Implemented: `src/features/export/` (`formatters.ts` TXT/Markdown,
 `docx.ts` via `docx@9.7.2`, `service.ts` read-only `exportNovel`),
 `GET /api/novels/:novelId/export`, `ExportView` UI, `ExportResult`
-schema (`txt|md|docx` + `word` alias). Commits `ffe3091` (Phase 10
-TXT/Markdown, 15 tests) + `3d4cbb6` (Phase 11 DOCX with Title→H1→H2→H3
-hierarchy). PDF/EPUB deferred post-MVP. Covered by 15 TXT/MD tests +
-DOCX unit (blocks order, empty semantics, ZIP magic) + feature
-(buffer + cross-user deny).
+schema (`txt|md|docx` + `word` alias). Commits `ffe3091`
+(TXT/Markdown MVP) + `3d4cbb6` (DOCX follow-up with Title→H1→H2→H3
+hierarchy). PDF/EPUB deferred post-MVP.
+
+---
+
+## PHASE 10 EXIT CRITERIA [VERIFIED]
+
+The author can download the whole manuscript as a file.
+
+```text
+[x] Markdown export with heading hierarchy (Task: Markdown)
+[x] TXT export as plain text, same order + empty semantics (Task: TXT)
+[x] DOCX export with Title→H1→H2→H3 hierarchy (Task: DOCX)
+[x] Respects chapter order, scene order, formatting, manuscript content
+[x] Read-only: never writes to the manuscript; ownership enforced
+[x] PDF / EPUB deferred post-MVP
+```
+
+Verified: `src/features/export/` (`formatters.ts`, `docx.ts`,
+`service.ts`), `GET /api/novels/:novelId/export`, `ExportView` UI,
+export schema (`txt|md|docx` + aliases), tests
+(`tests/feature/export.test.ts`: end-to-end, cross-user deny;
+`tests/unit/export.test.ts`: builders, docx blocks, query schema).
 
 ---
 
