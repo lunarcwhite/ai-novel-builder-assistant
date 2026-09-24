@@ -2,6 +2,7 @@ import React from "react";
 import Link from "next/link";
 import { requireAuth } from "@/server/auth/guards";
 import { Button } from "@/components/ui/button";
+import CommandPaletteHost, { PaletteTriggerButton } from "@/components/command-palette";
 import { LogOut } from "lucide-react";
 
 export default async function WorkspaceLayout({
@@ -28,6 +29,7 @@ export default async function WorkspaceLayout({
 
         {/* User Profile & Session Actions */}
         <div className="flex items-center gap-3">
+          <PaletteTriggerButton />
           <div className="text-right hidden sm:block">
             <div className="text-xs font-medium text-foreground">{user.displayName}</div>
             <div className="text-[10px] text-muted-foreground">{user.email}</div>
@@ -52,9 +54,16 @@ export default async function WorkspaceLayout({
       </header>
 
       {/* Main Workspace Canvas */}
-      <main className="flex-1 max-w-7xl mx-auto w-full p-6 md:p-8">
+      <main id="main-content" className="flex-1 max-w-7xl mx-auto w-full p-6 md:p-8">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-16 focus:left-4 focus:z-[60] focus:px-3 focus:py-2 focus:rounded-md focus:bg-card focus:border focus:border-border focus:text-xs"
+        >
+          Lewati ke konten utama
+        </a>
         {children}
       </main>
+      <CommandPaletteHost />
     </div>
   );
 }

@@ -75,12 +75,14 @@ export default function EditorHeader({
           variant="ghost"
           size="sm"
           onClick={onToggleLeftPanel}
+          aria-pressed={showLeftPanel}
           className={`h-8 w-8 p-0 text-muted-foreground hover:text-foreground ${
             !showLeftPanel ? "opacity-50" : ""
           }`}
           title={showLeftPanel ? "Sembunyikan Navigasi" : "Tampilkan Navigasi"}
         >
           <PanelLeft className="w-4 h-4" />
+          <span className="sr-only">{showLeftPanel ? "Sembunyikan Navigasi" : "Tampilkan Navigasi"}</span>
         </Button>
 
         {/* Breadcrumb Info */}
@@ -163,6 +165,7 @@ export default function EditorHeader({
           variant="outline"
           size="sm"
           onClick={onToggleFocusMode}
+          aria-pressed={isFocusMode}
           className={`h-8 px-2.5 text-xs gap-1.5 border-border/80 ${
             isFocusMode
               ? "bg-primary text-primary-foreground hover:bg-primary/90"
@@ -179,12 +182,14 @@ export default function EditorHeader({
           variant="ghost"
           size="sm"
           onClick={onToggleRightPanel}
+          aria-pressed={showRightPanel}
           className={`h-8 w-8 p-0 text-muted-foreground hover:text-foreground ${
             !showRightPanel ? "opacity-50" : ""
           }`}
           title={showRightPanel ? "Sembunyikan Panel AI" : "Tampilkan Panel AI"}
         >
           <PanelRight className="w-4 h-4" />
+          <span className="sr-only">{showRightPanel ? "Sembunyikan Panel AI" : "Tampilkan Panel AI"}</span>
         </Button>
       </div>
     </header>

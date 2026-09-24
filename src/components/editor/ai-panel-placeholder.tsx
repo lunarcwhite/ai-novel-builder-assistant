@@ -83,7 +83,7 @@ export default function AIPanelPlaceholder({
   }, [state]);
 
   return (
-    <aside className="w-80 shrink-0 border-l border-border/80 bg-sidebar/40 flex flex-col h-full overflow-hidden select-none transition-all">
+    <aside className="absolute inset-y-0 right-0 z-40 w-80 border-l border-border/80 bg-background shadow-paper flex flex-col h-full overflow-hidden select-none transition-all lg:static lg:z-auto lg:shadow-none lg:bg-sidebar/40">
       {/* Header */}
       <div className="p-3.5 border-b border-border/80 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">

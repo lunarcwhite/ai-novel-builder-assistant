@@ -33,6 +33,8 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { PALETTE_ACTION_EVENT } from "@/components/command-palette";
+import { isFocusShortcut, isSaveShortcut } from "@/lib/shortcuts";
 
 interface EditorWorkspaceProps {
   novel: Novel;
@@ -186,16 +188,37 @@ export default function EditorWorkspace({
     }
   };
 
-  // Keyboard shortcut for Focus Mode (Escape to exit)
+  // Keyboard shortcuts: Escape exits focus, Ctrl+S saves now, F11 toggles focus.
+  // Palette actions (save-now / toggle-focus / open-versions) arrive as events.
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && isFocusMode) {
         setIsFocusMode(false);
+        return;
+      }
+      if (isSaveShortcut(e)) {
+        e.preventDefault();
+        executeSave(latestContentRef.current);
+        return;
+      }
+      if (isFocusShortcut(e)) {
+        e.preventDefault();
+        setIsFocusMode((v) => !v);
       }
     };
+    const handlePaletteAction = (e: Event) => {
+      const actionId = (e as CustomEvent<string>).detail;
+      if (actionId === "save-now") executeSave(latestContentRef.current);
+      else if (actionId === "toggle-focus") setIsFocusMode((v) => !v);
+      else if (actionId === "open-versions") setIsVersionsOpen(true);
+    };
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isFocusMode]);
+    window.addEventListener(PALETTE_ACTION_EVENT, handlePaletteAction);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener(PALETTE_ACTION_EVENT, handlePaletteAction);
+    };
+  }, [isFocusMode, executeSave]);
 
   // Aggregate word count calculations
   const chapterEffectiveWords = Math.max(
@@ -277,6 +300,18 @@ export default function EditorWorkspace({
 
       {/* Main Workspace Layout (3-Column Architecture) */}
       <div className="flex-1 flex overflow-hidden relative">
+        {/* Mobile scrim when either side panel overlays the canvas */}
+        {!isFocusMode && (showLeftPanel || showRightPanel) && (
+          <button
+            type="button"
+            aria-label="Tutup panel samping"
+            onClick={() => {
+              setShowLeftPanel(false);
+              setShowRightPanel(false);
+            }}
+            className="absolute inset-0 z-30 bg-background/60 backdrop-blur-[1px] lg:hidden"
+          />
+        )}
         {/* 1. Left Scene Navigator */}
         {!isFocusMode && showLeftPanel && (
           <SceneNavigator

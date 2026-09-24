@@ -80,13 +80,14 @@ export default function NovelNavigationBar({
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/80 pb-3">
       {/* Navigation tabs */}
-      <nav className="flex items-center gap-1.5 overflow-x-auto py-1">
+      <nav aria-label="Navigasi novel" className="flex items-center gap-1.5 overflow-x-auto py-1">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           return (
             <Link
               key={tab.href}
               href={tab.href}
+              aria-current={tab.active ? "page" : undefined}
               className={cn(
                 "inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition-all shrink-0",
                 tab.active

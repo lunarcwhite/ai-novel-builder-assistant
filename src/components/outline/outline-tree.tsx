@@ -206,6 +206,8 @@ export default function OutlineTree({ novelId, structure }: OutlineTreeProps) {
                   <button
                     type="button"
                     onClick={() => toggleActCollapse(act.id)}
+                    aria-expanded={!isActCollapsed}
+                    aria-label={`${isActCollapsed ? "Buka" : "Tutup"} babak ${act.title}`}
                     className="p-1 text-muted-foreground hover:text-foreground rounded transition-colors mt-0.5"
                     title={isActCollapsed ? "Buka Babak" : "Tutup Babak"}
                   >
@@ -320,6 +322,8 @@ export default function OutlineTree({ novelId, structure }: OutlineTreeProps) {
                                 <button
                                   type="button"
                                   onClick={() => toggleChapterCollapse(chapter.id)}
+                                  aria-expanded={!isChapterCollapsed}
+                                  aria-label={`${isChapterCollapsed ? "Buka" : "Tutup"} bab ${chapter.title}`}
                                   className="p-1 text-muted-foreground hover:text-foreground rounded transition-colors mt-0.5"
                                   title={isChapterCollapsed ? "Buka Adegan" : "Tutup Adegan"}
                                 >

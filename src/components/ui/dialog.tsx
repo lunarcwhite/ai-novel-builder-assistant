@@ -37,9 +37,12 @@ export function Dialog({
 export function DialogContent({
   className,
   children,
+  label,
 }: {
   className?: string;
   children: React.ReactNode;
+  /** Accessible name; falls back to the inner DialogTitle text. */
+  label?: string;
 }) {
   const context = React.useContext(DialogContext);
   if (!context) throw new Error("DialogContent must be used within Dialog");
@@ -61,7 +64,12 @@ export function DialogContent({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={label}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in"
+    >
       <div
         className={cn(
           "w-full max-w-lg bg-card border border-border/80 rounded-xl shadow-paper relative overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95",

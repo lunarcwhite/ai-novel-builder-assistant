@@ -6,17 +6,28 @@ import { deleteNovelAction } from "@/server/actions/novels";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { 
-  Plus, 
-  BookOpen, 
-  Trash2, 
-  FileText, 
-  ArrowRight
+import { Input } from "@/components/ui/input";
+import { filterNovelsForLibrary } from "@/lib/library-search";
+import {
+  Plus,
+  BookOpen,
+  Trash2,
+  FileText,
+  ArrowRight,
+  Search,
+  SearchX,
 } from "lucide-react";
 
-export default async function WorkspacePage() {
+export default async function WorkspacePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string }>;
+}) {
   const user = await requireAuth();
+  const { q } = await searchParams;
+  const libraryQuery = q?.trim() ?? "";
   const novels = await NovelService.listUserNovels(user.id);
+  const visible = filterNovelsForLibrary(novels, libraryQuery);
 
   return (
     <div className="space-y-8">
@@ -49,14 +60,28 @@ export default async function WorkspacePage() {
 
       {/* Novel Library Grid */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <h2 className="text-sm font-semibold tracking-wider uppercase text-muted-foreground flex items-center gap-2">
             <BookOpen className="w-4 h-4 text-primary" />
-            Karya Aktif ({novels.length})
+            Karya Aktif ({visible.length}{libraryQuery ? ` dari ${novels.length}` : ""})
           </h2>
+          {novels.length > 1 && (
+            <form action="/workspace" method="get" className="relative w-full sm:w-64" role="search">
+              <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+              <Input
+                type="search"
+                name="q"
+                defaultValue={libraryQuery}
+                placeholder="Cari judul, genre, premis…"
+                aria-label="Cari novel di perpustakaan"
+                className="h-8 pl-8 text-xs bg-card"
+              />
+            </form>
+          )}
         </div>
 
-        {novels.length === 0 ? (
+        {visible.length === 0 ? (
+          novels.length === 0 ? (
           /* Empty State */
           <div className="border border-dashed border-border/80 rounded-xl p-12 text-center space-y-4 bg-card/30">
             <div className="w-12 h-12 rounded-full bg-muted/60 text-muted-foreground flex items-center justify-center mx-auto">
@@ -75,10 +100,29 @@ export default async function WorkspacePage() {
               </Button>
             </Link>
           </div>
+          ) : (
+          /* No search results */
+          <div className="border border-dashed border-border/80 rounded-xl p-12 text-center space-y-4 bg-card/30">
+            <div className="w-12 h-12 rounded-full bg-muted/60 text-muted-foreground flex items-center justify-center mx-auto">
+              <SearchX className="w-6 h-6" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="font-serif text-lg font-medium">Tidak Ada Hasil</h3>
+              <p className="text-xs text-muted-foreground max-w-sm mx-auto leading-relaxed">
+                Tidak ada novel yang cocok dengan “{libraryQuery}”. Coba kata kunci lain.
+              </p>
+            </div>
+            <Link href="/workspace" className="inline-block pt-2">
+              <Button size="sm" variant="outline" className="text-xs">
+                Tampilkan Semua Novel
+              </Button>
+            </Link>
+          </div>
+          )
         ) : (
           /* Novel Cards Grid */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {novels.map((novel) => {
+            {visible.map((novel) => {
               const { progressPercent, readingTimeMinutes } = NovelService.calculateStats(
                 novel.word_count,
                 novel.target_word_count

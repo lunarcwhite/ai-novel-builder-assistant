@@ -45,7 +45,7 @@ export default function SceneNavigator({
   ];
 
   return (
-    <aside className="w-72 shrink-0 border-r border-border/80 bg-sidebar/50 flex flex-col h-full overflow-hidden select-none transition-all">
+    <aside className="absolute inset-y-0 left-0 z-40 w-72 border-r border-border/80 bg-background shadow-paper flex flex-col h-full overflow-hidden select-none transition-all lg:static lg:z-auto lg:shadow-none lg:bg-sidebar/50">
       {/* Navigator Header */}
       <div className="p-3.5 border-b border-border/80 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
@@ -108,6 +108,8 @@ export default function SceneNavigator({
                     <button
                       type="button"
                       onClick={() => toggleChapter(chapter.id)}
+                      aria-expanded={!isCollapsed}
+                      aria-label={`${isCollapsed ? "Buka" : "Tutup"} bab ${chapter.title}`}
                       className="w-full flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-muted/60 text-left transition-colors text-xs font-medium text-foreground/90 group"
                     >
                       <div className="flex items-center gap-1.5 truncate">
@@ -139,6 +141,7 @@ export default function SceneNavigator({
                               <Link
                                 key={scene.id}
                                 href={`/workspace/${novelId}/write/${scene.id}`}
+                                aria-current={isActive ? "page" : undefined}
                                 className={`flex items-center justify-between px-2 py-1.5 rounded text-xs transition-colors group ${
                                   isActive
                                     ? "bg-primary/15 text-primary font-medium border-l-2 border-primary"
@@ -185,6 +188,8 @@ export default function SceneNavigator({
                     <button
                       type="button"
                       onClick={() => toggleChapter(chapter.id)}
+                      aria-expanded={!isCollapsed}
+                      aria-label={`${isCollapsed ? "Buka" : "Tutup"} bab ${chapter.title}`}
                       className="w-full flex items-center justify-between px-2 py-1.5 rounded-md hover:bg-muted/60 text-left transition-colors text-xs font-medium text-foreground/90 group"
                     >
                       <div className="flex items-center gap-1.5 truncate">
@@ -215,6 +220,7 @@ export default function SceneNavigator({
                               <Link
                                 key={scene.id}
                                 href={`/workspace/${novelId}/write/${scene.id}`}
+                                aria-current={isActive ? "page" : undefined}
                                 className={`flex items-center justify-between px-2 py-1.5 rounded text-xs transition-colors group ${
                                   isActive
                                     ? "bg-primary/15 text-primary font-medium border-l-2 border-primary"
