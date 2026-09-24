@@ -1219,7 +1219,7 @@ This phase extends the MVP toward the full product vision.
 
 ---
 
-## Task 9.1 — Plot Threads
+## Task 9.1 — Plot Threads [COMPLETED]
 
 Implemented: `src/features/plot/` (repository, service), `src/server/actions/plot.ts`,
 `src/app/(workspace)/workspace/[novelId]/plot/` (page, studio view, dialogs),
@@ -1234,7 +1234,7 @@ migration `010_plot_threads_timeline.sql` (applied live on Supabase).
 
 ---
 
-## Task 9.2 — Timeline
+## Task 9.2 — Timeline [COMPLETED]
 
 Implemented: `src/features/timeline/` (repository, service), dialogs + vertical
 timeline view in `plot/` studio, same migration 010 (applied live on Supabase).
@@ -1247,7 +1247,7 @@ timeline view in `plot/` studio, same migration 010 (applied live on Supabase).
 
 ---
 
-## Task 9.3 — Story Doctor
+## Task 9.3 — Story Doctor [COMPLETED]
 
 Implemented: `src/features/doctor/` (deterministic analyzers + service),
 `src/server/actions/doctor.ts`, `src/app/(workspace)/workspace/[novelId]/doctor/`
@@ -1309,6 +1309,33 @@ Implemented: `proposeSceneMemoriesAction` (explicit author trigger via
 "Usulkan Memori" in the AI panel — never on autosave), candidates stored
 as `proposed` and reviewed in Memory Studio, covered by
 `tests/feature/memory-proposals.test.ts` + memories suite.
+
+---
+
+## PHASE 9 EXIT CRITERIA [VERIFIED]
+
+The system can track story intelligence beyond the manuscript text.
+
+```text
+[x] Plot threads: planned / active / resolved / abandoned with guarded transitions (Task 9.1)
+[x] Timeline: flexible precision incl. unknown, conditional date requirements (Task 9.2)
+[x] Story Doctor: 6 deterministic sections, evidence-bound, no score (Task 9.3)
+[x] Hierarchical summaries: scene → chapter → act → novel, AI optional (Task 9.4)
+[x] Memory proposals: explicit trigger, always proposed, never auto-confirmed (Task 9.5)
+```
+
+Verified: `src/features/plot/`, `src/features/timeline/` (repositories +
+services, migration `010_plot_threads_timeline.sql`), `src/features/doctor/`
+(deterministic analyzers + service), `src/features/summaries/` (hierarchy +
+service), plot/timeline studio + doctor view + summary studio, tests
+(`tests/feature/plot-timeline.test.ts`, `tests/unit/plot-timeline.test.ts`,
+`tests/feature/story-doctor.test.ts`, `tests/unit/story-doctor.test.ts`,
+`tests/feature/summaries.test.ts`, `tests/unit/summaries.test.ts`,
+`tests/feature/memory-proposals.test.ts`).
+
+Note: timeline_events table now exists, but the Phase 8 Consistency Engine
+still has no timeline check (Task 8.5 deferred stands) — a timeline-vs-manuscript
+check remains future work.
 
 ---
 
