@@ -621,5 +621,141 @@ export interface AISuggestionResult {
   latencyMs: number;
   conversationId: string;
   messageId: string;
+};
+
+// -------------------------------------------------------------
+// Phase 8 Domain: Consistency Engine
+// -------------------------------------------------------------
+// SOUL.md #13/#32: findings are tentative observations with evidence,
+// never verdicts. Timeline/plot tables do not exist yet (Phase 9+) —
+// timeline_inconsistency / plot_hole types are reserved; the checker
+// only produces character_contradiction + lore_conflict until then.
+
+export type ConsistencyFindingType =
+  | "character_contradiction"
+  | "timeline_inconsistency"
+  | "lore_conflict"
+  | "plot_hole";
+
+export type ConsistencySeverity = "potential" | "notable" | "high_attention";
+
+export type ConsistencyStatus = "open" | "reviewed" | "dismissed" | "resolved";
+
+export type ConsistencyScope = "scene" | "chapter";
+
+export interface ConsistencySourceRef {
+  type: "scene" | "chapter" | "character" | "world_rule" | "world_lore" | "memory" | "timeline_event";
+  id?: string | null;
+  label?: string | null;
+  excerpt?: string | null;
 }
+
+export interface ConsistencyRelatedEntity {
+  type: string;
+  id: string;
+}
+
+export interface ConsistencyFinding {
+  id: UUID;
+  novel_id: UUID;
+  type: ConsistencyFindingType;
+  severity: ConsistencySeverity;
+  description: string;
+  status: ConsistencyStatus;
+  source_ids: ConsistencySourceRef[];
+  related_entity_ids: ConsistencyRelatedEntity[];
+  metadata: {
+    scope?: ConsistencyScope;
+    fact_key?: string;
+    ai_generated?: boolean;
+    [key: string]: unknown;
+  };
+  created_at: string;
+  updated_at: string;
+}
+
+export const consistencyScopeSchema = z.enum(["scene", "chapter"]);
+
+export const runConsistencyCheckSchema = z.object({
+  scope: consistencyScopeSchema,
+  sceneId: z.string().min(1).max(100).nullable().optional(),
+  chapterId: z.string().min(1).max(100).nullable().optional(),
+});
+
+export type RunConsistencyCheckInput = z.infer<typeof runConsistencyCheckSchema>;
+
+export const updateConsistencyFindingSchema = z.object({
+  status: z.enum(["reviewed", "dismissed", "resolved"]),
+});
+
+export type UpdateConsistencyFindingInput = z.infer<typeof updateConsistencyFindingSchema>;
+
+// -------------------------------------------------------------
+// Phase 9 Domain: Plot Threads + Timeline Events (Story Intelligence)
+// -------------------------------------------------------------
+// SOUL.md #13/#15: thread status is author-decided; "unknown" is a
+// valid timeline state. The system observes and suggests, never
+// auto-resolves story content.
+
+export type PlotThreadStatus = "planned" | "active" | "resolved" | "abandoned";
+
+export interface PlotThread {
+  id: UUID;
+  novel_id: UUID;
+  title: string;
+  description?: string | null;
+  status: PlotThreadStatus;
+  importance: number; // 1 to 5
+  introduced_chapter_id?: UUID | null;
+  resolved_chapter_id?: UUID | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export const createPlotThreadSchema = z.object({
+  title: z.string().min(1, "Judul plot thread wajib diisi").max(150, "Judul plot thread maksimal 150 karakter"),
+  description: z.string().optional().nullable(),
+  status: z.enum(["planned", "active", "resolved", "abandoned"]).default("planned"),
+  importance: z.coerce.number().int().min(1).max(5).default(3),
+  introduced_chapter_id: z.string().min(1).max(100).nullable().optional(),
+  resolved_chapter_id: z.string().min(1).max(100).nullable().optional(),
+});
+
+export type CreatePlotThreadInput = z.input<typeof createPlotThreadSchema>;
+
+export const updatePlotThreadSchema = createPlotThreadSchema.partial();
+
+export type UpdatePlotThreadInput = z.infer<typeof updatePlotThreadSchema>;
+
+export type TimelinePrecision = "exact" | "day" | "month" | "year" | "relative" | "unknown";
+
+export interface TimelineEvent {
+  id: UUID;
+  novel_id: UUID;
+  title: string;
+  description?: string | null;
+  date_value?: string | null;
+  date_precision: TimelinePrecision;
+  relative_time?: string | null;
+  chapter_id?: UUID | null;
+  location_id?: UUID | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export const createTimelineEventSchema = z.object({
+  title: z.string().min(1, "Judul peristiwa wajib diisi").max(150, "Judul peristiwa maksimal 150 karakter"),
+  description: z.string().optional().nullable(),
+  date_value: z.string().max(120, "Nilai tanggal maksimal 120 karakter").optional().nullable(),
+  date_precision: z.enum(["exact", "day", "month", "year", "relative", "unknown"]).default("unknown"),
+  relative_time: z.string().max(200, "Waktu relatif maksimal 200 karakter").optional().nullable(),
+  chapter_id: z.string().min(1).max(100).nullable().optional(),
+  location_id: z.string().min(1).max(100).nullable().optional(),
+});
+
+export type CreateTimelineEventInput = z.input<typeof createTimelineEventSchema>;
+
+export const updateTimelineEventSchema = createTimelineEventSchema.partial();
+
+export type UpdateTimelineEventInput = z.infer<typeof updateTimelineEventSchema>;
 

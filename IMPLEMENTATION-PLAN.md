@@ -1160,6 +1160,19 @@ Resolve
 
 Consistency checker produces explainable findings with sources.
 
+Implemented: `src/features/consistency/` (repository, checks, service), `src/server/ai/prompts.ts` (CONSISTENCY_VALIDATION_SYSTEM + builder), `src/server/actions/consistency.ts`, `src/components/editor/consistency-panel.tsx`, migration `009_consistency_findings.sql` (applied live on Supabase).
+
+```text
+[x] Run check on current scene / current chapter (Selected Chapters + Entire Novel deferred)
+[x] Character consistency: memory-vs-memory + scene-vs-confirmed-memory (Task 8.3)
+[x] World rule consistency: scene-vs-rule exclusivity check (Task 8.4)
+[x] Timeline consistency deferred — no timeline_events table yet (Phase 9); types reserved (Task 8.5)
+[x] Every finding carries description + source A / source B (Task 8.6)
+[x] Author workflow: Review / Dismiss / Resolve + delete; manuscript never written (Task 8.7)
+```
+
+Verified: 90 tests pass (23 new consistency: 14 unit + 9 feature), lint clean, typecheck clean, build clean.
+
 ---
 
 # PHASE 9 — Story Intelligence

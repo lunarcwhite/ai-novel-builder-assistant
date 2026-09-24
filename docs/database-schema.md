@@ -957,16 +957,23 @@ Metadata dapat menyimpan:
 
 # 26. Consistency Findings
 
+Implemented in `src/db/migrations/009_consistency_findings.sql` (Phase 8).
+Findings are tentative observations with evidence, never verdicts.
+The checker is read-only against the manuscript.
+
 ```sql
+create type consistency_severity as enum ('potential', 'notable', 'high_attention');
+create type consistency_status as enum ('open', 'reviewed', 'dismissed', 'resolved');
+
 create table consistency_findings (
     id uuid primary key default gen_random_uuid(),
 
     novel_id uuid not null
         references novels(id) on delete cascade,
 
-    type text not null,
+    type text not null check (type in ('character_contradiction', 'timeline_inconsistency', 'lore_conflict', 'plot_hole')),
 
-    severity consistency_severity not null,
+    severity consistency_severity not null default 'potential',
 
     description text not null,
 
@@ -981,7 +988,18 @@ create table consistency_findings (
     created_at timestamptz not null default now(),
     updated_at timestamptz not null default now()
 );
+
+create index consistency_findings_novel_id_idx on consistency_findings(novel_id);
+create index consistency_findings_novel_status_idx on consistency_findings(novel_id, status);
+create index consistency_findings_novel_type_idx on consistency_findings(novel_id, type);
 ```
+
+Trigger `set_consistency_findings_updated_at` memakai `handle_updated_at()`.
+RLS: `Users can manage findings of own novels` (ownership via `novels.user_id`).
+
+`type` `timeline_inconsistency` / `plot_hole` dicadangkan untuk Phase 9+
+(belum ada tabel timeline/plot) — checker Phase 8 hanya menghasilkan
+`character_contradiction` + `lore_conflict`.
 
 Contoh:
 

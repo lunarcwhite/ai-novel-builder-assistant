@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { formatNumber } from "@/lib/utils";
 import { quickAddSceneMemoryAction, type MemoryActionResult } from "@/server/actions/memories";
 import AIAssistant from "./ai-assistant";
+import ConsistencyPanel from "./consistency-panel";
 import {
   Sparkles,
   PanelRightClose,
@@ -245,6 +246,9 @@ export default function AIPanelPlaceholder({
             </div>
           </div>
         </div>
+
+        {/* Consistency (Phase 8) */}
+        <ConsistencyPanel novel={novel} chapter={chapter} scene={scene} />
 
         {/* AI Assistant (Phase 7 — live) */}
         <AIAssistant

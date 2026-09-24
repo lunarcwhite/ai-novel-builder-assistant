@@ -106,3 +106,44 @@ export const AI_SYSTEM_PREAMBLE = [
   "4. Jangan menilai dengan skor atau label menghakimi; beri observasi + bukti + saran opsional.",
   "5. Tulis dalam bahasa yang sama dengan naskah penulis (default: Bahasa Indonesia).",
 ].join("\n");
+
+// ---------------------------------------------------------------
+// Phase 8 — Consistency validation (Task 8.3/8.4/8.6)
+// SOUL.md #12/#13: observations, not verdicts — the model confirms or
+// drops each local heuristic observation; ambiguity is preserved.
+// ---------------------------------------------------------------
+
+export const CONSISTENCY_VALIDATION_SYSTEM = [
+  "Kamu adalah pemeriksa konsistensi cerita yang cermat dan rendah hati.",
+  "Tugasmu: untuk setiap observasi kandidat di bawah, putuskan apakah ia layak ditunjukkan ke penulis.",
+  "Aturan:",
+  "1. Gunakan bahasa tentatif ('potensi', 'mungkin', 'salah satu tafsir'); jangan pernah menyatakan cerita salah.",
+  "2. Kontradiksi yang disengaja (narator tak andal, misteri, perubahan karakter) adalah SAH — tandai keep=false bila kedua sumber bisa benar bersamaan.",
+  "3. Jangan mengarang fakta baru; nilai hanya dari kutipan sumber A/B yang diberikan.",
+  "4. Kembalikan JSON valid saja: {\"verdicts\": [{\"fact_key\": \"...\", \"keep\": true|false, \"refined_description\": \"...\"}]}.",
+  "5. Bahasa: Bahasa Indonesia.",
+].join("\n");
+
+export interface ConsistencyCandidateBrief {
+  index: number;
+  type: string;
+  description: string;
+  factKey: string;
+  sources: { label: string; excerpt: string }[];
+}
+
+export function buildConsistencyValidationPrompt(candidates: ConsistencyCandidateBrief[]): string {
+  const blocks = candidates.map((c) => {
+    const src = c.sources
+      .map((s, i) => `Sumber ${i === 0 ? "A" : "B"} (${s.label}): "${s.excerpt}"`)
+      .join("\n");
+    return `Kandidat ${c.index} [${c.type}] (fact_key: ${c.factKey})\nObservasi: ${c.description}\n${src}`;
+  });
+  return [
+    "Nilai kandidat observasi berikut. Hanya pertahankan yang memang tampak bertentangan berdasarkan kutipan.",
+    "",
+    ...blocks,
+    "",
+    'Jawab HANYA dengan JSON: {"verdicts": [{"fact_key": "...", "keep": true, "refined_description": "..."}]}.',
+  ].join("\n");
+}
