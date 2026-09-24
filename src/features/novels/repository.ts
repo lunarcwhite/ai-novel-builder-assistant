@@ -194,8 +194,15 @@ export class NovelRepository {
 
   /**
    * Delete a novel, strictly checking ownership.
+   * Returns false when the novel does not belong to the caller, so a
+   * cross-user delete is reported as "not deleted" instead of silently
+   * succeeding (Supabase RLS would block the write, but `!error` alone
+   * cannot distinguish "deleted" from "matched zero rows").
    */
   static async delete(id: string, userId: string): Promise<boolean> {
+    const existing = await this.findById(id, userId);
+    if (!existing) return false;
+
     const supabase = await createClient();
 
     if (supabase && isSupabaseConfigured) {

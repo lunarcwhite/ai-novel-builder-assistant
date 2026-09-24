@@ -45,6 +45,8 @@ describe("vertical CRUD slice: novel -> act -> chapter -> scene", () => {
 
     assert.equal(await NovelService.getNovel(novel.id, stranger), null);
     assert.deepEqual(await NovelService.listUserNovels(stranger), []);
+    assert.equal(await NovelService.deleteNovel(novel.id, stranger), false);
+    assert.ok(await NovelService.getNovel(novel.id, owner));
     assert.equal(await ChapterService.getChapter(chapter.id, novel.id, stranger), null);
 
     // Write path throws when the novel does not belong to the caller.

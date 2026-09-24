@@ -386,10 +386,10 @@ Business logic:
 
 ## Task 2.4 — Novel Library UI
 
-Route:
+Route (`/workspace`; earlier drafts called it `/dashboard`):
 
 ```text
-/dashboard
+/workspace
 ```
 
 Display:
@@ -440,7 +440,8 @@ login
 
 Verified: `src/features/novels/` (repository + service + migration
 `002_novels.sql`), library page + create flow (`/workspace`, `/workspace/new`
-+ `createNovelAction`), novel overview with metadata edit, delete action,
++ `createNovelAction`), novel overview with metadata edit, delete action
+(ownership pre-check: cross-user delete returns `false`, data untouched),
 server-side library search (`?q=` via `filterNovelsForLibrary`).
 
 ---
