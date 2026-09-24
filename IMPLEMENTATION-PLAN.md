@@ -221,16 +221,21 @@ Follow `docs/design.md`.
 
 ---
 
-## Phase 0 Exit Criteria
+## Phase 0 Exit Criteria [COMPLETED]
 
 ```text
-[ ] Application starts
-[ ] TypeScript passes
-[ ] Lint passes
-[ ] Base UI works
-[ ] Environment documented
-[ ] Repository clean
+[x] Application starts
+[x] TypeScript passes
+[x] Lint passes
+[x] Base UI works
+[x] Environment documented
+[x] Repository clean
 ```
+
+Verified: app boots (`npm run dev` / `npm run build` clean, 19 routes),
+`tsc --noEmit` + `next lint` pass, design-system foundation
+(`tailwind.config.ts`, `globals.css`, `src/components/ui/`) renders,
+`.env.example` documents all vars, README + `docs/local-testing.md` present.
 
 ---
 
@@ -298,15 +303,21 @@ Screens:
 
 ---
 
-## Phase 1 Exit Criteria
+## Phase 1 Exit Criteria [COMPLETED]
 
 ```text
-[ ] User can sign up
-[ ] User can log in
-[ ] User can log out
-[ ] Protected pages work
-[ ] Unauthorized access is blocked
+[x] User can sign up
+[x] User can log in
+[x] User can log out
+[x] Protected pages work
+[x] Unauthorized access is blocked
 ```
+
+Verified: `src/server/auth/guards.ts` (`requireAuth`, `requireNovelAccess`),
+`src/middleware.ts` (workspace guard + login redirect), auth UI
+(`login`/`signup`/`forgot-password` pages + actions), demo login
+(`POST /api/auth/demo`) for local testing, unauthorized novel access
+blocked server-side (feature export tests deny cross-user).
 
 ---
 
@@ -410,7 +421,7 @@ Target Audience
 
 ---
 
-## Phase 2 Exit Criteria
+## Phase 2 Exit Criteria [COMPLETED]
 
 User dapat:
 
@@ -422,6 +433,11 @@ login
 → edit metadata
 → delete/archive
 ```
+
+Verified: `src/features/novels/` (repository + service + migration
+`002_novels.sql`), library page + create flow (`/workspace`, `/workspace/new`
++ `createNovelAction`), novel overview with metadata edit, delete action,
+server-side library search (`?q=` via `filterNovelsForLibrary`).
 
 ---
 
@@ -511,7 +527,7 @@ Do not start with complex drag/drop.
 
 ---
 
-## Phase 3 Exit Criteria
+## Phase 3 Exit Criteria [COMPLETED]
 
 User dapat:
 
@@ -522,6 +538,12 @@ Create Scene
 Reorder
 Navigate
 ```
+
+Verified: `src/features/acts|chapters|scenes/` + `src/features/structure/`
+(migration `003_acts_chapters_scenes.sql`), outline tree UI with act/chapter
+collapse + move up/down + dialogs, editor scene navigator with active-scene
+highlight. Task 3.5 drag & drop: covered via move buttons (no DnD lib —
+simplest coherent option per AGENTS.md).
 
 ---
 
@@ -1057,7 +1079,7 @@ Verified: 67 tests pass (19 new AI), lint clean, typecheck clean, build clean.
 
 ---
 
-# PHASE 8 — Consistency Engine
+# PHASE 8 — Consistency Engine [COMPLETED]
 
 ## Goal
 
@@ -1175,7 +1197,7 @@ Verified: 90 tests pass (23 new consistency: 14 unit + 9 feature), lint clean, t
 
 ---
 
-# PHASE 9 — Story Intelligence
+# PHASE 9 — Story Intelligence [COMPLETED]
 
 This phase extends the MVP toward the full product vision.
 
@@ -1225,7 +1247,7 @@ No migration, no score, read-only — SOUL.md #14 (diagnose, don't dictate).
 
 ---
 
-## Task 9.4 — Hierarchical Summaries
+## Task 9.4 — Hierarchical Summaries [COMPLETED]
 
 Build:
 
@@ -1241,9 +1263,15 @@ Novel Summary
 
 These become long-novel context layers.
 
+Implemented: `src/features/summaries/` (hierarchy + service),
+`src/server/actions/summaries.ts` (`getSummaryHierarchyAction`,
+`synthesizeSummaryAction`, `applySummaryAction`), summary studio
+(`summaries/page.tsx` + `summary-studio-view.tsx`), covered by
+`tests/unit/summaries.test.ts` + `tests/feature/summaries.test.ts`.
+
 ---
 
-## Task 9.5 — Automatic Memory Proposals
+## Task 9.5 — Automatic Memory Proposals [COMPLETED]
 
 After scene save:
 
@@ -1261,9 +1289,14 @@ author confirmation
 
 Do not auto-confirm initially.
 
+Implemented: `proposeSceneMemoriesAction` (explicit author trigger via
+"Usulkan Memori" in the AI panel — never on autosave), candidates stored
+as `proposed` and reviewed in Memory Studio, covered by
+`tests/feature/memory-proposals.test.ts` + memories suite.
+
 ---
 
-# PHASE 10 — Export
+# PHASE 10 — Export [COMPLETED]
 
 Implement:
 
@@ -1287,9 +1320,18 @@ Export must respect:
 - formatting;
 - manuscript content.
 
+Implemented: `src/features/export/` (`formatters.ts` TXT/Markdown,
+`docx.ts` via `docx@9.7.2`, `service.ts` read-only `exportNovel`),
+`GET /api/novels/:novelId/export`, `ExportView` UI, `ExportResult`
+schema (`txt|md|docx` + `word` alias). Commits `ffe3091` (Phase 10
+TXT/Markdown, 15 tests) + `3d4cbb6` (Phase 11 DOCX with Title→H1→H2→H3
+hierarchy). PDF/EPUB deferred post-MVP. Covered by 15 TXT/MD tests +
+DOCX unit (blocks order, empty semantics, ZIP magic) + feature
+(buffer + cross-user deny).
+
 ---
 
-# PHASE 11 — Polish
+# PHASE 11 — Polish [COMPLETED]
 
 Focus on:
 
@@ -1303,9 +1345,37 @@ Focus on:
 - error recovery;
 - performance.
 
+Implemented (commit `bb2a4f0`, `docs/local-testing.md`):
+
+```text
+[x] Command palette Ctrl+K: global + 8 novel tabs + editor actions,
+    ranked filter, keyboard nav (src/lib/palette.ts, command-palette.tsx)
+[x] Shortcuts: Ctrl+S save-now, F11 toggle focus, Esc exit
+    (src/lib/shortcuts.ts; fixed missing F11 handler in workspace)
+[x] Search: server-side library ?q= title/genre/premise (library-search.ts)
+[x] Loading: (workspace)/loading.tsx skeleton + aria-busy
+[x] Empty states: library empty + no-search-results + chapter/scene empties
+[x] Accessibility: skip link, nav aria-current, collapse aria-expanded,
+    header aria-pressed, dialog role/aria-modal, palette combobox/listbox
+[x] Responsive: side panels overlay + scrim below lg, static at lg+
+[x] Error recovery: (workspace)/error.tsx + global-error.tsx + not-found.tsx,
+    manuscript-safe copy, reset + back-to-library actions
+[x] Empty-state wording shared between TXT/MD/DOCX formatters
+```
+
+Deferred (documented, YAGNI): scene jump commands in palette (needs client
+structure store), global manuscript search, outline virtualization for
+100+ chapters, full contrast audit, custom shortcuts. Covered by
+`tests/unit/palette.test.ts` (16 tests: builders, ranking, paths,
+shortcuts, library filter).
+
 ---
 
-# PHASE 12 — Deployment
+# PHASE 12 — Deployment [DEFERRED — pending local testing]
+
+Local testing first (`docs/local-testing.md`: 16 scenarios + 6 keyboard
+checks, demo mode, no Supabase/AI key needed). Deploy only after the
+author signs off on the local run.
 
 ## Production Stack
 
@@ -1314,23 +1384,35 @@ Recommended:
 ```text
 Frontend / App
     ↓
-Next.js hosting
+Next.js hosting (Vercel or any Node 20+ host; `npm run build` verified: 19 routes)
 
 Database
     ↓
-PostgreSQL + pgvector
+PostgreSQL + pgvector (apply src/db/migrations/*.sql in order)
 
 Auth
     ↓
-Supabase Auth
+Supabase Auth (fill .env.local from .env.example, use /signup)
 
 Storage
     ↓
-Object Storage
+Object Storage (only if manuscript attachments are added; not needed now)
 
 AI
     ↓
-AI Provider
+AI Provider (set AI_PROVIDER + AI_API_KEY server-side only)
+```
+
+## Go-live checklist
+
+```text
+[ ] Local testing doc fully passes in demo mode
+[ ] .env.local filled with real Supabase + AI keys (never commit)
+[ ] Migrations applied in order to production Postgres + pgvector enabled
+[ ] npm run build passes on the deploy host
+[ ] Signup → create novel → write → reload verified with a real account
+[ ] AI features verified with a real key (suggest/doctor/proposals)
+[ ] Export .md/.txt/.docx downloaded and opened
 ```
 
 ---
