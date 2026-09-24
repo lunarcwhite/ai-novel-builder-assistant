@@ -912,3 +912,40 @@ export const applySummarySchema = z.object({
 
 export type ApplySummaryInput = z.infer<typeof applySummarySchema>;
 
+// -------------------------------------------------------------
+// Phase 10 — Export (TXT + Markdown MVP)
+// -------------------------------------------------------------
+// SOUL.md #6: export renders data the author owns into a file.
+// Read-only — it never writes to the manuscript. DOCX/PDF/EPUB
+// are post-MVP (PRD #22); no `exports` table until async jobs
+// or history are actually needed (no migration in this phase).
+
+export const exportFormatSchema = z.enum(["txt", "md"]);
+
+export type ExportFormat = z.infer<typeof exportFormatSchema>;
+
+const EXPORT_FORMAT_ALIASES: Record<string, string> = {
+  txt: "txt",
+  text: "txt",
+  md: "md",
+  markdown: "md",
+};
+
+export const exportQuerySchema = z.object({
+  format: z.preprocess(
+    (v) => EXPORT_FORMAT_ALIASES[String(v ?? "md").toLowerCase()] ?? String(v ?? ""),
+    z.enum(["txt", "md"], {
+      errorMap: () => ({ message: "Format ekspor harus 'txt' atau 'md'." }),
+    })
+  ),
+  includeEmpty: z.preprocess(
+    (v) =>
+      v === undefined || v === null || v === ""
+        ? true
+        : v === true || v === "1" || v === "true" || v === "on",
+    z.boolean()
+  ),
+});
+
+export type ExportQuery = z.infer<typeof exportQuerySchema>;
+
