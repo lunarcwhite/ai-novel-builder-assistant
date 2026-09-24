@@ -104,12 +104,25 @@ export class StoryDoctorService {
     ];
 
     // Scene appearances per character (POV + involved) for arc presence.
+    // Task 9.6: presenceChapters maps character -> set of chapter ids,
+    // enabling distribution analysis (clustering, middle absence).
     const appearances = new Map<string, number>();
+    const presenceChapters = new Map<string, Set<string>>();
+    const trackPresence = (charId: string, chapterId: string) => {
+      let set = presenceChapters.get(charId);
+      if (!set) {
+        set = new Set<string>();
+        presenceChapters.set(charId, set);
+      }
+      set.add(chapterId);
+    };
     try {
       const allScenes = chapters.flatMap((c) => c.scenes);
+      const sceneChapter = new Map(allScenes.map((s) => [s.id, s.chapter_id]));
       for (const s of allScenes) {
         if (s.pov_character_id) {
           appearances.set(s.pov_character_id, (appearances.get(s.pov_character_id) || 0) + 1);
+          trackPresence(s.pov_character_id, s.chapter_id);
         }
       }
       const sceneIds = allScenes.map((s) => s.id);
@@ -118,11 +131,13 @@ export class StoryDoctorService {
           SceneCharacterRepository.findByScene(sid, opts.novelId, opts.userId).catch(() => [])
         )
       );
-      for (const list of ctxs) {
+      ctxs.forEach((list, i) => {
+        const chapterId = sceneChapter.get(sceneIds[i]);
         for (const c of list) {
           appearances.set(c.id, (appearances.get(c.id) || 0) + 1);
+          if (chapterId) trackPresence(c.id, chapterId);
         }
-      }
+      });
     } catch {
       // Presence data is best-effort; analyzers degrade gracefully to empty.
     }
@@ -148,7 +163,7 @@ export class StoryDoctorService {
       unresolved_questions: [],
     };
     if (want.has("plot")) bucket.plot = analyzePlot(input);
-    if (want.has("character_arcs")) bucket.character_arcs = analyzeCharacterArcs(input, appearances);
+    if (want.has("character_arcs")) bucket.character_arcs = analyzeCharacterArcs(input, appearances, presenceChapters);
     if (want.has("pacing")) bucket.pacing = analyzePacing(input);
     if (want.has("plot_threads")) bucket.plot_threads = analyzePlotThreads(input);
     if (want.has("worldbuilding")) bucket.worldbuilding = analyzeWorldbuilding(input);

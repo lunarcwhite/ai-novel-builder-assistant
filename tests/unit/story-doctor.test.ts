@@ -14,8 +14,10 @@ import { runStoryDoctorSchema } from "@/types";
 import type {
   ChapterWithScenes,
   Character,
+  CharacterRelationship,
   PlotThread,
   StoryMemory,
+  TimelineEvent,
   WorldRule,
 } from "@/types";
 
@@ -155,6 +157,187 @@ describe("analyzeCharacterArcs", () => {
     ];
     const out = analyzeCharacterArcs(input, new Map([["c1", 3]]));
     assert.equal(out.length, 0);
+  });
+
+  // Task 9.6a: presence clustering in the first third.
+  it("flags mains clustered in one third of the novel", () => {
+    const input = base();
+    input.chapters = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) =>
+      chapter({ id: `ch_${n}`, title: `Bab ${n}`, position: n })
+    );
+    input.characters = [
+      char({
+        id: "c1",
+        name: "Anna",
+        role: "protagonist",
+        motivation: "Kebenaran",
+        goal: "Bebas",
+        character_arc: "Berani",
+      }),
+    ];
+    const presence = new Map<string, Set<string>>([
+      ["c1", new Set(["ch_1", "ch_2", "ch_3"])],
+    ]);
+    const out = analyzeCharacterArcs(input, new Map([["c1", 3]]), presence);
+    assert.ok(out.some((o) => /menumpuk di sepertiga/i.test(o.observation)));
+  });
+
+  it("stays silent when presence is evenly spread", () => {
+    const input = base();
+    input.chapters = [1, 2, 3, 4, 5, 6].map((n) =>
+      chapter({ id: `ch_${n}`, title: `Bab ${n}`, position: n })
+    );
+    input.characters = [
+      char({
+        id: "c1",
+        name: "Anna",
+        role: "protagonist",
+        motivation: "Kebenaran",
+        goal: "Bebas",
+        character_arc: "Berani",
+      }),
+    ];
+    const presence = new Map<string, Set<string>>([
+      ["c1", new Set(["ch_1", "ch_3", "ch_6"])],
+    ]);
+    const out = analyzeCharacterArcs(input, new Map([["c1", 3]]), presence);
+    assert.ok(!out.some((o) => /menumpuk di sepertiga/i.test(o.observation)));
+  });
+
+  // Task 9.6b: present early + late, absent across the middle.
+  it("flags mains absent through the middle chapters", () => {
+    const input = base();
+    input.chapters = [1, 2, 3, 4, 5, 6].map((n) =>
+      chapter({ id: `ch_${n}`, title: `Bab ${n}`, position: n })
+    );
+    input.characters = [
+      char({
+        id: "c1",
+        name: "Vane",
+        role: "antagonist",
+        motivation: "Kuasa",
+        goal: "Takhta",
+        character_arc: "Jatuh",
+      }),
+    ];
+    const presence = new Map<string, Set<string>>([
+      ["c1", new Set(["ch_1", "ch_6"])],
+    ]);
+    const out = analyzeCharacterArcs(input, new Map([["c1", 2]]), presence);
+    assert.ok(out.some((o) => /absen di \d+ bab tengah/i.test(o.observation)));
+    const hit = out.find((o) => /absen di \d+ bab tengah/i.test(o.observation));
+    assert.ok(hit!.evidence.some((e) => e.type === "chapter"));
+  });
+
+  // Task 9.6c: annotated relation with no timeline/memory anchor.
+  it("flags annotated relations without story anchors", () => {
+    const input = base();
+    input.characters = [
+      char({ id: "c1", name: "Anna", role: "protagonist" }),
+      char({ id: "c2", name: "Daniel", role: "supporting" }),
+    ];
+    const rel = (extra: Partial<CharacterRelationship> = {}): CharacterRelationship => ({
+      id: "rel_1",
+      novel_id: "nov_1",
+      from_character_id: "c1",
+      to_character_id: "c2",
+      relationship_type: "rival",
+      description: null,
+      history: null,
+      current_state: "Bermusuhan setelah pengkhianatan.",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      ...extra,
+    });
+    input.relationships = [rel()];
+    const out = analyzeCharacterArcs(input, new Map());
+    assert.ok(out.some((o) => /belum berjangkar/i.test(o.observation)));
+  });
+
+  it("stays silent when the relation is anchored by a timeline event", () => {
+    const input = base();
+    input.characters = [
+      char({ id: "c1", name: "Anna", role: "protagonist" }),
+      char({ id: "c2", name: "Daniel", role: "supporting" }),
+    ];
+    input.relationships = [
+      {
+        id: "rel_1",
+        novel_id: "nov_1",
+        from_character_id: "c1",
+        to_character_id: "c2",
+        relationship_type: "rival",
+        description: null,
+        history: null,
+        current_state: "Bermusuhan setelah pengkhianatan.",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+    ];
+    const ev = (extra: Partial<TimelineEvent> = {}): TimelineEvent => ({
+      id: "ev_1",
+      novel_id: "nov_1",
+      title: "Pengkhianatan Daniel di dermaga",
+      description: "Anna melihat Daniel menyerahkan segel.",
+      date_precision: "unknown",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      ...extra,
+    });
+    input.events = [ev()];
+    const out = analyzeCharacterArcs(input, new Map());
+    assert.ok(!out.some((o) => /belum berjangkar/i.test(o.observation)));
+  });
+
+  // Task 9.6d: written arc, no memory anchor, single-chapter presence.
+  it("flags written arcs without manuscript anchors", () => {
+    const input = base();
+    input.characters = [
+      char({
+        id: "c1",
+        name: "Lyra",
+        role: "protagonist",
+        motivation: "Kebenaran",
+        goal: "Bebas",
+        character_arc: "Dari penakut menjadi berani",
+      }),
+    ];
+    const presence = new Map<string, Set<string>>([["c1", new Set(["ch_1"])]]);
+    const out = analyzeCharacterArcs(input, new Map([["c1", 1]]), presence);
+    assert.ok(out.some((o) => /belum berjangkar di memori/i.test(o.observation)));
+  });
+
+  it("stays silent when the arc has a character_fact anchor", () => {
+    const input = base();
+    input.characters = [
+      char({
+        id: "c1",
+        name: "Lyra",
+        role: "protagonist",
+        motivation: "Kebenaran",
+        goal: "Bebas",
+        character_arc: "Dari penakut menjadi berani",
+      }),
+    ];
+    input.memories = [
+      {
+        id: "m1",
+        novel_id: "nov_1",
+        type: "character_fact",
+        content: "Lyra berlatih pedang setiap malam sejak ayahnya wafat.",
+        importance: 3,
+        status: "confirmed",
+        source_type: "manual",
+        source_id: null,
+        metadata: {},
+        embedding: null,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+    ];
+    const presence = new Map<string, Set<string>>([["c1", new Set(["ch_1"])]]);
+    const out = analyzeCharacterArcs(input, new Map([["c1", 1]]), presence);
+    assert.ok(!out.some((o) => /belum berjangkar di memori/i.test(o.observation)));
   });
 });
 

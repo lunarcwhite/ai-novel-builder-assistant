@@ -90,11 +90,16 @@ export function analyzePlot(input: DoctorInput): StoryDoctorObservation[] {
 }
 
 // ---------------------------------------------------------------
-// 2. Character arcs — motivation, development, presence
+// 2. Character arcs — motivation, development, presence,
+//    distribution, relationship anchors (Task 9.6)
 // ---------------------------------------------------------------
+// SOUL.md #13/#15: arc absence or clustering may be intentional.
+// Every new check is evidence-bound and tentative; "unknown" and
+// untracked presence stay valid states, never verdicts.
 export function analyzeCharacterArcs(
   input: DoctorInput,
-  appearances: Map<string, number>
+  appearances: Map<string, number>,
+  presenceChapters?: Map<string, Set<string>>
 ): StoryDoctorObservation[] {
   const out: StoryDoctorObservation[] = [];
   if (input.characters.length === 0) return out;
@@ -130,7 +135,133 @@ export function analyzeCharacterArcs(
       );
     }
   }
-  return out.slice(0, 6);
+
+  // Task 9.6a: presence clustering — main appears in >=3 chapters but
+  // >=70% of those chapters sit in the first or last third of the novel.
+  // Needs chapter-ordered presence; degrades silently without it.
+  if (presenceChapters && presenceChapters.size > 0) {
+    const ordered = [...input.chapters].sort((a, b) => a.position - b.position);
+    if (ordered.length >= 6) {
+      const rank = new Map(ordered.map((c, i) => [c.id, i]));
+      const third = ordered.length / 3;
+      for (const c of mains) {
+        const present = [...(presenceChapters.get(c.id) || [])].filter((id) => rank.has(id));
+        if (present.length < 3) continue;
+        const inFirst = present.filter((id) => (rank.get(id) || 0) < third).length;
+        const inLast = present.filter((id) => (rank.get(id) || 0) >= ordered.length - third).length;
+        const clustered = Math.max(inFirst, inLast);
+        if (clustered / present.length >= 0.7) {
+          const side = inFirst >= inLast ? "awal" : "akhir";
+          const evChapters = present
+            .sort((a, b) => (rank.get(a) || 0) - (rank.get(b) || 0))
+            .slice(0, 5)
+            .map((id) => {
+              const ch = ordered.find((x) => x.id === id);
+              return chEvidence(id, ch?.title || id);
+            });
+          out.push(
+            obs("character_arcs", `Kehadiran "${c.name}" menumpuk di sepertiga ${side} novel (${clustered} dari ${present.length} bab) — busurnya mungkin timpang.`, {
+              evidence: [{ type: "character", id: c.id, label: c.name }, ...evChapters],
+              interpretation: "Bisa disengaja (tokoh yang masuk belakangan, atau keluar lebih awal); bisa juga porsi tengah yang belum ditulis.",
+              suggestion: `Opsional: periksa apakah "${c.name}" perlu satu kemunculan kecil di sepertiga yang kosong agar busurnya terasa utuh.`,
+            })
+          );
+        }
+      }
+    }
+
+    // Task 9.6b: middle absence — main present in early AND late chapters
+    // but missing from >=2 consecutive middle chapters.
+    if (ordered.length >= 5) {
+      const midStart = Math.floor(ordered.length / 3);
+      const midEnd = Math.ceil((ordered.length * 2) / 3);
+      const middle = ordered.slice(midStart, midEnd);
+      for (const c of mains) {
+        const present = presenceChapters.get(c.id) || new Set<string>();
+        if (present.size < 2) continue;
+        const early = ordered.slice(0, midStart).some((ch) => present.has(ch.id));
+        const late = ordered.slice(midEnd).some((ch) => present.has(ch.id));
+        const missingMid = middle.filter((ch) => !present.has(ch.id));
+        if (early && late && missingMid.length >= 2 && missingMid.length === middle.length) {
+          out.push(
+            obs("character_arcs", `"${c.name}" hadir di awal dan akhir tetapi absen di ${missingMid.length} bab tengah berurutan — pembaca mungkin kehilangan jejak busurnya.`, {
+              evidence: [
+                { type: "character", id: c.id, label: c.name },
+                ...missingMid.map((ch) => chEvidence(ch.id, ch.title)),
+              ],
+              interpretation: "Ketidakhadiran di tengah bisa disengaja (tokoh yang menghilang lalu kembali); risikonya hanya bila kembalinya terasa tiba-tiba.",
+              suggestion: `Opsional: selipkan satu penyebutan atau dampak "${c.name}" di bab tengah agar kehadirannya terjaga.`,
+            })
+          );
+        }
+      }
+    }
+  }
+
+  // Task 9.6c: relationship without story anchor — a relation with written
+  // history/current_state but no timeline event or character/relationship
+  // memory mentioning either party. Only checked when the relation has
+  // notes (empty relations are not punished).
+  const annotatedRels = input.relationships.filter((r) => r.history?.trim() || r.current_state?.trim());
+  if (annotatedRels.length > 0) {
+    const nameOf = new Map(input.characters.map((c) => [c.id, c.name.toLowerCase()]));
+    const anchorTexts = [
+      ...input.events.map((e) => `${e.title} ${e.description || ""}`.toLowerCase()),
+      ...input.memories
+        .filter((m) => m.type === "character_fact" || m.type === "relationship_fact")
+        .map((m) => m.content.toLowerCase()),
+    ];
+    for (const r of annotatedRels.slice(0, 8)) {
+      const a = nameOf.get(r.from_character_id) || "";
+      const b = nameOf.get(r.to_character_id) || "";
+      if (!a || !b) continue;
+      const anchored = anchorTexts.some((t) => t.includes(a) || t.includes(b));
+      if (!anchored) {
+        const labelA = input.characters.find((c) => c.id === r.from_character_id)?.name || "Tokoh A";
+        const labelB = input.characters.find((c) => c.id === r.to_character_id)?.name || "Tokoh B";
+        out.push(
+          obs("character_arcs", `Relasi ${r.relationship_type} "${labelA} – ${labelB}" punya catatan (${r.current_state?.trim() ? "status kini" : "riwayat"}) tetapi belum berjangkar di peristiwa timeline maupun memori karakter mana pun.`, {
+            evidence: [
+              { type: "character", id: r.from_character_id, label: labelA },
+              { type: "character", id: r.to_character_id, label: labelB },
+            ],
+            interpretation: "Relasi mungkin berkembang murni lewat dialog naskah (sah); atau peristiwa yang mengubahnya belum dicatat di timeline.",
+            suggestion: "Opsional: catat satu peristiwa timeline untuk titik balik relasi tersebut, atau biarkan bila naskah sudah menunjukkannya.",
+          })
+        );
+      }
+      if (out.length >= 10) break;
+    }
+  }
+
+  // Task 9.6d: arc without manuscript anchor — character_arc is written but
+  // the character has no character_fact memory (any status except rejected)
+  // and appears in at most one chapter. Needs chapter-level presence data;
+  // without it the check degrades silently (count unknown, never assumed).
+  const hasDistribution = !!presenceChapters && presenceChapters.size > 0;
+  for (const c of mains) {
+    if (!c.character_arc?.trim()) continue;
+    if (!hasDistribution) continue;
+    const hasAnchorMemory = input.memories.some(
+      (m) =>
+        m.type === "character_fact" &&
+        m.status !== "rejected" &&
+        (m.content.toLowerCase().includes(c.name.toLowerCase()) ||
+          (m.metadata.character_ids || []).includes(c.id))
+    );
+    const chapterCount = presenceChapters!.get(c.id)?.size || 0;
+    if (!hasAnchorMemory && chapterCount <= 1) {
+      out.push(
+        obs("character_arcs", `Busur "${c.name}" tertulis ("${c.character_arc!.slice(0, 60)}${c.character_arc!.length > 60 ? "…" : ""}") tetapi belum berjangkar di memori fakta karakter maupun kehadiran multi-bab.`, {
+          evidence: [{ type: "character", id: c.id, label: c.name }],
+          interpretation: "Arknya mungkin masih hidup di kepala penulis dan belum turun ke naskah; atau kehadirannya belum ditautkan.",
+          suggestion: `Opsional: catat satu fakta karakter pendukung untuk "${c.name}", atau tautkan ia ke adegan yang memajukan busurnya.`,
+        })
+      );
+    }
+  }
+
+  return out.slice(0, 8);
 }
 
 // ---------------------------------------------------------------
