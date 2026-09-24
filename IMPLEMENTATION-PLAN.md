@@ -1211,15 +1211,16 @@ timeline view in `plot/` studio, same migration 010 (applied live on Supabase).
 
 ## Task 9.3 — Story Doctor
 
-Analyze:
+Implemented: `src/features/doctor/` (deterministic analyzers + service),
+`src/server/actions/doctor.ts`, `src/app/(workspace)/workspace/[novelId]/doctor/`
+(page + view), prompt `buildStoryDoctorPrompt` + `STORY_DOCTOR_SYSTEM`.
+No migration, no score, read-only — SOUL.md #14 (diagnose, don't dictate).
 
 ```text
-Plot
-Character Arcs
-Pacing
-Plot Threads
-Worldbuilding
-Unresolved Questions
+[x] 6 sections: plot / character_arcs / pacing / plot_threads / worldbuilding / unresolved_questions
+[x] Deterministic analyzers, evidence-bound, tentative language (SOUL.md #12-14)
+[x] AI enrichment optional, guarded: enriches wording of existing findings only, never invents new ones or scores
+[x] UI: run-on-demand report, filter per section, evidence badges, tentative language
 ```
 
 ---

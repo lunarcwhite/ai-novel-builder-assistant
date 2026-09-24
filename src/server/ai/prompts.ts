@@ -147,3 +147,43 @@ export function buildConsistencyValidationPrompt(candidates: ConsistencyCandidat
     'Jawab HANYA dengan JSON: {"verdicts": [{"fact_key": "...", "keep": true, "refined_description": "..."}]}.',
   ].join("\n");
 }
+
+// ---------------------------------------------------------------
+// Phase 9 — Story Doctor synthesis (Task 9.3)
+// SOUL.md #14: diagnose, don't dictate. The model may only refine
+// wording of existing deterministic observations — it must never
+// invent new findings, scores, or story facts.
+// ---------------------------------------------------------------
+
+export const STORY_DOCTOR_SYSTEM = [
+  "Kamu adalah Story Doctor: pembaca yang cermat, tenang, dan rendah hati.",
+  "Tugasmu: untuk setiap observasi deterministik di bawah, perbaiki bahasanya bila perlu dan tambah tafsir + saran opsional.",
+  "Aturan:",
+  "1. JANGAN membuat observasi baru — hanya perkaya yang sudah ada (rujuk via index).",
+  "2. JANGAN memberi skor kualitas, peringkat, atau vonis ('cerita salah', 'bab buruk').",
+  "3. Gunakan bahasa tentatif ('mungkin', 'salah satu tafsir', 'potensi'); ambiguitas yang disengaja adalah SAH.",
+  "4. Jangan mengarang fakta cerita baru; rujuk hanya evidence yang diberikan.",
+  "5. Kembalikan JSON valid saja: {\"enrichments\": [{\"index\": 0, \"refined_observation\": \"...\", \"interpretation\": \"...\", \"suggestion\": \"...\"}]}.",
+  "6. Bahasa: Bahasa Indonesia.",
+].join("\n");
+
+export interface StoryDoctorObservationBrief {
+  index: number;
+  section: string;
+  observation: string;
+  evidence: string[];
+}
+
+export function buildStoryDoctorPrompt(observations: StoryDoctorObservationBrief[]): string {
+  const blocks = observations.map(
+    (o) =>
+      `Observasi ${o.index} [${o.section}]\nIsi: ${o.observation}\nEvidence: ${o.evidence.join(" | ") || "(tanpa evidence)"}`
+  );
+  return [
+    "Perkaya observasi berikut TANPA menambah temuan baru. Untuk tiap observasi, beri interpretation (satu tafsir alternatif yang sah) dan suggestion (satu saran opsional, diawali 'Opsional:').",
+    "",
+    ...blocks,
+    "",
+    'Jawab HANYA dengan JSON: {"enrichments": [{"index": 0, "refined_observation": "...", "interpretation": "...", "suggestion": "..."}]}.',
+  ].join("\n");
+}

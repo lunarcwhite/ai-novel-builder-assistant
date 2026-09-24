@@ -759,3 +759,58 @@ export const updateTimelineEventSchema = createTimelineEventSchema.partial();
 
 export type UpdateTimelineEventInput = z.infer<typeof updateTimelineEventSchema>;
 
+// -------------------------------------------------------------
+// Phase 9 Domain: Story Doctor (Task 9.3)
+// -------------------------------------------------------------
+// SOUL.md #14: diagnose, don't dictate — Observation + Evidence +
+// Possible interpretation + Optional suggestion. Never a score.
+// Analyzers are deterministic and evidence-bound; AI synthesis is
+// optional enrichment, never the source of findings.
+
+export type StoryDoctorSection =
+  | "plot"
+  | "character_arcs"
+  | "pacing"
+  | "plot_threads"
+  | "worldbuilding"
+  | "unresolved_questions";
+
+export interface StoryDoctorEvidence {
+  type: "chapter" | "scene" | "character" | "plot_thread" | "timeline_event" | "memory" | "world_rule" | "world_lore" | "finding";
+  id?: string | null;
+  label?: string | null;
+}
+
+export interface StoryDoctorObservation {
+  section: StoryDoctorSection;
+  observation: string;
+  evidence: StoryDoctorEvidence[];
+  interpretation?: string | null;
+  suggestion?: string | null;
+  ai_enriched?: boolean;
+}
+
+export interface StoryDoctorReport {
+  novel_id: UUID;
+  generated_at: string;
+  ai_enriched: boolean;
+  sections: Record<StoryDoctorSection, StoryDoctorObservation[]>;
+  counts: Record<StoryDoctorSection, number>;
+}
+
+export const storyDoctorSectionSchema = z.enum([
+  "plot",
+  "character_arcs",
+  "pacing",
+  "plot_threads",
+  "worldbuilding",
+  "unresolved_questions",
+]);
+
+export const runStoryDoctorSchema = z.object({
+  sections: z.array(storyDoctorSectionSchema).max(6).optional(),
+  withAI: z.boolean().optional().default(false),
+});
+
+export type RunStoryDoctorInput = z.infer<typeof runStoryDoctorSchema>;
+
