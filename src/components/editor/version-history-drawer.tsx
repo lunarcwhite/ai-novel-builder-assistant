@@ -10,6 +10,7 @@ import { formatNumber } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/components/ui/toast";
 import {
   History,
   Clock,
@@ -18,7 +19,6 @@ import {
   X,
   FileText,
   AlertCircle,
-  CheckCircle2,
   ChevronDown,
   ChevronUp,
   ShieldCheck,
@@ -45,7 +45,7 @@ export default function VersionHistoryDrawer({
 }: VersionHistoryDrawerProps) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const { toast } = useToast();
   const [newTitle, setNewTitle] = useState("");
   const [newNotes, setNewNotes] = useState("");
   const [previewVersionId, setPreviewVersionId] = useState<string | null>(null);
@@ -56,7 +56,6 @@ export default function VersionHistoryDrawer({
   const handleCreateSnapshot = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setSuccessMessage(null);
 
     startTransition(async () => {
       try {
@@ -71,8 +70,7 @@ export default function VersionHistoryDrawer({
           onVersionsUpdated([res.version, ...versions]);
           setNewTitle("");
           setNewNotes("");
-          setSuccessMessage(`Versi #${res.version.version_number} berhasil disimpan.`);
-          setTimeout(() => setSuccessMessage(null), 3000);
+          toast({ title: `Versi #${res.version.version_number} berhasil disimpan.` });
         } else {
           setError(res.error || "Gagal membuat versi.");
         }
@@ -84,7 +82,6 @@ export default function VersionHistoryDrawer({
 
   const handleRestore = (versionId: string) => {
     setError(null);
-    setSuccessMessage(null);
 
     startTransition(async () => {
       try {
@@ -94,8 +91,7 @@ export default function VersionHistoryDrawer({
           onVersionRestored(res.restoredContent || "");
           onVersionsUpdated([res.version, ...versions]);
           setConfirmRestoreId(null);
-          setSuccessMessage(`Naskah berhasil dipulihkan dari Versi #${res.version.version_number}.`);
-          setTimeout(() => setSuccessMessage(null), 3000);
+          toast({ title: `Naskah dipulihkan dari Versi #${res.version.version_number}.` });
         } else {
           setError(res.error || "Gagal memulihkan versi.");
         }
@@ -146,18 +142,11 @@ export default function VersionHistoryDrawer({
           </Button>
         </div>
 
-        {/* Feedback alerts */}
+        {/* Feedback alerts (errors stay inline; success goes to toast) */}
         {error && (
           <div className="m-4 mb-0 p-3 rounded-md bg-destructive/10 border border-destructive/20 text-xs text-destructive flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
-          </div>
-        )}
-
-        {successMessage && (
-          <div className="m-4 mb-0 p-3 rounded-md bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-600 flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 shrink-0" />
-            <span>{successMessage}</span>
           </div>
         )}
 

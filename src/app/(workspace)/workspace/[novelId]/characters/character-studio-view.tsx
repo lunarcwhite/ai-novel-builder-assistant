@@ -28,6 +28,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Tabs } from "@/components/ui/tabs";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   CharacterFormDialog,
@@ -363,39 +364,26 @@ export default function CharacterStudioView({
                 </div>
 
                 {/* Sub-Navigation Tabs */}
-                <div className="flex items-center gap-2 pt-2 border-t border-border/50 overflow-x-auto">
-                  {[
-                    { id: "profile", label: "Profil & Motivasi", icon: Compass },
-                    { id: "arc", label: "Busur Karakter (Arc)", icon: Sparkles },
-                    {
-                      id: "relations",
-                      label: `Relasi (${charRelations.length})`,
-                      icon: HeartHandshake,
-                    },
-                    {
-                      id: "appearances",
-                      label: `Kemunculan di Naskah (${charAppearances.length})`,
-                      icon: BookOpen,
-                    },
-                  ].map((tab) => {
-                    const Icon = tab.icon;
-                    return (
-                      <button
-                        key={tab.id}
-                        type="button"
-                        onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                        className={cn(
-                          "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all shrink-0",
-                          activeTab === tab.id
-                            ? "bg-accent/20 text-accent font-semibold border border-accent/40"
-                            : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
-                        )}
-                      >
-                        <Icon className="w-3.5 h-3.5" />
-                        <span>{tab.label}</span>
-                      </button>
-                    );
-                  })}
+                <div className="pt-2 border-t border-border/50">
+                  <Tabs
+                    value={activeTab}
+                    onValueChange={(id) => setActiveTab(id as typeof activeTab)}
+                    ariaLabel="Navigasi detail karakter"
+                    items={[
+                      { id: "profile", label: "Profil & Motivasi", icon: Compass },
+                      { id: "arc", label: "Busur Karakter (Arc)", icon: Sparkles },
+                      {
+                        id: "relations",
+                        label: `Relasi (${charRelations.length})`,
+                        icon: HeartHandshake,
+                      },
+                      {
+                        id: "appearances",
+                        label: `Kemunculan di Naskah (${charAppearances.length})`,
+                        icon: BookOpen,
+                      },
+                    ]}
+                  />
                 </div>
               </div>
 

@@ -20,6 +20,7 @@ import { MemoryFormDialog, DeleteMemoryDialog } from "./memory-dialogs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Tabs } from "@/components/ui/tabs";
 import {
   BrainCircuit,
   Plus,
@@ -369,36 +370,19 @@ export default function MemoryStudioView({
       <div className="space-y-3">
         {/* Status Tabs */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/80 pb-3">
-          <nav className="flex items-center gap-1.5 overflow-x-auto py-1">
-            {[
+          <Tabs
+            value={activeStatus}
+            onValueChange={(id) => setActiveStatus(id as MemoryStatus | "all")}
+            variant="primary"
+            ariaLabel="Filter status memori"
+            items={[
               { id: "all", label: "Semua Memori", count: stats.total },
               { id: "confirmed", label: "Terkonfirmasi (Kanon)", count: stats.confirmed },
               { id: "proposed", label: "Usulan Naskah / AI", count: stats.proposed },
               { id: "archived", label: "Diarsipkan", count: stats.archived },
               { id: "rejected", label: "Ditolak", count: stats.rejected },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveStatus(tab.id as MemoryStatus | "all")}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all shrink-0 ${
-                  activeStatus === tab.id
-                    ? "bg-primary text-primary-foreground shadow-subtle"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
-                }`}
-              >
-                <span>{tab.label}</span>
-                <span
-                  className={`text-[10px] px-1.5 py-0.2 rounded-full ${
-                    activeStatus === tab.id
-                      ? "bg-primary-foreground/20 text-primary-foreground"
-                      : "bg-muted text-muted-foreground"
-                  }`}
-                >
-                  {tab.count}
-                </span>
-              </button>
-            ))}
-          </nav>
+            ]}
+          />
 
           {/* Quick text search */}
           <div className="relative w-full sm:w-64">

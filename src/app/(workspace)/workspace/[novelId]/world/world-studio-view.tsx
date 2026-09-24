@@ -21,6 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Tabs } from "@/components/ui/tabs";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {
   LocationFormDialog,
@@ -195,8 +196,14 @@ export default function WorldStudioView({
 
       {/* Tabs Bar & Search */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/80 pb-3">
-        <div className="flex items-center gap-1.5 overflow-x-auto">
-          {[
+        <Tabs
+          value={activeTab}
+          onValueChange={(id) => {
+            setActiveTab(id as typeof activeTab);
+            setSearchQuery("");
+          }}
+          ariaLabel="Navigasi studio dunia"
+          items={[
             {
               id: "locations",
               label: `Lokasi (${locations.length})`,
@@ -212,30 +219,8 @@ export default function WorldStudioView({
               label: `Lore & Ensiklopedia (${worldLore.length})`,
               icon: ScrollText,
             },
-          ].map((tab) => {
-            const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                onClick={() => {
-                  setActiveTab(tab.id as typeof activeTab);
-                  setSearchQuery("");
-                }}
-                className={cn(
-                  "inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-medium transition-all shrink-0",
-                  isActive
-                    ? "bg-accent/20 text-accent font-semibold border border-accent/40 shadow-subtle"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                )}
-              >
-                <Icon className="w-3.5 h-3.5" />
-                <span>{tab.label}</span>
-              </button>
-            );
-          })}
-        </div>
+          ]}
+        />
 
         {/* Global Tab Search */}
         <div className="relative sm:w-64">
