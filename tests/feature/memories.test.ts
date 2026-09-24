@@ -130,6 +130,10 @@ describe("story memory: lifecycle, status, dedup, retrieval", () => {
     assert.equal(del.success, true);
     const statsAfter = await MemoryService.getStats(novel.id, userId);
     assert.equal(statsAfter.total, 0);
+
+    // Deleting a missing ID reports failure instead of silent success.
+    const missing = await MemoryService.deleteMemory("mem_missing", novel.id, userId);
+    assert.equal(missing.success, false);
   });
 
   it("scene-relevant retrieval merges direct links with semantic context", async () => {

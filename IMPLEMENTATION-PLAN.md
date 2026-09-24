@@ -895,7 +895,7 @@ The system can:
 [x] Store (dual-mode pgvector + local dev)
 [x] Search semantically (cosine similarity ranking)
 [x] Show source (attribution badge & scene navigation)
-[x] Deduplicate & detect conflicts
+[x] Deduplicate (similarity warning on near-duplicate facts)
 ```
 
 ---

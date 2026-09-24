@@ -371,9 +371,16 @@ export class MemoryRepository {
   }
 
   /**
-   * Delete a memory
+   * Delete a memory.
+   * Returns false when the memory does not exist in the novel, so a
+   * missing-ID delete is reported as "not deleted" instead of silently
+   * succeeding (Supabase RLS would block a cross-novel write, but `!error`
+   * alone cannot distinguish "deleted" from "matched zero rows").
    */
   static async delete(id: string, novelId: string): Promise<boolean> {
+    const existing = await this.findById(id, novelId);
+    if (!existing) return false;
+
     if (isSupabaseConfigured) {
       const supabase = await createClient();
       if (!supabase) return false;
