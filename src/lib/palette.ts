@@ -45,6 +45,7 @@ export function buildGlobalCommands(): PaletteCommand[] {
   ];
 }
 
+// Must mirror the 8 tabs in src/components/novel-navigation-bar.tsx.
 const NOVEL_TABS: Array<{ id: string; label: string; hint: string; keywords: string; suffix: string }> = [
   { id: "overview", label: "Garis Besar & Naskah", hint: "Struktur novel", keywords: "outline garis besar overview struktur naskah bab adegan", suffix: "" },
   { id: "characters", label: "Karakter & Relasi", hint: "Tokoh & relasi", keywords: "karakter character tokoh relasi relationship pov", suffix: "/characters" },

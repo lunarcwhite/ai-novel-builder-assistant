@@ -41,7 +41,7 @@ export function DialogContent({
 }: {
   className?: string;
   children: React.ReactNode;
-  /** Accessible name; falls back to the inner DialogTitle text. */
+  /** Accessible name; when omitted the dialog is named by its content (DialogTitle). */
   label?: string;
 }) {
   const context = React.useContext(DialogContext);
@@ -67,7 +67,7 @@ export function DialogContent({
     <div
       role="dialog"
       aria-modal="true"
-      aria-label={label}
+      {...(label ? { "aria-label": label } : {})}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm animate-in fade-in"
     >
       <div

@@ -1431,6 +1431,27 @@ structure store), global manuscript search, outline virtualization for
 `tests/unit/palette.test.ts` (16 tests: builders, ranking, paths,
 shortcuts, library filter).
 
+## PHASE 11 EXIT CRITERIA [VERIFIED]
+
+The author can navigate, search, and recover with keyboard and assistive tech.
+
+```text
+[x] Command palette Ctrl+K: global + 8 novel tabs + editor actions, ranked filter
+[x] Shortcuts: Ctrl+S save-now, F11 toggle focus, Esc exit
+[x] Library search ?q= title/genre/premise with empty + no-result states
+[x] Loading skeleton + aria-busy, error boundaries + not-found (manuscript-safe copy)
+[x] A11y: skip link, nav aria-current, collapse aria-expanded,
+    header aria-pressed, dialog role/aria-modal, palette combobox/listbox
+[x] Responsive side panels (overlay + scrim below lg, static at lg+)
+[x] Deferred list documented (scene jump, global search, virtualization,
+    contrast audit, custom shortcuts)
+```
+
+Verified: `src/lib/palette.ts`, `src/lib/shortcuts.ts`,
+`src/lib/library-search.ts`, `src/components/command-palette.tsx`,
+`(workspace)/loading.tsx`, `(workspace)/error.tsx`, `global-error.tsx`,
+`not-found.tsx`, `tests/unit/palette.test.ts` (16 tests).
+
 ---
 
 # PHASE 12 — Deployment [DEFERRED — pending local testing]

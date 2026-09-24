@@ -19,7 +19,7 @@ describe("palette command builders", () => {
     assert.ok(cmds.some((c) => c.href === "/workspace/new"));
   });
 
-  it("novel commands mirror the 8 navigation tabs", () => {
+  it("novel commands mirror the 8 NovelNavigationBar tabs", () => {
     const cmds = buildNovelCommands("nov_1");
     assert.equal(cmds.length, 8);
     const hrefs = cmds.map((c) => c.href);
