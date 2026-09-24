@@ -1153,7 +1153,10 @@ Compare manuscript against confirmed world rules.
 
 ## Task 8.5 — Timeline Consistency
 
-Compare:
+Deferred — no timeline_events table yet (Phase 9). Types reserved; no
+fake timeline findings manufactured.
+
+Planned scope when tables exist:
 
 ```text
 timeline events
@@ -1187,11 +1190,9 @@ Resolve
 
 ---
 
-## PHASE 8 EXIT CRITERIA
+## PHASE 8 EXIT CRITERIA [VERIFIED]
 
-Consistency checker produces explainable findings with sources.
-
-Implemented: `src/features/consistency/` (repository, checks, service), `src/server/ai/prompts.ts` (CONSISTENCY_VALIDATION_SYSTEM + builder), `src/server/actions/consistency.ts`, `src/components/editor/consistency-panel.tsx`, migration `009_consistency_findings.sql` (applied live on Supabase).
+A user can run a consistency check producing explainable findings with sources.
 
 ```text
 [x] Run check on current scene / current chapter (Selected Chapters + Entire Novel deferred)
@@ -1202,7 +1203,13 @@ Implemented: `src/features/consistency/` (repository, checks, service), `src/ser
 [x] Author workflow: Review / Dismiss / Resolve + delete; manuscript never written (Task 8.7)
 ```
 
-Verified: 90 tests pass (23 new consistency: 14 unit + 9 feature), lint clean, typecheck clean, build clean.
+Verified: `src/features/consistency/` (repository, checks, service),
+`src/server/ai/prompts.ts` (CONSISTENCY_VALIDATION_SYSTEM + builder),
+`src/server/actions/consistency.ts`,
+`src/components/editor/consistency-panel.tsx`, migration
+`009_consistency_findings.sql`, consistency tests
+(`tests/feature/consistency.test.ts`: rule tension, dedupe, workflow;
+`tests/unit/consistency.test.ts`: heuristics, evidence).
 
 ---
 
