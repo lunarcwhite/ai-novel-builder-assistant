@@ -3,11 +3,7 @@
 import * as React from "react";
 import { AlertCircle, CheckCircle2, Info, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  initialToastState,
-  toastReducer,
-  type ToastVariant,
-} from "@/lib/toast-store";
+import { initialToastState, toastReducer, type ToastVariant } from "@/lib/toast-store";
 
 export interface ToastOptions {
   title: string;

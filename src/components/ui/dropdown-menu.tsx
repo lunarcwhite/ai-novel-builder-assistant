@@ -43,7 +43,7 @@ export function DropdownMenu({
       document.removeEventListener("pointerdown", onPointerDown);
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [open ]);
+  }, [open]);
 
   return (
     <div ref={rootRef} className="relative inline-block">

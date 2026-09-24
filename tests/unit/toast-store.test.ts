@@ -1,10 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert/strict";
-import {
-  MAX_TOASTS,
-  initialToastState,
-  toastReducer,
-} from "@/lib/toast-store";
+import { MAX_TOASTS, initialToastState, toastReducer } from "@/lib/toast-store";
 
 describe("toastReducer (Phase 0 design-system primitive)", () => {
   it("pushes toasts with incrementing ids", () => {

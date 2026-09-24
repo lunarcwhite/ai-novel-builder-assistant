@@ -232,7 +232,7 @@ Follow `docs/design.md`.
 [x] Repository clean
 ```
 
-Verified: app boots (`npm run dev` / `npm run build` clean, 19 routes),
+Verified: app boots (`npm run dev` / `npm run build` clean, 20 routes),
 `tsc --noEmit` + `next lint` pass, design-system foundation
 (`tailwind.config.ts`, `globals.css`, `src/components/ui/`) renders,
 `.env.example` documents all vars, README + `docs/local-testing.md` present.
@@ -1384,7 +1384,7 @@ Recommended:
 ```text
 Frontend / App
     ↓
-Next.js hosting (Vercel or any Node 20+ host; `npm run build` verified: 19 routes)
+Next.js hosting (Vercel or any Node 20+ host; `npm run build` verified: 20 routes)
 
 Database
     ↓
