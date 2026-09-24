@@ -685,29 +685,26 @@ The exact offline strategy can remain lightweight for MVP.
 
 ---
 
-## PHASE 4 EXIT CRITERIA
+## PHASE 4 EXIT CRITERIA [VERIFIED]
 
-This is a critical milestone.
-
-A user must be able to:
+A user can:
 
 ```text
-Create Novel
- ↓
-Create Chapter
- ↓
-Create Scene
- ↓
-Write
- ↓
-Leave
- ↓
-Return
- ↓
-Continue writing
+[x] Create Novel
+[x] Create Chapter
+[x] Create Scene
+[x] Write (TipTap rich text: paragraphs, headings, bold/italic, lists, blockquote, links)
+[x] Leave (autosave debounce + local draft preserved on failure)
+[x] Return (local draft recovery banner: restore or dismiss)
+[x] Continue writing (scene navigator, focus mode, version history with restore)
 ```
 
-If this is not reliable, do not proceed to AI.
+Verified: `src/components/editor/` (TipTap editor, 3-column workspace,
+autosave with honest saved/saving/error/offline states, focus mode, scene
+navigator, version drawer) + `src/server/actions/editor.ts`
+(save/version/restore) + migration `004_scene_versions.sql`, manuscript
+safety tests (`tests/feature/manuscript.test.ts`: word-count sync, snapshot
+numbering, restore checkpoint).
 
 ---
 

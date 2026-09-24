@@ -16,7 +16,6 @@ import {
   Quote,
   Undo,
   Redo,
-  Sparkles,
   Link as LinkIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -150,17 +149,6 @@ export default function TipTapEditor({
         >
           <LinkIcon className="w-3.5 h-3.5" />
         </button>
-
-        <div className="w-[1px] h-3.5 bg-border/60 mx-1" />
-
-        {/* AI Action Teaser Placeholder (Task 4.2 / Phase 7 ready) */}
-        <div
-          className="flex items-center gap-1 px-1.5 py-1 text-[11px] text-primary/80 font-sans cursor-default select-none opacity-80"
-          title="Asisten AI akan aktif di Phase 7"
-        >
-          <Sparkles className="w-3 h-3 text-primary" />
-          <span>AI Refine (Phase 7)</span>
-        </div>
       </BubbleMenu>
 
       {/* Editor Fixed Header Toolbar */}

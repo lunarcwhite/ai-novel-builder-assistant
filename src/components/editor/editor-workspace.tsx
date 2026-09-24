@@ -109,9 +109,14 @@ export default function EditorWorkspace({
     }
   }, [scene.id, scene.content, storageKey]);
 
-  // Autosave execution
+  // Autosave execution. Distinguishes honest states (SOUL.md #34):
+  // "offline" = browser reports no network; "error" = server save failed.
   const executeSave = useCallback(
     async (textToSave: string) => {
+      if (typeof navigator !== "undefined" && !navigator.onLine) {
+        setSaveStatus("offline");
+        return;
+      }
       setSaveStatus("saving");
       try {
         const res = await saveSceneContentAction(novel.id, scene.id, textToSave);
@@ -127,11 +132,30 @@ export default function EditorWorkspace({
           setSaveStatus("error");
         }
       } catch {
-        setSaveStatus("error");
+        if (typeof navigator !== "undefined" && !navigator.onLine) {
+          setSaveStatus("offline");
+        } else {
+          setSaveStatus("error");
+        }
       }
     },
     [novel.id, scene.id, storageKey]
   );
+
+  // Honest connectivity tracking: browser online/offline events drive the
+  // "offline" badge; reconnecting retries the latest draft automatically.
+  useEffect(() => {
+    const handleOffline = () => setSaveStatus("offline");
+    const handleOnline = () => {
+      executeSave(latestContentRef.current);
+    };
+    window.addEventListener("offline", handleOffline);
+    window.addEventListener("online", handleOnline);
+    return () => {
+      window.removeEventListener("offline", handleOffline);
+      window.removeEventListener("online", handleOnline);
+    };
+  }, [executeSave]);
 
   // Trigger debounced autosave upon editor changes
   const handleEditorChange = useCallback(
