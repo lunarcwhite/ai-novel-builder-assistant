@@ -205,6 +205,8 @@ archived
 
 ## plot_thread_status
 
+Allowed values (enforced via CHECK in migration 010, not a Postgres enum):
+
 ```sql
 planned
 active
@@ -215,6 +217,8 @@ abandoned
 ---
 
 ## plot_point_type
+
+DEFERRED with `plot_points` (Phase 9) — planned values when the table is created:
 
 ```sql
 inciting_incident
@@ -229,6 +233,8 @@ custom
 ---
 
 ## timeline_precision
+
+Allowed values (enforced via CHECK in migration 010, not a Postgres enum):
 
 ```sql
 exact
@@ -684,6 +690,10 @@ create table world_lore (
 
 # 17. Plot Threads
 
+Implemented in `src/db/migrations/010_plot_threads_timeline.sql` (Phase 9, Task 9.1).
+Author owns status transitions; the system observes, never auto-resolves.
+`status` is `text` + CHECK (not a Postgres enum) so future states need no type migration.
+
 ```sql
 create table plot_threads (
     id uuid primary key default gen_random_uuid(),
@@ -694,7 +704,8 @@ create table plot_threads (
     title text not null,
     description text,
 
-    status plot_thread_status not null default 'planned',
+    status text not null default 'planned'
+        check (status in ('planned', 'active', 'resolved', 'abandoned')),
 
     importance smallint not null default 3
         check (importance between 1 and 5),
@@ -710,9 +721,16 @@ create table plot_threads (
 );
 ```
 
+Indexes on `(novel_id)`, `(novel_id, status)`, `(novel_id, importance desc)`.
+Trigger `set_plot_threads_updated_at` memakai `handle_updated_at()`.
+RLS: `Users can manage plot threads of own novels` (ownership via `novels.user_id`).
+
 ---
 
 # 18. Plot Points
+
+DEFERRED — tabel ini belum dibuat (YAGNI). Tidak ada fitur yang membutuhkannya
+di Task 9.1/9.2. Spek yang direncanakan bila kelak dibutuhkan:
 
 ```sql
 create table plot_points (
@@ -743,7 +761,9 @@ create table plot_points (
 
 # 19. Timeline Events
 
-Fictional stories may use exact dates, relative time, or no dates.
+Implemented in `src/db/migrations/010_plot_threads_timeline.sql` (Phase 9, Task 9.2).
+Fictional stories may use exact dates, relative time, or no dates —
+`unknown` is a valid state (SOUL.md #15).
 
 ```sql
 create table timeline_events (
@@ -756,7 +776,8 @@ create table timeline_events (
     description text,
 
     date_value text,
-    date_precision timeline_precision not null default 'unknown',
+    date_precision text not null default 'unknown'
+        check (date_precision in ('exact', 'day', 'month', 'year', 'relative', 'unknown')),
 
     relative_time text,
 
@@ -772,6 +793,10 @@ create table timeline_events (
 ```
 
 `date_value` sengaja berupa text karena cerita tidak selalu menggunakan Gregorian dates.
+Implementasi memakai `text` + CHECK (bukan enum) dengan nilai yang sama seperti spek.
+Indexes on `(novel_id)`, `(novel_id, chapter_id)`, `(novel_id, created_at)`.
+Trigger `set_timeline_events_updated_at` memakai `handle_updated_at()`.
+RLS: `Users can manage timeline events of own novels` (ownership via `novels.user_id`).
 
 ---
 

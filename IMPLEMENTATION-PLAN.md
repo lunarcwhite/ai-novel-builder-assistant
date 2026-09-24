@@ -1183,20 +1183,29 @@ This phase extends the MVP toward the full product vision.
 
 ## Task 9.1 — Plot Threads
 
-Implement:
+Implemented: `src/features/plot/` (repository, service), `src/server/actions/plot.ts`,
+`src/app/(workspace)/workspace/[novelId]/plot/` (page, studio view, dialogs),
+migration `010_plot_threads_timeline.sql` (applied live on Supabase).
 
 ```text
-planned
-active
-resolved
-abandoned
+[x] planned / active / resolved / abandoned with guarded transitions (author decides)
+[x] Importance 1–5, chapter links (introduced/resolved) verified same-novel
+[x] Status counts as calm summary, never a score (SOUL.md #31)
+[x] plot_points deferred (YAGNI)
 ```
 
 ---
 
 ## Task 9.2 — Timeline
 
-Implement full timeline UI.
+Implemented: `src/features/timeline/` (repository, service), dialogs + vertical
+timeline view in `plot/` studio, same migration 010 (applied live on Supabase).
+
+```text
+[x] Full timeline UI: chronological list with chapter/location links
+[x] Flexible precision: exact/day/month/year/relative/unknown; "unknown" valid (SOUL.md #15)
+[x] Dated precision requires date_value; relative requires relative_time
+```
 
 ---
 
