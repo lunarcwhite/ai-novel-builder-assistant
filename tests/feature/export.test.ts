@@ -59,15 +59,38 @@ describe("ExportService end-to-end (in-memory stores)", () => {
     assert.match(res.body || "", /Kaelen memecahkan kode/);
   });
 
-  it("denies cross-user access (AGENTS.md #5.3)", async () => {
+  it("docx export returns a ZIP buffer with filename and mime", async () => {
+    const userId = freshUser();
+    const { novel, scene } = await seed(userId);
+    const before = (await SceneService.getScene(scene.id, novel.id, userId))?.content;
+
+    const res = await ExportService.exportNovel(novel.id, userId, { format: "docx" });
+    assert.equal(res.success, true);
+    assert.equal(res.format, "docx");
+    assert.equal(res.filename, "novel-ekspor-uji-coba.docx");
+    assert.equal(
+      res.mimeType,
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    );
+    assert.ok(Buffer.isBuffer(res.buffer));
+    assert.ok((res.buffer as Buffer).length > 1000);
+    assert.equal((res.buffer as Buffer)[0], 0x50);
+    assert.equal((res.buffer as Buffer)[1], 0x4b);
+    assert.equal(res.body, undefined);
+
+    const after = (await SceneService.getScene(scene.id, novel.id, userId))?.content;
+    assert.equal(after, before);
+  });
+
+  it("denies cross-user access for md and docx (AGENTS.md #5.3)", async () => {
     const owner = freshUser();
     const { novel } = await seed(owner);
 
-    const denied = await ExportService.exportNovel(novel.id, freshUser(), {
-      format: "md",
-    });
-    assert.equal(denied.success, false);
-    assert.match(denied.error || "", /akses ditolak/);
+    for (const format of ["md", "docx"] as const) {
+      const denied = await ExportService.exportNovel(novel.id, freshUser(), { format });
+      assert.equal(denied.success, false);
+      assert.match(denied.error || "", /akses ditolak/);
+    }
   });
 
   it("rejects unknown formats and never touches the manuscript", async () => {

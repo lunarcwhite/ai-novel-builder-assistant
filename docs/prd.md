@@ -687,9 +687,12 @@ MVP:
 - TXT
 - Markdown
 
-Post-MVP:
+Implemented (Phase 11):
 
 - DOCX
+
+Post-MVP:
+
 - PDF
 - EPUB
 

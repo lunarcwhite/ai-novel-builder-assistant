@@ -8,11 +8,11 @@ import type {
 } from "@/types";
 
 // ---------------------------------------------------------------
-// Pure export formatters (Phase 10 — TXT + Markdown MVP)
+// Pure export formatters (Phase 10 TXT + Markdown; Phase 11 DOCX)
 // ---------------------------------------------------------------
 // No I/O, no auth. Renders data the author owns into file text.
 // Read-only: the manuscript body is never modified here.
-// ponytail: DOCX/PDF/EPUB are post-MVP (PRD #22) — add renderers
+// ponytail: PDF/EPUB are post-MVP (PRD #22) — add renderers
 // here only when those formats are actually required.
 
 export interface ExportBuildOptions {
@@ -22,9 +22,10 @@ export interface ExportBuildOptions {
   exportedAt?: string;
 }
 
-const EMPTY_SCENE_NOTE = "[Belum ada naskah pada adegan ini.]";
-const EMPTY_CHAPTER_NOTE = "[Belum ada naskah pada bab ini.]";
-const EMPTY_NOVEL_NOTE =
+// Shared with docx.ts so empty-state wording never diverges.
+export const EMPTY_SCENE_NOTE = "[Belum ada naskah pada adegan ini.]";
+export const EMPTY_CHAPTER_NOTE = "[Belum ada naskah pada bab ini.]";
+export const EMPTY_NOVEL_NOTE =
   "Belum ada naskah untuk diekspor. Tulis adegan terlebih dahulu, lalu ekspor ulang.";
 
 /**
@@ -67,14 +68,14 @@ interface VisibleScene {
   text: string;
 }
 
-function visibleScenes(chapter: ChapterWithScenes, includeEmpty: boolean): VisibleScene[] {
+export function visibleScenes(chapter: ChapterWithScenes, includeEmpty: boolean): VisibleScene[] {
   const ordered = [...chapter.scenes].sort((a, b) => a.position - b.position);
   return ordered
     .map((s: Scene) => ({ title: s.title, text: htmlToText(s.content) }))
     .filter((s) => includeEmpty || s.text);
 }
 
-function orderedChapters(act: ActWithChapters): ChapterWithScenes[] {
+export function orderedChapters(act: ActWithChapters): ChapterWithScenes[] {
   return [...act.chapters].sort((a, b) => a.position - b.position);
 }
 
@@ -86,10 +87,14 @@ export function exportFilename(
     (novel.slug || "").trim() ||
     novel.title.toLowerCase().trim().replace(/\s+/g, "-").replace(/[^\w-]+/g, "") ||
     "novel";
-  return `${base}.${format === "txt" ? "txt" : "md"}`;
+  const ext = format === "txt" ? "txt" : format === "docx" ? "docx" : "md";
+  return `${base}.${ext}`;
 }
 
 export function mimeTypeFor(format: ExportFormat): string {
+  if (format === "docx") {
+    return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+  }
   return format === "txt" ? "text/plain; charset=utf-8" : "text/markdown; charset=utf-8";
 }
 

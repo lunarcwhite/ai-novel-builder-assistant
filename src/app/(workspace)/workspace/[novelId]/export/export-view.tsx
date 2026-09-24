@@ -54,7 +54,7 @@ export default function ExportView({
       a.href = url;
       a.download =
         res.headers.get("Content-Disposition")?.match(/filename="([^"]+)"/)?.[1] ||
-        `${title}.${format === "txt" ? "txt" : "md"}`;
+        `${title}.${format}`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -116,6 +116,7 @@ export default function ExportView({
                 [
                   { value: "md", label: "Markdown", hint: ".md — heading bab & adegan" },
                   { value: "txt", label: "Teks Polos", hint: ".txt — tanpa pemformatan" },
+                  { value: "docx", label: "Word", hint: ".docx — dibuka di Word & Docs" },
                 ] as const
               ).map((opt) => (
                 <button
@@ -166,7 +167,7 @@ export default function ExportView({
                 </>
               ) : (
                 <>
-                  <FileDown className="w-3.5 h-3.5 mr-1" /> Unduh .{format === "txt" ? "txt" : "md"}
+                  <FileDown className="w-3.5 h-3.5 mr-1" /> Unduh .{format}
                 </>
               )}
             </Button>
@@ -178,7 +179,7 @@ export default function ExportView({
           </div>
 
           <p className="text-[11px] text-muted-foreground opacity-70">
-            DOCX, PDF, dan EPUB direncanakan setelah MVP.
+            PDF dan EPUB direncanakan setelah ini.
           </p>
         </CardContent>
       </Card>

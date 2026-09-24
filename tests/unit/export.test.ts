@@ -7,6 +7,7 @@ import {
   htmlToText,
   mimeTypeFor,
 } from "@/features/export/formatters";
+import { buildDocx, collectDocxBlocks } from "@/features/export/docx";
 import { exportQuerySchema } from "@/types";
 import type { Novel, NovelStructureTree } from "@/types";
 
@@ -143,11 +144,66 @@ describe("export builders (TXT + Markdown MVP)", () => {
     assert.match(marked, /\[Belum ada naskah pada adegan ini\.\]/);
   });
 
-  it("filename falls back to slugified title; mime types are text kinds", () => {
+  it("filename falls back to slugified title; mime types per format", () => {
     assert.equal(exportFilename(novel(), "md"), "bayang-kota-tua.md");
     assert.equal(exportFilename(novel(), "txt"), "bayang-kota-tua.txt");
+    assert.equal(exportFilename(novel(), "docx"), "bayang-kota-tua.docx");
     assert.equal(mimeTypeFor("txt"), "text/plain; charset=utf-8");
     assert.equal(mimeTypeFor("md"), "text/markdown; charset=utf-8");
+    assert.equal(
+      mimeTypeFor("docx"),
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    );
+  });
+});
+
+describe("docx blocks (Phase 11 — same order + empty semantics)", () => {
+  const scenes = [
+    { title: "Adegan 1", content: "<p>Kaelen memecahkan kode.</p><p>Paragraf kedua.</p>" },
+    { title: "Adegan 2", content: "<p>Pengejaran dimulai.</p>" },
+  ];
+
+  it("collects title/act/chapter/scene/body in order without HTML", () => {
+    const blocks = collectDocxBlocks(novel(), structure(scenes), {
+      exportedAt: "2026-09-24",
+    });
+    const kinds = blocks.map((b) => b.kind);
+    assert.ok(kinds.indexOf("title") < kinds.indexOf("act"));
+    assert.ok(kinds.indexOf("act") < kinds.indexOf("chapter"));
+    assert.ok(kinds.indexOf("chapter") < kinds.indexOf("scene"));
+    const texts = blocks.map((b) => b.text).join("\n");
+    assert.match(texts, /Bayang Kota Tua/);
+    assert.match(texts, /Babak: Act I/);
+    assert.match(texts, /Bab 1: Bab 1/);
+    assert.match(texts, /Kaelen memecahkan kode\./);
+    assert.match(texts, /Paragraf kedua\./);
+    assert.ok(!texts.includes("<p>"));
+  });
+
+  it("includeEmpty=false skips empty scenes like TXT builder", () => {
+    const mixed = structure([
+      { title: "Penuh", content: "<p>Ada teks.</p>" },
+      { title: "Kosong", content: "" },
+    ]);
+    const skipped = collectDocxBlocks(novel(), mixed, { includeEmpty: false });
+    const texts = skipped.map((b) => b.text).join("\n");
+    assert.match(texts, /Ada teks/);
+    assert.ok(!texts.includes("Kosong"));
+  });
+
+  it("empty novel ends with no-manuscript note, never invented prose", () => {
+    const blocks = collectDocxBlocks(novel(), structure([]), { includeEmpty: false });
+    assert.match(blocks.map((b) => b.text).join("\n"), /Belum ada naskah/);
+  });
+
+  it("buildDocx returns a non-empty ZIP buffer (PK magic)", async () => {
+    const buf = await buildDocx(novel(), structure(scenes), {
+      exportedAt: "2026-09-24",
+    });
+    assert.ok(Buffer.isBuffer(buf));
+    assert.ok(buf.length > 1000);
+    assert.equal(buf[0], 0x50);
+    assert.equal(buf[1], 0x4b);
   });
 });
 
@@ -167,8 +223,19 @@ describe("exportQuerySchema (query validation)", () => {
     assert.deepEqual(exportQuerySchema.parse({}), { format: "md", includeEmpty: true });
   });
 
-  it("rejects unknown formats", () => {
-    assert.throws(() => exportQuerySchema.parse({ format: "docx" }));
+  it("rejects formats beyond txt/md/docx", () => {
     assert.throws(() => exportQuerySchema.parse({ format: "pdf" }));
+    assert.throws(() => exportQuerySchema.parse({ format: "epub" }));
+  });
+
+  it("accepts docx and the word alias", () => {
+    assert.deepEqual(exportQuerySchema.parse({ format: "docx" }), {
+      format: "docx",
+      includeEmpty: true,
+    });
+    assert.deepEqual(exportQuerySchema.parse({ format: "word" }), {
+      format: "docx",
+      includeEmpty: true,
+    });
   });
 });
