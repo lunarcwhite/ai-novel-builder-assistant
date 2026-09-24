@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { isDevAuthFallbackEnabled } from "@/lib/supabase/client";
 
 async function handleDemoAuth(request: NextRequest) {
+  if (!isDevAuthFallbackEnabled) {
+    return NextResponse.redirect(new URL("/login", request.url), 303);
+  }
+
   const cookieStore = await cookies();
   const demoUser = {
     id: "usr_demo_author_01",

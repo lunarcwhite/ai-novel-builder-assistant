@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { isDevAuthFallbackEnabled } from "@/lib/supabase/client";
+import { NovelRepository } from "@/features/novels/repository";
 
 export interface AuthUser {
   id: string;
@@ -12,7 +14,7 @@ export interface AuthUser {
 /**
  * Ensures a valid authenticated user exists.
  * If not authenticated, automatically redirects to /login.
- * 
+ *
  * Rule 5.3 & Rule 21 (AGENTS.md): Never trust client-provided IDs. Always verify server-side.
  */
 export async function requireAuth(options: { redirectToLogin?: boolean } = { redirectToLogin: true }): Promise<AuthUser> {
@@ -38,8 +40,10 @@ export async function requireAuth(options: { redirectToLogin?: boolean } = { red
         avatarUrl: profile?.avatar_url || user.user_metadata?.avatar_url || null,
       };
     }
-  } else {
-    // 2. Local Dev / Demo Session Fallback (when Supabase credentials are not yet configured)
+  } else if (isDevAuthFallbackEnabled) {
+    // 2. Local Dev / Demo Session Fallback (when Supabase credentials are not yet configured).
+    // Unsigned JSON cookie: only honored outside production, never when real
+    // credentials exist or in a production build.
     const devCookie = cookieStore.get("novel_builder_dev_session");
     if (devCookie?.value) {
       try {
@@ -68,22 +72,20 @@ export async function requireAuth(options: { redirectToLogin?: boolean } = { red
 /**
  * Verifies that the currently authenticated user owns or has access to the specified novel.
  * Prevents unauthorized access or cross-tenant data leakage.
+ * Ownership is resolved through NovelRepository so the check holds in both
+ * Supabase and local-dev in-memory modes.
  */
-export async function requireNovelAccess(novelId: string, currentUserId?: string): Promise<{ novelId: string; userId: string }> {
-  const user = currentUserId ? { id: currentUserId } : await requireAuth();
-  const supabase = await createClient();
+export async function requireNovelAccess(
+  novelId: string,
+  options: { redirectToLogin?: boolean; currentUserId?: string } = {}
+): Promise<{ novelId: string; userId: string }> {
+  const user = options.currentUserId
+    ? { id: options.currentUserId }
+    : await requireAuth({ redirectToLogin: options.redirectToLogin });
 
-  if (supabase) {
-    const { data, error } = await supabase
-      .from("novels")
-      .select("id")
-      .eq("id", novelId)
-      .eq("user_id", user.id)
-      .single();
-
-    if (error || !data) {
-      throw new Error(`Unauthorized: User does not have access to novel "${novelId}".`);
-    }
+  const novel = await NovelRepository.findById(novelId, user.id);
+  if (!novel) {
+    throw new Error(`Unauthorized: User does not have access to novel "${novelId}".`);
   }
 
   return {

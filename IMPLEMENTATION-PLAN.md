@@ -232,7 +232,7 @@ Follow `docs/design.md`.
 [x] Repository clean
 ```
 
-Verified: app boots (`npm run dev` / `npm run build` clean, 20 routes),
+Verified: app boots (`npm run dev` / `npm run build` clean, 22 routes),
 `tsc --noEmit` + `next lint` pass, design-system foundation
 (`tailwind.config.ts`, `globals.css`, `src/components/ui/`) renders,
 `.env.example` documents all vars, README + `docs/local-testing.md` present.
@@ -313,11 +313,15 @@ Screens:
 [x] Unauthorized access is blocked
 ```
 
-Verified: `src/server/auth/guards.ts` (`requireAuth`, `requireNovelAccess`),
+Verified: `src/server/auth/guards.ts` (`requireAuth`, `requireNovelAccess`
+via `NovelRepository` so the check holds in Supabase and local-dev modes),
 `src/middleware.ts` (workspace guard + login redirect), auth UI
-(`login`/`signup`/`forgot-password` pages + actions), demo login
-(`POST /api/auth/demo`) for local testing, unauthorized novel access
-blocked server-side (feature export tests deny cross-user).
+(`login`/`signup`/`forgot-password`/`reset-password` pages + actions,
+`/auth/confirm` code-exchange route, `updatePasswordAction`), demo login
+(`POST /api/auth/demo`, refused in production) for local testing,
+unsigned dev-session fallback gated to non-production
+(`isDevAuthFallbackEnabled`), unauthorized novel access blocked server-side
+(`tests/feature/auth-guards.test.ts` + feature export tests deny cross-user).
 
 ---
 
@@ -1384,7 +1388,7 @@ Recommended:
 ```text
 Frontend / App
     ↓
-Next.js hosting (Vercel or any Node 20+ host; `npm run build` verified: 20 routes)
+Next.js hosting (Vercel or any Node 20+ host; `npm run build` verified: 22 routes)
 
 Database
     ↓

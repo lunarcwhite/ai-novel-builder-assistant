@@ -16,3 +16,11 @@ export function createClient() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 }
+
+/**
+ * Unsigned local-dev session fallback (`novel_builder_dev_session` cookie)
+ * is only honored outside production. The cookie is plain JSON, so it must
+ * never be trusted when real credentials exist or in a production build.
+ */
+export const isDevAuthFallbackEnabled =
+  process.env.NODE_ENV !== "production";

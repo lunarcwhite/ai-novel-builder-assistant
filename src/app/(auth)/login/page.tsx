@@ -7,11 +7,12 @@ import { loginAction, type AuthActionResult } from "@/server/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { Feather, Sparkles, AlertCircle } from "lucide-react";
+import { Feather, Sparkles, AlertCircle, CheckCircle2 } from "lucide-react";
 
 function LoginForm() {
   const searchParams = useSearchParams();
   const redirectTo = searchParams.get("redirectTo") || "/workspace";
+  const passwordUpdated = searchParams.get("passwordUpdated") === "1";
 
   const [state, formAction, isPending] = useActionState<AuthActionResult | null, FormData>(
     loginAction,
@@ -31,6 +32,13 @@ function LoginForm() {
       </CardHeader>
 
       <CardContent className="space-y-4">
+        {passwordUpdated && !state?.error && (
+          <div className="p-3 rounded-md bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-xs flex items-center gap-2 border border-emerald-500/20">
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
+            <span>Kata sandi berhasil diperbarui. Silakan masuk dengan kata sandi baru.</span>
+          </div>
+        )}
+
         {state?.error && (
           <div className="p-3 rounded-md bg-destructive/10 text-destructive text-xs flex items-center gap-2 border border-destructive/20">
             <AlertCircle className="w-4 h-4 shrink-0" />

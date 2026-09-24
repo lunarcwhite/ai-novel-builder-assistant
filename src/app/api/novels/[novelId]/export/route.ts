@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireAuth } from "@/server/auth/guards";
+import { requireNovelAccess } from "@/server/auth/guards";
 import { ExportService } from "@/features/export/service";
 import { mimeTypeFor } from "@/features/export/formatters";
 
@@ -15,10 +15,20 @@ interface RouteContext {
  */
 export async function GET(request: NextRequest, context: RouteContext) {
   try {
-    const user = await requireAuth({ redirectToLogin: false });
     const { novelId } = await context.params;
     if (!novelId) {
       return NextResponse.json({ error: "ID novel tidak valid." }, { status: 400 });
+    }
+
+    // Phase 1 Task 1.3: ownership gate before any manuscript data is read.
+    let userId: string;
+    try {
+      ({ userId } = await requireNovelAccess(novelId, { redirectToLogin: false }));
+    } catch {
+      return NextResponse.json(
+        { error: "Novel tidak ditemukan atau akses ditolak." },
+        { status: 404 }
+      );
     }
 
     const query: Record<string, string> = {};
@@ -26,7 +36,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
       query[key] = value;
     }
 
-    const res = await ExportService.exportNovel(novelId, user.id, query);
+    const res = await ExportService.exportNovel(novelId, userId, query);
     const payload = res.format === "docx" ? res.buffer : res.body;
     if (!res.success || !payload || !res.format || !res.filename) {
       const denied = res.error === "Novel tidak ditemukan atau akses ditolak.";

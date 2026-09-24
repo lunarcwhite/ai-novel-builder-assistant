@@ -3,23 +3,23 @@
 // Two jobs:
 // 1. Resolve the `@/` path alias to ./src with TypeScript extension probing,
 //    including extensionless relative imports (e.g. `./tree` -> `./tree.ts`).
-// 2. Redirect `@supabase/ssr` and `next/headers` to local stubs so feature
-//    code runs in local-dev in-memory mode without network or credentials.
+// 2. Redirect `@supabase/ssr`, `next/headers`, and `next/navigation` to local
+//    stubs so feature code runs in local-dev in-memory mode without network
+//    or credentials.
 //
 // Usage:
-//   node --experimental-strip-types --loader ./tests/loader.mjs \
-//     --test tests/*.test.ts
+//   node --experimental-strip-types --loader ./tests/support/loader.mjs \
+//     --test "tests/**/*.test.ts"
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const supportDir = path.dirname(fileURLToPath(import.meta.url));
-const testsDir = path.dirname(supportDir);
-const repoRoot = path.dirname(testsDir);
 
 const STUBS = new Map([
   ["@supabase/ssr", "supabase-ssr.mjs"],
   ["next/headers", "next-headers.mjs"],
+  ["next/navigation", "next-navigation.mjs"],
 ]);
 
 function tryFile(basePath) {
@@ -46,6 +46,8 @@ export async function resolve(specifier, context, next) {
   }
 
   if (specifier.startsWith("@/")) {
+    const testsDir = path.dirname(supportDir);
+    const repoRoot = path.dirname(testsDir);
     const file = tryFile(path.join(repoRoot, "src", specifier.slice(2)));
     if (file) return { url: pathToFileURL(file).href, shortCircuit: true };
   }

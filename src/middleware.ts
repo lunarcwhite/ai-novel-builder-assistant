@@ -44,8 +44,9 @@ export async function middleware(request: NextRequest) {
 
     const { data: { user } } = await supabase.auth.getUser();
     isAuthenticated = Boolean(user);
-  } else {
-    // Local dev mode fallback session check
+  } else if (process.env.NODE_ENV !== "production") {
+    // Local dev mode fallback session check. Unsigned cookie: never trusted
+    // in production (see isDevAuthFallbackEnabled).
     const devCookie = request.cookies.get("novel_builder_dev_session");
     isAuthenticated = Boolean(devCookie?.value);
   }
