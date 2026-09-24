@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { formatNumber } from "@/lib/utils";
-import { quickAddSceneMemoryAction, type MemoryActionResult } from "@/server/actions/memories";
+import { quickAddSceneMemoryAction, proposeSceneMemoriesAction, type MemoryActionResult, type ProposeSceneMemoriesActionResult } from "@/server/actions/memories";
 import AIAssistant from "./ai-assistant";
 import ConsistencyPanel from "./consistency-panel";
 import {
@@ -55,6 +55,25 @@ export default function AIPanelPlaceholder({
     quickAddSceneMemoryAction,
     null
   );
+
+  // Task 9.5: manual "Usulkan Memori" — extraction on explicit author
+  // trigger only (never on autosave). Candidates are stored as
+  // "proposed" and reviewed in the Memory Studio.
+  const [proposeState, setProposeState] = useState<ProposeSceneMemoriesActionResult | null>(null);
+  const [isProposing, setIsProposing] = useState<boolean>(false);
+
+  const handleProposeMemories = async () => {
+    setIsProposing(true);
+    setProposeState(null);
+    try {
+      const res = await proposeSceneMemoriesAction(novel.id, scene.id);
+      setProposeState(res);
+    } catch {
+      setProposeState({ error: "Ekstraksi memori gagal. Naskah Anda aman — coba lagi." });
+    } finally {
+      setIsProposing(false);
+    }
+  };
 
   useEffect(() => {
     if (state?.success) {
@@ -189,6 +208,53 @@ export default function AIPanelPlaceholder({
 
             {/* Quick Add Fact Accordion */}
             <div className="pt-2 border-t border-border/40">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleProposeMemories}
+                disabled={isProposing}
+                className="w-full h-7 text-[11px] flex items-center justify-center gap-1.5"
+                title="Ekstrak kandidat memori dari naskah adegan ini. Hasil tersimpan sebagai usulan — tidak otomatis menjadi kanon."
+              >
+                <Sparkles className="w-3 h-3" />
+                {isProposing ? "Mengekstrak..." : "Usulkan Memori dari Adegan"}
+              </Button>
+
+              {proposeState?.error && (
+                <div className="mt-2 text-[10px] text-destructive leading-relaxed">
+                  {proposeState.error}
+                </div>
+              )}
+              {proposeState?.success && (
+                <div className="mt-2 p-2 rounded-md bg-amber-500/5 border border-amber-500/20 text-[10px] leading-relaxed space-y-1">
+                  <p className="text-foreground font-medium">
+                    {(proposeState.created?.length || 0) > 0
+                      ? `${proposeState.created!.length} usulan tersimpan sebagai Proposed.`
+                      : "Tidak ada usulan baru."}
+                    {(proposeState.skippedDuplicates || 0) > 0 && (
+                      <span className="text-muted-foreground font-normal">
+                        {" "}{proposeState.skippedDuplicates} duplikat dilewati.
+                      </span>
+                    )}
+                  </p>
+                  {(proposeState.created?.length || 0) > 0 && (
+                    <ul className="space-y-1 text-muted-foreground">
+                      {proposeState.created!.slice(0, 3).map((m) => (
+                        <li key={m.id} className="line-clamp-2">• {m.content}</li>
+                      ))}
+                    </ul>
+                  )}
+                  <Link
+                    href={`/workspace/${novel.id}/memories`}
+                    className="text-primary hover:underline inline-flex items-center gap-0.5"
+                  >
+                    <span>Tinjau di Memory Studio</span>
+                    <ExternalLink className="w-2.5 h-2.5" />
+                  </Link>
+                </div>
+              )}
+
               <button
                 type="button"
                 onClick={() => setIsQuickAddOpen((prev) => !prev)}

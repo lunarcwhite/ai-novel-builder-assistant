@@ -8,6 +8,7 @@ import type {
   MemoryType,
   MemorySearchResult,
   MemoryDeduplicationCheckResult,
+  StoryMemory,
 } from "@/types";
 
 export type MemoryActionResult = {
@@ -16,6 +17,14 @@ export type MemoryActionResult = {
   id?: string;
   duplicateWarning?: string;
 };
+
+export interface ProposeSceneMemoriesActionResult {
+  success?: boolean;
+  error?: string;
+  created?: StoryMemory[];
+  skippedDuplicates?: number;
+  aiEnriched?: boolean;
+}
 
 // ==========================================
 // MEMORY CRUD ACTIONS
@@ -222,6 +231,38 @@ export async function quickAddSceneMemoryAction(
     return { success: true, id: res.memory?.id, duplicateWarning: res.duplicateWarning };
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Terjadi kesalahan saat mencatat fakta.";
+    return { error: message };
+  }
+}
+
+/**
+ * Propose memory candidates from a scene (Task 9.5).
+ * Stores candidates with status "proposed" only — never auto-confirms.
+ * The author reviews each one in the Memory Studio.
+ */
+export async function proposeSceneMemoriesAction(
+  novelId: string,
+  sceneId: string
+): Promise<ProposeSceneMemoriesActionResult> {
+  try {
+    const user = await requireAuth();
+    if (!novelId || !sceneId) return { error: "ID novel atau adegan tidak valid." };
+
+    const res = await MemoryService.proposeFromScene(novelId, user.id, { sceneId });
+    if (!res.success) {
+      return { error: res.error || "Ekstraksi memori gagal." };
+    }
+
+    revalidatePath(`/workspace/${novelId}/memories`);
+    revalidatePath(`/workspace/${novelId}/write/${sceneId}`);
+    return {
+      success: true,
+      created: res.created,
+      skippedDuplicates: res.skippedDuplicates,
+      aiEnriched: res.aiEnriched,
+    };
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Ekstraksi memori gagal.";
     return { error: message };
   }
 }

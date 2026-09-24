@@ -500,6 +500,36 @@ export interface MemoryDeduplicationCheckResult {
 }
 
 // -------------------------------------------------------------
+// Phase 9 — Task 9.5: Automatic Memory Proposals
+// -------------------------------------------------------------
+// Scene -> AI extraction -> candidate memories -> dedup ->
+// author confirmation. Stored candidates always keep status
+// "proposed" (SOUL.md #8: never auto-confirm).
+
+export const proposeSceneMemoriesSchema = z.object({
+  sceneId: z.string().min(1, "ID adegan wajib diisi.").max(100),
+});
+
+export type ProposeSceneMemoriesInput = z.infer<typeof proposeSceneMemoriesSchema>;
+
+export interface MemoryProposalCandidate {
+  type: MemoryType;
+  content: string;
+  importance: number;
+}
+
+export interface ProposeSceneMemoriesResult {
+  success: boolean;
+  error?: string;
+  sceneId?: string;
+  /** Stored candidates — always status "proposed", never auto-confirmed. */
+  created?: StoryMemory[];
+  skippedDuplicates?: number;
+  /** False when the local deterministic fallback was used. */
+  aiEnriched?: boolean;
+}
+
+// -------------------------------------------------------------
 // Phase 7 Domain: AI Assistant
 // -------------------------------------------------------------
 

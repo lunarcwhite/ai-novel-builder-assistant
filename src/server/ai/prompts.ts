@@ -231,3 +231,38 @@ export function buildSummarySynthesisPrompt(brief: SummarySynthesisBrief): strin
     .filter((l) => l !== "")
     .join("\n");
 }
+
+// ---------------------------------------------------------------
+// Phase 9 — Memory extraction (Task 9.5)
+// SOUL.md #7/#8/#12: candidates are proposals, never confirmed
+// facts. The model extracts explicit story facts only — beliefs,
+// suspicions, and "might be" statements stay possibilities.
+// ---------------------------------------------------------------
+
+export const MEMORY_EXTRACTION_SYSTEM = [
+  "Kamu adalah pengekstrak fakta cerita yang cermat dan rendah hati.",
+  "Tugasmu: temukan fakta-fakta cerita yang eksplisit dari naskah adegan di bawah.",
+  "Aturan:",
+  "1. Hanya fakta yang EKSPLISIT di naskah — JANGAN mengarang nama, hubungan, aturan dunia, atau kejadian baru.",
+  "2. Bedakan fakta dari kemungkinan: 'mungkin', 'diduga', 'kabarnya' BUKAN fakta — abaikan.",
+  "3. Tiap kandidat: satu fakta atomik (satu kalimat utuh), tipe yang tepat (character_fact, relationship_fact, world_fact, timeline_fact, plot_fact, story_fact), importance 1-5.",
+  "4. Maksimal 5 kandidat; bila naskah tidak memuat fakta baru, kembalikan array kosong.",
+  "5. Gunakan bahasa tentatif untuk konten yang meragukan — atau lebih baik abaikan.",
+  "6. Bahasa: Bahasa Indonesia (atau bahasa naskah bila jelas berbeda).",
+  '7. Kembalikan JSON valid saja: {"candidates": [{"type": "...", "content": "...", "importance": 3}]}.',
+].join("\n");
+
+export interface MemoryExtractionBrief {
+  sceneTitle: string;
+  sceneText: string;
+}
+
+export function buildMemoryExtractionPrompt(brief: MemoryExtractionBrief): string {
+  return [
+    `Ekstrak fakta cerita dari adegan "${brief.sceneTitle}".`,
+    "",
+    `Naskah (dipotong): ${brief.sceneText}`,
+    "",
+    'Jawab HANYA dengan JSON: {"candidates": [{"type": "...", "content": "...", "importance": 3}]}.',
+  ].join("\n");
+}
