@@ -200,6 +200,29 @@ describe("characters, relationships, and world CRUD", () => {
     assert.equal(ctx.location_id, scene.location_id);
     assert.ok(loc.success);
   });
+
+  it("reports false when deleting entities that do not exist", async () => {
+    const userId = freshUser();
+    const novel = await NovelService.createNovel({ title: "Novel Hapus" }, userId);
+
+    assert.equal((await CharacterService.deleteCharacter("char_missing", novel.id, userId)).success, false);
+    assert.equal((await CharacterService.deleteRelationship("rel_missing", novel.id, userId)).success, false);
+    assert.equal((await WorldService.deleteLocation("loc_missing", novel.id, userId)).success, false);
+    assert.equal((await WorldService.deleteWorldRule("rule_missing", novel.id, userId)).success, false);
+    assert.equal((await WorldService.deleteWorldLore("lore_missing", novel.id, userId)).success, false);
+
+    // Deleting an existing entity still succeeds, exactly once.
+    const created = await CharacterService.createCharacter(novel.id, userId, { name: "Z" });
+    assert.ok(created.success);
+    assert.equal(
+      (await CharacterService.deleteCharacter(created.character!.id, novel.id, userId)).success,
+      true
+    );
+    assert.equal(
+      (await CharacterService.deleteCharacter(created.character!.id, novel.id, userId)).success,
+      false
+    );
+  });
 });
 
 describe("novel update and delete", () => {

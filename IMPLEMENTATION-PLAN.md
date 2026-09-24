@@ -798,14 +798,17 @@ Characters involved may initially be inferred from content later; manual selecti
 User can construct:
 
 ```text
-[x] Characters (CRUD, Psychological Profile, 3-Stage Arc, Manuscript Appearances)
-[x] Relationships (Bidirectional links, Relationship Types, Dynamic State)
-[x] Locations (CRUD, Atmosphere, Significance, Linked Scenes)
-[x] World Rules (CRUD, Strictness/Importance Levels 1–5, Limitations)
-[x] World Lore (Lore Articles, Categories, Cross-tags)
+[x] Characters (CRUD, Psychological Profile, 3-Stage Arc, Manuscript Appearances*)
+[x] Relationships (Bidirectional display, Relationship Types, Dynamic State)
+[x] Locations (CRUD, Atmosphere, Geography, Notes)
+[x] World Rules (CRUD, Importance Levels 1–5)
+[x] World Lore (Lore Articles, Categories)
 ```
 
 and connect them to scenes (POV Character, Primary Location, Characters Involved in Scene Context Inspector).
+
+* Appearances tab resolves via the local-dev scene store; Supabase-backed lookup pending.
+* Scene-context IDs validate as UUID; local-dev seed IDs are non-UUID (Supabase IDs unaffected).
 
 ---
 

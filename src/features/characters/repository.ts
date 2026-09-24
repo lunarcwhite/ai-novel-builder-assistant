@@ -425,8 +425,15 @@ export class CharacterRepository {
 
   /**
    * Delete a character safely.
+   * Returns false when the character does not belong to the novel, so a
+   * cross-user delete is reported as "not deleted" instead of silently
+   * succeeding (Supabase RLS would block the write, but `!error` alone
+   * cannot distinguish "deleted" from "matched zero rows").
    */
   static async delete(id: string, novelId: string, userId: string): Promise<boolean> {
+    const existing = await this.findById(id, novelId, userId);
+    if (!existing) return false;
+
     const novel = await NovelRepository.findById(novelId, userId);
     if (!novel) return false;
 
@@ -444,6 +451,7 @@ export class CharacterRepository {
 
     const characters = localDevCharactersStore.get(novelId) || [];
     const filtered = characters.filter((c) => c.id !== id);
+    const deleted = filtered.length < characters.length;
     localDevCharactersStore.set(novelId, filtered);
 
     // Also remove associated relationships in local store
@@ -453,7 +461,7 @@ export class CharacterRepository {
     );
     localDevRelationshipsStore.set(novelId, filteredRels);
 
-    return true;
+    return deleted;
   }
 }
 
@@ -600,10 +608,11 @@ export class RelationshipRepository {
 
   /**
    * Delete a relationship.
+   * Returns false when the relationship does not belong to the novel.
    */
   static async delete(id: string, novelId: string, userId: string): Promise<boolean> {
-    const novel = await NovelRepository.findById(novelId, userId);
-    if (!novel) return false;
+    const existing = (await this.findManyByNovel(novelId, userId)).some((r) => r.id === id);
+    if (!existing) return false;
 
     const supabase = await createClient();
 
@@ -619,8 +628,9 @@ export class RelationshipRepository {
 
     const rels = localDevRelationshipsStore.get(novelId) || [];
     const filtered = rels.filter((r) => r.id !== id);
+    const deleted = filtered.length < rels.length;
     localDevRelationshipsStore.set(novelId, filtered);
-    return true;
+    return deleted;
   }
 }
 
@@ -675,7 +685,11 @@ export class SceneCharacterRepository {
 
     if (supabase && isSupabaseConfigured) {
       // Delete existing
-      await supabase.from("scene_characters").delete().eq("scene_id", sceneId);
+      const { error: deleteError } = await supabase
+        .from("scene_characters")
+        .delete()
+        .eq("scene_id", sceneId);
+      if (deleteError) return false;
 
       if (characterIds.length > 0) {
         const rows = characterIds.map((charId) => ({
@@ -684,7 +698,8 @@ export class SceneCharacterRepository {
           character_id: charId,
           role_in_scene: "present",
         }));
-        await supabase.from("scene_characters").insert(rows);
+        const { error: insertError } = await supabase.from("scene_characters").insert(rows);
+        if (insertError) return false;
       }
       return true;
     }

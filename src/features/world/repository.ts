@@ -277,10 +277,11 @@ export class LocationRepository {
 
   /**
    * Delete a location.
+   * Returns false when the location does not belong to the novel.
    */
   static async delete(id: string, novelId: string, userId: string): Promise<boolean> {
-    const novel = await NovelRepository.findById(novelId, userId);
-    if (!novel) return false;
+    const existing = await this.findById(id, novelId, userId);
+    if (!existing) return false;
 
     const supabase = await createClient();
 
@@ -296,8 +297,9 @@ export class LocationRepository {
 
     const locs = localDevLocationsStore.get(novelId) || [];
     const filtered = locs.filter((l) => l.id !== id);
+    const deleted = filtered.length < locs.length;
     localDevLocationsStore.set(novelId, filtered);
-    return true;
+    return deleted;
   }
 }
 
@@ -444,8 +446,8 @@ export class WorldRuleRepository {
    * Delete a world rule.
    */
   static async delete(id: string, novelId: string, userId: string): Promise<boolean> {
-    const novel = await NovelRepository.findById(novelId, userId);
-    if (!novel) return false;
+    const existing = await this.findById(id, novelId, userId);
+    if (!existing) return false;
 
     const supabase = await createClient();
 
@@ -461,8 +463,9 @@ export class WorldRuleRepository {
 
     const rules = localDevWorldRulesStore.get(novelId) || [];
     const filtered = rules.filter((r) => r.id !== id);
+    const deleted = filtered.length < rules.length;
     localDevWorldRulesStore.set(novelId, filtered);
-    return true;
+    return deleted;
   }
 }
 
@@ -610,8 +613,8 @@ export class WorldLoreRepository {
    * Delete a world lore entry.
    */
   static async delete(id: string, novelId: string, userId: string): Promise<boolean> {
-    const novel = await NovelRepository.findById(novelId, userId);
-    if (!novel) return false;
+    const existing = await this.findById(id, novelId, userId);
+    if (!existing) return false;
 
     const supabase = await createClient();
 
@@ -627,7 +630,8 @@ export class WorldLoreRepository {
 
     const loreList = localDevWorldLoreStore.get(novelId) || [];
     const filtered = loreList.filter((l) => l.id !== id);
+    const deleted = filtered.length < loreList.length;
     localDevWorldLoreStore.set(novelId, filtered);
-    return true;
+    return deleted;
   }
 }
