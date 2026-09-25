@@ -132,7 +132,7 @@ export default function EditorHeader({
         {saveStatus === "offline" && (
           <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
             <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
-            <span className="hidden sm:inline">Anda offline — draf lokal aman</span>
+            <span className="hidden sm:inline">Anda offline; draf lokal aman</span>
             <button
               onClick={onRetrySave}
               className="underline font-semibold hover:text-amber-700 dark:hover:text-amber-300 ml-1 inline-flex items-center gap-1"

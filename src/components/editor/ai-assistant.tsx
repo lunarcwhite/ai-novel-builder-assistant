@@ -33,7 +33,7 @@ import {
   Plus,
   RefreshCw,
   Send,
-  Sparkles,
+  BrainCircuit,
   Wand2,
   X,
 } from "lucide-react";
@@ -254,7 +254,7 @@ export default function AIAssistant({ novel, chapter, scene, editorHtml, onApply
         <Textarea
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder={`${DEFAULT_QUERY[operation]}${operation === "ask" ? " Tanya apa saja tentang cerita ini…" : " (opsional — tambahkan arahan spesifik)"}`}
+          placeholder={`${DEFAULT_QUERY[operation]}${operation === "ask" ? " Tanya apa saja tentang cerita ini…" : " (opsional: tambahkan arahan spesifik)"}`}
           rows={2}
           disabled={status === "loading"}
           className="text-xs resize-none bg-background/70"
@@ -303,8 +303,8 @@ export default function AIAssistant({ novel, chapter, scene, editorHtml, onApply
         <div className="rounded-md border border-border/70 bg-background/80 overflow-hidden">
           <div className="px-2.5 py-1.5 border-b border-border/50 flex items-center justify-between gap-2">
             <span className="text-[10px] font-medium text-foreground flex items-center gap-1">
-              <Sparkles className="w-3 h-3 text-primary" />
-              Saran AI — {OPERATION_CONTRACTS[suggestion.operation].label}
+              <BrainCircuit className="w-3 h-3 text-primary" />
+              Saran AI: {OPERATION_CONTRACTS[suggestion.operation].label}
             </span>
             <Badge variant="outline" className="text-[9px] py-0 px-1">
               {suggestion.provider} • {suggestion.model}

@@ -22,7 +22,6 @@ import {
   Flame,
   KeyRound,
   Compass,
-  Sparkles,
   Feather,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -284,8 +283,8 @@ export default function CharacterStudioView({
                         </div>
                       )}
 
-                      <div className="flex items-center justify-between text-[10px] text-muted-foreground/80 pt-1">
-                        <span>{c.age || "Usia —"}</span>
+                      <div className="flex items-center justify-between text-[10px] text-muted-foreground pt-1">
+                        <span>{c.age ? `Usia: ${c.age}` : "Usia belum diisi"}</span>
                         <span>{appearancesCount} adegan naskah</span>
                       </div>
                     </div>
@@ -371,7 +370,7 @@ export default function CharacterStudioView({
                     ariaLabel="Navigasi detail karakter"
                     items={[
                       { id: "profile", label: "Profil & Motivasi", icon: Compass },
-                      { id: "arc", label: "Busur Karakter (Arc)", icon: Sparkles },
+                      { id: "arc", label: "Busur Karakter (Arc)", icon: Flame },
                       {
                         id: "relations",
                         label: `Relasi (${charRelations.length})`,
@@ -442,13 +441,13 @@ export default function CharacterStudioView({
                       <div className="space-y-1">
                         <span className="font-semibold text-foreground">Kekuatan Utama:</span>
                         <p className="text-muted-foreground leading-relaxed">
-                          {selectedChar.strengths || "—"}
+                          {selectedChar.strengths || "-"}
                         </p>
                       </div>
                       <div className="space-y-1">
                         <span className="font-semibold text-foreground">Kelemahan / Cacat Fatal:</span>
                         <p className="text-muted-foreground leading-relaxed">
-                          {selectedChar.weaknesses || "—"}
+                          {selectedChar.weaknesses || "-"}
                         </p>
                       </div>
                     </div>
@@ -479,7 +478,7 @@ export default function CharacterStudioView({
                     <div className="p-4 rounded-lg bg-muted/20 border border-border/60 space-y-4">
                       <div className="flex items-center justify-between">
                         <span className="font-semibold text-sm text-foreground flex items-center gap-2">
-                          <Sparkles className="w-4 h-4 text-primary" />
+                          <Flame className="w-4 h-4 text-primary" />
                           Visualisasi Busur Cerita (Character Arc)
                         </span>
                       </div>

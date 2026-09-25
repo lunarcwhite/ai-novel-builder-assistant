@@ -100,7 +100,7 @@ export default function ActDialog({ novelId, act, trigger }: ActDialogProps) {
                     id="act-title"
                     name="title"
                     defaultValue={act?.title || ""}
-                    placeholder="Contoh: Act I — Permulaan & Titik Balik"
+                    placeholder="Contoh: Act I: Permulaan & Titik Balik"
                     required
                     className="text-sm"
                   />

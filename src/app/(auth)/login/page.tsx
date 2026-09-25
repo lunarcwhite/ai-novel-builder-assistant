@@ -7,7 +7,7 @@ import { loginAction, type AuthActionResult } from "@/server/actions/auth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { Feather, Sparkles, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Feather, KeyRound, AlertCircle, CheckCircle2 } from "lucide-react";
 
 function LoginForm() {
   const searchParams = useSearchParams();
@@ -107,7 +107,7 @@ function LoginForm() {
             variant="outline"
             className="w-full text-xs text-muted-foreground hover:text-foreground flex items-center gap-1.5"
           >
-            <Sparkles className="w-3.5 h-3.5 text-primary" />
+            <KeyRound className="w-3.5 h-3.5 text-primary" />
             Masuk Cepat Demo Author (Lokal)
           </Button>
         </form>

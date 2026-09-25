@@ -151,7 +151,7 @@ export default function SceneNavigator({
                                 <div className="flex items-center gap-1.5 truncate">
                                   <Feather
                                     className={`w-3 h-3 shrink-0 ${
-                                      isActive ? "text-primary" : "text-muted-foreground/60"
+                                      isActive ? "text-primary" : "text-muted-foreground"
                                     }`}
                                   />
                                   <span className="truncate">{scene.title}</span>
@@ -230,7 +230,7 @@ export default function SceneNavigator({
                                 <div className="flex items-center gap-1.5 truncate">
                                   <Feather
                                     className={`w-3 h-3 shrink-0 ${
-                                      isActive ? "text-primary" : "text-muted-foreground/60"
+                                      isActive ? "text-primary" : "text-muted-foreground"
                                     }`}
                                   />
                                   <span className="truncate">{scene.title}</span>

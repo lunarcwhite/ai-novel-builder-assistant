@@ -2,18 +2,16 @@ import React from "react";
 import Link from "next/link";
 import { requireAuth } from "@/server/auth/guards";
 import { NovelService } from "@/features/novels/service";
-import { deleteNovelAction } from "@/server/actions/novels";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { filterNovelsForLibrary } from "@/lib/library-search";
+import { DeleteNovelDialog } from "@/features/novels/components/delete-novel-dialog";
 import {
   Plus,
   BookOpen,
-  Trash2,
   FileText,
-  ArrowRight,
   Search,
   SearchX,
 } from "lucide-react";
@@ -34,11 +32,8 @@ export default async function WorkspacePage({
       {/* Welcome Banner */}
       <div className="rounded-xl border border-border/80 bg-card p-6 md:p-8 shadow-paper flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-2 max-w-2xl">
-          <div className="flex items-center gap-2">
-            <Badge variant="accent" className="text-[10px]">
-              Sesi Terautentikasi
-            </Badge>
-            <span className="text-xs text-muted-foreground">ID Penulis: {user.id}</span>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <span>ID Penulis: {user.id}</span>
           </div>
           <h1 className="text-2xl md:text-3xl font-serif font-normal text-foreground">
             Koleksi Novel, {user.displayName}
@@ -156,7 +151,7 @@ export default async function WorkspacePage({
                           &ldquo;{novel.premise}&rdquo;
                         </p>
                       ) : (
-                        <p className="text-xs text-muted-foreground/60 mt-1.5 italic">
+                        <p className="text-xs text-muted-foreground mt-1.5 italic">
                           Belum ada premis tertulis.
                         </p>
                       )}
@@ -188,22 +183,11 @@ export default async function WorkspacePage({
                     </span>
 
                     <div className="flex items-center gap-2">
-                      <form action={deleteNovelAction}>
-                        <input type="hidden" name="id" value={novel.id} />
-                        <Button
-                          type="submit"
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 px-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
-                      </form>
+                      <DeleteNovelDialog novelId={novel.id} novelTitle={novel.title} />
 
                       <Link href={`/workspace/${novel.id}`}>
-                        <Button size="sm" variant="default" className="text-xs h-8 flex items-center gap-1">
+                        <Button size="sm" variant="default" className="text-xs h-8">
                           Buka Studio
-                          <ArrowRight className="w-3.5 h-3.5" />
                         </Button>
                       </Link>
                     </div>

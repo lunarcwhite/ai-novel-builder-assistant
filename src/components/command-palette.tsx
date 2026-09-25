@@ -20,28 +20,43 @@ export const PALETTE_ACTION_EVENT = "novel-builder:palette-action";
 
 const GROUP_ORDER: PaletteGroup[] = ["Navigasi", "Adegan", "Aksi"];
 
-/** Button for the workspace header — dispatches an event the host listens to. */
+/** Button for the workspace header: dispatches an event the host listens to. */
 export function PaletteTriggerButton() {
   const open = React.useCallback(() => {
     window.dispatchEvent(new CustomEvent(OPEN_PALETTE_EVENT));
   }, []);
 
   return (
-    <button
-      type="button"
-      onClick={open}
-      className="hidden sm:flex items-center gap-2 h-8 px-2.5 rounded-md border border-border/70 bg-muted/40 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-colors min-w-44 justify-between"
-      aria-label="Buka palet perintah (Ctrl K)"
-      title="Palet perintah (Ctrl+K)"
-    >
-      <span className="inline-flex items-center gap-1.5">
+    <>
+      {/* Mobile icon trigger */}
+      <button
+        type="button"
+        onClick={open}
+        className="sm:hidden flex items-center justify-center w-8 h-8 rounded-md border border-border/70 bg-muted/40 text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        aria-label="Buka palet perintah dan pencarian"
+        title="Buka palet perintah"
+      >
         <Search className="w-3.5 h-3.5" />
-        <span>Cari / perintah…</span>
-      </span>
-      <kbd className="text-[10px] font-sans px-1 py-0.5 rounded border border-border/70 bg-background">
-        Ctrl K
-      </kbd>
-    </button>
+        <span className="sr-only">Buka palet perintah</span>
+      </button>
+
+      {/* Desktop expanded trigger */}
+      <button
+        type="button"
+        onClick={open}
+        className="hidden sm:flex items-center gap-2 h-8 px-2.5 rounded-md border border-border/70 bg-muted/40 text-xs text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-colors min-w-44 justify-between focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        aria-label="Buka palet perintah (Ctrl K)"
+        title="Palet perintah (Ctrl+K)"
+      >
+        <span className="inline-flex items-center gap-1.5">
+          <Search className="w-3.5 h-3.5" />
+          <span>Cari / perintah…</span>
+        </span>
+        <kbd className="text-[10px] font-sans px-1 py-0.5 rounded border border-border/70 bg-background">
+          Ctrl K
+        </kbd>
+      </button>
+    </>
   );
 }
 

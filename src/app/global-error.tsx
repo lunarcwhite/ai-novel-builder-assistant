@@ -27,7 +27,7 @@ export default function GlobalError({
           <div className="space-y-1">
             <h1 className="font-serif text-xl font-medium">Aplikasi gagal dimuat</h1>
             <p className="text-xs text-muted-foreground leading-relaxed max-w-sm mx-auto">
-              Terjadi kesalahan tak terduga. Naskah tersimpan di server tetap aman —
+              Terjadi kesalahan tak terduga. Naskah tersimpan di server tetap aman;
               muat ulang halaman ini untuk mencoba lagi.
             </p>
           </div>

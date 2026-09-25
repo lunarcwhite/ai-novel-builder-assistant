@@ -28,7 +28,7 @@ export default function WorkspaceError({
       <div className="space-y-1">
         <h2 className="font-serif text-xl font-medium">Studio tidak dapat dimuat</h2>
         <p className="text-xs text-muted-foreground leading-relaxed max-w-sm mx-auto">
-          Terjadi gangguan saat memuat halaman ini. Naskah Anda aman — tidak ada
+          Terjadi gangguan saat memuat halaman ini. Naskah Anda aman; tidak ada
           tulisan yang hilang atau berubah.
         </p>
       </div>

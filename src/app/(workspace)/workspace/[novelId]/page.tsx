@@ -194,24 +194,24 @@ export default async function NovelWorkspacePage({ params }: PageProps) {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 border-t border-border/40">
             <div>
               <span className="text-muted-foreground">Tema Inti:</span>
-              <p className="font-medium text-foreground mt-0.5">{novel.theme || "—"}</p>
+              <p className="font-medium text-foreground mt-0.5">{novel.theme || "-"}</p>
             </div>
             <div>
               <span className="text-muted-foreground">Nada (Tone):</span>
-              <p className="font-medium text-foreground mt-0.5">{novel.tone || "—"}</p>
+              <p className="font-medium text-foreground mt-0.5">{novel.tone || "-"}</p>
             </div>
             <div>
               <span className="text-muted-foreground">Target Pembaca:</span>
-              <p className="font-medium text-foreground mt-0.5">{novel.target_audience || "—"}</p>
+              <p className="font-medium text-foreground mt-0.5">{novel.target_audience || "-"}</p>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Main Narrative Structure (Phase 3 Core Feature) */}
+      {/* Main Narrative Structure */}
       <OutlineTree novelId={novel.id} structure={structure} />
 
-      {/* Story Knowledge & Bible Subsystems (Phase 5 Active) */}
+      {/* Story Knowledge & Bible Subsystems */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
         {/* Character Studio Card (Phase 5 Active) */}
         <Card className="border-border/80 flex flex-col justify-between shadow-subtle hover:border-accent/60 transition-all">

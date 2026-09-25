@@ -5,10 +5,8 @@ import Link from "next/link";
 import { 
   BookOpen, 
   Feather, 
-  Sparkles, 
   Users, 
   BrainCircuit, 
-  Clock, 
   CheckCircle2, 
   ShieldCheck, 
   Code2
@@ -31,8 +29,8 @@ export default function HomePage() {
           <div>
             <h1 className="text-sm font-semibold tracking-tight flex items-center gap-2">
               Novel Builder
-              <Badge variant="accent" className="text-[10px] tracking-normal font-sans py-0">
-                Phase 0 Active
+              <Badge variant="secondary" className="text-[10px] tracking-normal font-sans py-0">
+                v1.0 Ready
               </Badge>
             </h1>
             <p className="text-[11px] text-muted-foreground">AI Novel Writing Workspace</p>
@@ -93,14 +91,11 @@ export default function HomePage() {
             {/* Hero / Studio Welcome */}
             <div className="rounded-xl border border-border/80 bg-card p-6 md:p-8 shadow-paper relative overflow-hidden">
               <div className="max-w-2xl space-y-3">
-                <Badge variant="outline" className="text-xs uppercase tracking-wider text-muted-foreground">
-                  The author owns the story
-                </Badge>
                 <h2 className="text-2xl md:text-3xl font-serif font-medium tracking-tight text-foreground">
                   Ruang Kerja Penulisan Novel dengan Story Intelligence
                 </h2>
                 <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                  Fondasi proyek telah selesai diinisialisasi. Workspace ini menggabungkan naskah editorial, struktur cerita terorganisir, memori fakta novel, dan asisten AI non-destruktif.
+                  Fondasi proyek dan seluruh modul inti telah selesai. Workspace ini menggabungkan naskah editorial, struktur cerita terorganisir, memori fakta novel, dan asisten AI non-destruktif.
                 </p>
               </div>
             </div>
@@ -185,7 +180,7 @@ export default function HomePage() {
                       Di sakunya, segel perunggu itu terasa sedingin es. Tidak ada seorang pun di akademi yang tahu ia membawa dokumen itu melintasi perbatasan. Jika Lady Seraphina mendahuluinya sampai di gerbang barat, perjanjian damai yang dirintis selama satu dasawarsa akan hancur sebelum senja tiba.
                     </p>
                     <div className="p-3 my-4 rounded-md border border-primary/20 bg-primary/5 text-xs font-sans text-muted-foreground flex items-start gap-2.5">
-                      <Sparkles className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                      <BrainCircuit className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                       <div>
                         <span className="font-medium text-foreground">AI Story Memory Context:</span>
                         <p className="mt-0.5">Kaelen memiliki janji rahasia dengan Dewan Penjaga untuk tidak membuka segel perunggu sebelum gerhana ketiga.</p>
@@ -261,17 +256,17 @@ export default function HomePage() {
           <div className="space-y-6">
             <div>
               <h2 className="text-xl font-semibold tracking-tight">Status Rencana Implementasi</h2>
-              <p className="text-sm text-muted-foreground">Pelacakan progress fase dari IMPLEMENTATION-PLAN.md</p>
+              <p className="text-sm text-muted-foreground">Status penyelesaian fase dari IMPLEMENTATION-PLAN.md (Fase 0 - 11 Lengkap)</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <Card className="border-primary/40 bg-primary/5">
                 <CardHeader className="p-5 pb-3">
                   <div className="flex items-center justify-between">
                     <Badge variant="default" className="text-xs">Phase 0 • Completed</Badge>
-                    <CheckCircle2 className="w-5 h-5 text-primary" />
+                    <CheckCircle2 className="w-4 h-4 text-primary" />
                   </div>
-                  <CardTitle className="text-base font-semibold mt-2">Repository & Tooling Foundation</CardTitle>
+                  <CardTitle className="text-sm font-semibold mt-2">Repository & Tooling Foundation</CardTitle>
                   <CardDescription className="text-xs">Next.js 15, TypeScript, Tailwind CSS, TipTap, Zod, Supabase, dan arsitektur folder modular.</CardDescription>
                 </CardHeader>
               </Card>
@@ -280,54 +275,120 @@ export default function HomePage() {
                 <CardHeader className="p-5 pb-3">
                   <div className="flex items-center justify-between">
                     <Badge variant="default" className="text-xs">Phase 1 • Completed</Badge>
-                    <CheckCircle2 className="w-5 h-5 text-primary" />
+                    <CheckCircle2 className="w-4 h-4 text-primary" />
                   </div>
-                  <CardTitle className="text-base font-semibold mt-2">Authentication & User Profiles</CardTitle>
+                  <CardTitle className="text-sm font-semibold mt-2">Authentication & User Profiles</CardTitle>
                   <CardDescription className="text-xs">Integrasi login, sign up, session guard middleware, dan isolasi tenant per-penulis.</CardDescription>
                 </CardHeader>
               </Card>
 
-              <Card className="border-border">
+              <Card className="border-primary/40 bg-primary/5">
                 <CardHeader className="p-5 pb-3">
                   <div className="flex items-center justify-between">
-                    <Badge variant="outline" className="text-xs">Phase 2 • Next Up</Badge>
-                    <Clock className="w-4 h-4 text-muted-foreground" />
+                    <Badge variant="default" className="text-xs">Phase 2 • Completed</Badge>
+                    <CheckCircle2 className="w-4 h-4 text-primary" />
                   </div>
-                  <CardTitle className="text-base font-semibold mt-2">Novel Library & Workspace Frame</CardTitle>
+                  <CardTitle className="text-sm font-semibold mt-2">Novel Library & Workspace Frame</CardTitle>
                   <CardDescription className="text-xs">Manajemen perpustakaan novel, detail metadata, dan shell ruang kerja interaktif.</CardDescription>
                 </CardHeader>
               </Card>
 
-              <Card className="border-border">
+              <Card className="border-primary/40 bg-primary/5">
                 <CardHeader className="p-5 pb-3">
                   <div className="flex items-center justify-between">
-                    <Badge variant="outline" className="text-xs">Phase 3 • Planned</Badge>
-                    <BookOpen className="w-4 h-4 text-muted-foreground" />
+                    <Badge variant="default" className="text-xs">Phase 3 • Completed</Badge>
+                    <CheckCircle2 className="w-4 h-4 text-primary" />
                   </div>
-                  <CardTitle className="text-base font-semibold mt-2">Novel Structure: Acts, Chapters, Scenes</CardTitle>
+                  <CardTitle className="text-sm font-semibold mt-2">Novel Structure: Acts, Chapters, Scenes</CardTitle>
                   <CardDescription className="text-xs">Pengaturan bab, urutan scene, metadata POV karakter, dan outline cerita.</CardDescription>
                 </CardHeader>
               </Card>
 
-              <Card className="border-border">
+              <Card className="border-primary/40 bg-primary/5">
                 <CardHeader className="p-5 pb-3">
                   <div className="flex items-center justify-between">
-                    <Badge variant="outline" className="text-xs">Phase 4 • Planned</Badge>
-                    <Feather className="w-4 h-4 text-muted-foreground" />
+                    <Badge variant="default" className="text-xs">Phase 4 • Completed</Badge>
+                    <CheckCircle2 className="w-4 h-4 text-primary" />
                   </div>
-                  <CardTitle className="text-base font-semibold mt-2">Writing Editor & Version History</CardTitle>
+                  <CardTitle className="text-sm font-semibold mt-2">Writing Editor & Version History</CardTitle>
                   <CardDescription className="text-xs">Editor naskah TipTap dengan autosave debounced dan riwayat versi yang aman.</CardDescription>
                 </CardHeader>
               </Card>
 
-              <Card className="border-border">
+              <Card className="border-primary/40 bg-primary/5">
                 <CardHeader className="p-5 pb-3">
                   <div className="flex items-center justify-between">
-                    <Badge variant="outline" className="text-xs">Phase 5 • Planned</Badge>
-                    <Users className="w-4 h-4 text-muted-foreground" />
+                    <Badge variant="default" className="text-xs">Phase 5 • Completed</Badge>
+                    <CheckCircle2 className="w-4 h-4 text-primary" />
                   </div>
-                  <CardTitle className="text-base font-semibold mt-2">Characters & Worldbuilding</CardTitle>
+                  <CardTitle className="text-sm font-semibold mt-2">Characters & Worldbuilding</CardTitle>
                   <CardDescription className="text-xs">Character bible, peta relasi antar tokoh, lokasi, dan aturan hukum dunia (world lore).</CardDescription>
+                </CardHeader>
+              </Card>
+
+              <Card className="border-primary/40 bg-primary/5">
+                <CardHeader className="p-5 pb-3">
+                  <div className="flex items-center justify-between">
+                    <Badge variant="default" className="text-xs">Phase 6 • Completed</Badge>
+                    <CheckCircle2 className="w-4 h-4 text-primary" />
+                  </div>
+                  <CardTitle className="text-sm font-semibold mt-2">Story Memory Architecture</CardTitle>
+                  <CardDescription className="text-xs">Domain memori cerita, ekstraksi AI, status confirmed/proposed, dan atribusi sumber.</CardDescription>
+                </CardHeader>
+              </Card>
+
+              <Card className="border-primary/40 bg-primary/5">
+                <CardHeader className="p-5 pb-3">
+                  <div className="flex items-center justify-between">
+                    <Badge variant="default" className="text-xs">Phase 7 • Completed</Badge>
+                    <CheckCircle2 className="w-4 h-4 text-primary" />
+                  </div>
+                  <CardTitle className="text-sm font-semibold mt-2">Context Retrieval Engine</CardTitle>
+                  <CardDescription className="text-xs">Penyusunan konteks berlapis (Layer 1-7) dengan context budget dan ranking relevansi.</CardDescription>
+                </CardHeader>
+              </Card>
+
+              <Card className="border-primary/40 bg-primary/5">
+                <CardHeader className="p-5 pb-3">
+                  <div className="flex items-center justify-between">
+                    <Badge variant="default" className="text-xs">Phase 8 • Completed</Badge>
+                    <CheckCircle2 className="w-4 h-4 text-primary" />
+                  </div>
+                  <CardTitle className="text-sm font-semibold mt-2">Consistency Checker</CardTitle>
+                  <CardDescription className="text-xs">Deteksi kontradiksi berbasis bukti tanpa memberi label menyalahkan atau klaim palsu.</CardDescription>
+                </CardHeader>
+              </Card>
+
+              <Card className="border-primary/40 bg-primary/5">
+                <CardHeader className="p-5 pb-3">
+                  <div className="flex items-center justify-between">
+                    <Badge variant="default" className="text-xs">Phase 9 • Completed</Badge>
+                    <CheckCircle2 className="w-4 h-4 text-primary" />
+                  </div>
+                  <CardTitle className="text-sm font-semibold mt-2">Story Doctor & Diagnosis</CardTitle>
+                  <CardDescription className="text-xs">Analisis pacing, karakterisasi, dan plot threads dengan pandangan editorial objektif.</CardDescription>
+                </CardHeader>
+              </Card>
+
+              <Card className="border-primary/40 bg-primary/5">
+                <CardHeader className="p-5 pb-3">
+                  <div className="flex items-center justify-between">
+                    <Badge variant="default" className="text-xs">Phase 10 • Completed</Badge>
+                    <CheckCircle2 className="w-4 h-4 text-primary" />
+                  </div>
+                  <CardTitle className="text-sm font-semibold mt-2">Analytics & Manuscript Export</CardTitle>
+                  <CardDescription className="text-xs">Peta ritme kata, durasi baca, ekspor Markdown/HTML/DOCX lengkap.</CardDescription>
+                </CardHeader>
+              </Card>
+
+              <Card className="border-primary/40 bg-primary/5">
+                <CardHeader className="p-5 pb-3">
+                  <div className="flex items-center justify-between">
+                    <Badge variant="default" className="text-xs">Phase 11 • Completed</Badge>
+                    <CheckCircle2 className="w-4 h-4 text-primary" />
+                  </div>
+                  <CardTitle className="text-sm font-semibold mt-2">Verification & Hardening</CardTitle>
+                  <CardDescription className="text-xs">187 automated tests, audit performa, kepatuhan SOUL.md & AGENTS.md.</CardDescription>
                 </CardHeader>
               </Card>
             </div>

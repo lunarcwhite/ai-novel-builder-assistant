@@ -126,7 +126,7 @@ export default function ChapterDialog({
                       className="w-full h-9 rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-subtle focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                     >
                       <option value="" className="bg-card text-foreground">
-                        — Tanpa Babak (Unassigned) —
+                        (Tanpa Babak)
                       </option>
                       {acts.map((act) => (
                         <option key={act.id} value={act.id} className="bg-card text-foreground">

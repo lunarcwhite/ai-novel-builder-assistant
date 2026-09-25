@@ -264,13 +264,13 @@ export default function PlotStudioView({
                       {t.introduced_chapter_id && (
                         <span className="inline-flex items-center gap-1">
                           <BookOpen className="w-3 h-3" />
-                          Mulai: {chapterTitle(t.introduced_chapter_id) || "—"}
+                          Mulai: {chapterTitle(t.introduced_chapter_id) || "-"}
                         </span>
                       )}
                       {t.resolved_chapter_id && (
                         <span className="inline-flex items-center gap-1">
                           <Flag className="w-3 h-3" />
-                          Selesai: {chapterTitle(t.resolved_chapter_id) || "—"}
+                          Selesai: {chapterTitle(t.resolved_chapter_id) || "-"}
                         </span>
                       )}
                     </div>
@@ -312,7 +312,7 @@ export default function PlotStudioView({
         <>
           <div className="flex items-center justify-between gap-3">
             <p className="text-xs text-muted-foreground">
-              Urutan kronologi cerita — “belum pasti” adalah status yang sah.
+              Urutan kronologi cerita: status belum pasti adalah hal yang wajar.
             </p>
             <Button size="sm" onClick={openAddEvent}>
               <Plus className="w-3.5 h-3.5 mr-1" /> Peristiwa Baru
@@ -357,13 +357,13 @@ export default function PlotStudioView({
                         {e.chapter_id && (
                           <span className="inline-flex items-center gap-1">
                             <BookOpen className="w-3 h-3" />
-                            {chapterTitle(e.chapter_id) || "—"}
+                            {chapterTitle(e.chapter_id) || "-"}
                           </span>
                         )}
                         {e.location_id && (
                           <span className="inline-flex items-center gap-1">
                             <MapPin className="w-3 h-3" />
-                            {locationName(e.location_id) || "—"}
+                            {locationName(e.location_id) || "-"}
                           </span>
                         )}
                       </div>

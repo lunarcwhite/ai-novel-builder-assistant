@@ -96,7 +96,7 @@ export function TimelineEventFormDialog({
             <Input
               name="title"
               defaultValue={event?.title || ""}
-              placeholder="Mis: Insiden rumah sakit — Hari ke-47"
+              placeholder="Mis: Insiden rumah sakit (Hari ke-47)"
               required
               className="h-8 text-xs"
             />
@@ -155,7 +155,7 @@ export function TimelineEventFormDialog({
                 <Input
                   name="relative_time"
                   defaultValue={event?.relative_time || ""}
-                  placeholder="Opsional — mis: sebelum perang"
+                  placeholder="Opsional (mis: sebelum perang)"
                   className="h-8 text-xs"
                 />
               </div>
@@ -170,7 +170,7 @@ export function TimelineEventFormDialog({
                 defaultValue={event?.chapter_id || ""}
                 className="w-full h-8 rounded-md border border-input bg-background px-2 text-xs"
               >
-                <option value="">— Tidak tertaut —</option>
+                <option value="">(Tidak tertaut)</option>
                 {chapters.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.title}
@@ -185,7 +185,7 @@ export function TimelineEventFormDialog({
                 defaultValue={event?.location_id || ""}
                 className="w-full h-8 rounded-md border border-input bg-background px-2 text-xs"
               >
-                <option value="">— Tidak tertaut —</option>
+                <option value="">(Tidak tertaut)</option>
                 {locations.map((l) => (
                   <option key={l.id} value={l.id}>
                     {l.name}

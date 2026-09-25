@@ -114,9 +114,9 @@ export default function ExportView({
             <div className="flex gap-2" role="radiogroup" aria-label="Format ekspor">
               {(
                 [
-                  { value: "md", label: "Markdown", hint: ".md — heading bab & adegan" },
-                  { value: "txt", label: "Teks Polos", hint: ".txt — tanpa pemformatan" },
-                  { value: "docx", label: "Word", hint: ".docx — dibuka di Word & Docs" },
+                  { value: "md", label: "Markdown", hint: ".md (heading bab & adegan)" },
+                  { value: "txt", label: "Teks Polos", hint: ".txt (tanpa pemformatan)" },
+                  { value: "docx", label: "Word", hint: ".docx (dibuka di Word & Docs)" },
                 ] as const
               ).map((opt) => (
                 <button

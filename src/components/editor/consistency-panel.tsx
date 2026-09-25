@@ -172,7 +172,7 @@ export default function ConsistencyPanel({ novel, chapter, scene }: ConsistencyP
       <div className="space-y-2">
         {findings.length === 0 ? (
           <p className="text-[11px] text-muted-foreground italic leading-relaxed">
-            Belum ada potensi masalah terbuka. Jalankan pemeriksaan pada adegan atau bab ini — temuan bersifat
+            Belum ada potensi masalah terbuka. Jalankan pemeriksaan pada adegan atau bab ini. Temuan bersifat
             observasi tentatif, bukan vonis.
           </p>
         ) : (
@@ -195,7 +195,7 @@ export default function ConsistencyPanel({ novel, chapter, scene }: ConsistencyP
                       <span className="font-semibold text-foreground">
                         Sumber {i === 0 ? "A" : "B"}
                       </span>{" "}
-                      {s.label ? `(${s.label}) ` : ""}“{s.excerpt || "—"}”
+                      {s.label ? `(${s.label}) ` : ""}“{s.excerpt || "-"}”
                     </p>
                   ))}
                 </div>

@@ -11,7 +11,6 @@ import { quickAddSceneMemoryAction, proposeSceneMemoriesAction, type MemoryActio
 import AIAssistant from "./ai-assistant";
 import ConsistencyPanel from "./consistency-panel";
 import {
-  Sparkles,
   PanelRightClose,
   Compass,
   CheckCircle2,
@@ -69,7 +68,7 @@ export default function AIPanelPlaceholder({
       const res = await proposeSceneMemoriesAction(novel.id, scene.id);
       setProposeState(res);
     } catch {
-      setProposeState({ error: "Ekstraksi memori gagal. Naskah Anda aman — coba lagi." });
+      setProposeState({ error: "Ekstraksi memori gagal. Naskah Anda aman, silakan coba lagi." });
     } finally {
       setIsProposing(false);
     }
@@ -87,13 +86,10 @@ export default function AIPanelPlaceholder({
       {/* Header */}
       <div className="p-3.5 border-b border-border/80 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
-          <Sparkles className="w-4 h-4 text-primary shrink-0" />
+          <BrainCircuit className="w-4 h-4 text-primary shrink-0" />
           <span className="font-serif font-medium text-xs text-foreground truncate">
-            Konteks & AI Assistant
+            Konteks & Asisten Menulis
           </span>
-          <Badge variant="outline" className="text-[10px] h-4 px-1 py-0">
-            Phase 6/7
-          </Badge>
         </div>
 
         {onCollapse && (
@@ -215,9 +211,9 @@ export default function AIPanelPlaceholder({
                 onClick={handleProposeMemories}
                 disabled={isProposing}
                 className="w-full h-7 text-[11px] flex items-center justify-center gap-1.5"
-                title="Ekstrak kandidat memori dari naskah adegan ini. Hasil tersimpan sebagai usulan — tidak otomatis menjadi kanon."
+                title="Ekstrak kandidat memori dari naskah adegan ini. Hasil tersimpan sebagai usulan, tidak otomatis menjadi kanon."
               >
-                <Sparkles className="w-3 h-3" />
+                <BrainCircuit className="w-3 h-3 text-primary" />
                 {isProposing ? "Mengekstrak..." : "Usulkan Memori dari Adegan"}
               </Button>
 

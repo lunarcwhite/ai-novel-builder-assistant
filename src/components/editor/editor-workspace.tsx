@@ -30,7 +30,7 @@ import {
   Users,
   MapPin,
   Check,
-  Sparkles,
+  Compass,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PALETTE_ACTION_EVENT } from "@/components/command-palette";
@@ -443,7 +443,7 @@ export default function EditorWorkspace({
                     <div className="pt-3 border-t border-border/50 space-y-3">
                       <div className="flex items-center justify-between">
                         <div className="text-[11px] font-semibold uppercase tracking-wider text-foreground flex items-center gap-1.5">
-                          <Sparkles className="w-3.5 h-3.5 text-primary" />
+                          <Compass className="w-3.5 h-3.5 text-primary" />
                           <span>Konteks Adegan (Tautan Karakter & Lokasi)</span>
                         </div>
                         {contextSavedNotice && (
@@ -473,7 +473,7 @@ export default function EditorWorkspace({
                             }}
                             className="w-full h-8 px-2.5 rounded-md border border-input bg-background text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                           >
-                            <option value="">— Belum Ditentukan —</option>
+                            <option value="">(Belum Ditentukan)</option>
                             {characters.map((c) => (
                               <option key={c.id} value={c.id}>
                                 {c.name} ({c.role})
@@ -497,7 +497,7 @@ export default function EditorWorkspace({
                             }}
                             className="w-full h-8 px-2.5 rounded-md border border-input bg-background text-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                           >
-                            <option value="">— Belum Ditentukan —</option>
+                            <option value="">(Belum Ditentukan)</option>
                             {locations.map((l) => (
                               <option key={l.id} value={l.id}>
                                 {l.name}

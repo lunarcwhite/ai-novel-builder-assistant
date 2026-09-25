@@ -19,7 +19,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Layers,
   Loader2,
-  Sparkles,
+  BrainCircuit,
   ChevronDown,
   ChevronUp,
   BookOpen,
@@ -148,8 +148,8 @@ function NodeBlock({
           )}
         </>
       ) : (
-        <p className="text-[11px] text-muted-foreground/70 italic">
-          Belum ada ringkasan — sintesis dari level bawah atau tulis manual.
+        <p className="text-[11px] text-muted-foreground italic">
+          Belum ada ringkasan: buat sintesis dari level bawah atau tulis manual.
         </p>
       )}
 
@@ -273,7 +273,7 @@ export default function SummaryStudioView({
       <p className="text-xs text-muted-foreground leading-relaxed max-w-2xl">
         Lapisan konteks untuk novel panjang: ringkasan adegan mengalir ke bab,
         lalu babak, lalu novel. Sintesis hanya memberi{" "}
-        <span className="text-foreground font-medium">usulan</span> — tidak ada
+        <span className="text-foreground font-medium">usulan</span>: tidak ada
         yang tersimpan sebelum Anda meninjau dan menerapkan.
       </p>
 
@@ -386,7 +386,7 @@ export default function SummaryStudioView({
 
       {allChapters.length === 0 && (
         <div className="rounded-lg border border-dashed border-border/80 p-8 text-center text-xs text-muted-foreground">
-          Belum ada struktur — buat babak, bab, dan adegan terlebih dahulu di
+          Belum ada struktur: buat babak, bab, dan adegan terlebih dahulu di
           halaman Garis Besar & Naskah.
         </div>
       )}
@@ -417,7 +417,7 @@ export default function SummaryStudioView({
             <div className="p-5 space-y-3 overflow-y-auto">
               {pending.aiEnriched && (
                 <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                  <Sparkles className="w-3 h-3" /> Diperkaya AI — tetap periksa
+                  <BrainCircuit className="w-3 h-3 text-primary" /> Diperkaya AI: tetap periksa
                   sebelum menerapkan
                 </div>
               )}
@@ -444,7 +444,7 @@ export default function SummaryStudioView({
                 <span className="font-medium text-foreground">
                   {LEVEL_META[pending.level].column}
                 </span>{" "}
-                — naskah tidak disentuh.
+                (naskah tidak disentuh).
               </p>
             </div>
 

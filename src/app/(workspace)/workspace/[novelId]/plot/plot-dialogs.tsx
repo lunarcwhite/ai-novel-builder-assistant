@@ -140,7 +140,7 @@ export function PlotThreadFormDialog({
                 defaultValue={thread?.introduced_chapter_id || ""}
                 className="w-full h-8 rounded-md border border-input bg-background px-2 text-xs"
               >
-                <option value="">— Belum ditentukan —</option>
+                <option value="">(Belum ditentukan)</option>
                 {chapters.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.title}
@@ -155,7 +155,7 @@ export function PlotThreadFormDialog({
                 defaultValue={thread?.resolved_chapter_id || ""}
                 className="w-full h-8 rounded-md border border-input bg-background px-2 text-xs"
               >
-                <option value="">— Belum ditentukan —</option>
+                <option value="">(Belum ditentukan)</option>
                 {chapters.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.title}
@@ -214,7 +214,7 @@ export function DeletePlotThreadDialog({
         </DialogHeader>
         <p className="text-xs text-muted-foreground pt-2">
           Thread <span className="font-medium text-foreground">“{thread?.title}”</span> akan
-          dihapus permanen. Naskah tidak ikut berubah — hanya catatan thread yang hilang.
+          dihapus permanen. Naskah tidak ikut berubah; hanya catatan thread yang hilang.
         </p>
         {state?.error && (
           <div className="p-3 bg-destructive/10 border border-destructive/20 text-destructive rounded-lg text-xs">

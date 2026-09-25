@@ -238,11 +238,11 @@ export function WorldRuleFormDialog({
               defaultValue={rule?.importance ?? 3}
               className="w-full h-8 px-2.5 rounded-md border border-input bg-background text-xs"
             >
-              <option value="5">Tingkat 5 — Hukum Mutlak Dunia (Sangat Kritis)</option>
-              <option value="4">Tingkat 4 — Hukum Kota / Faksi Utama</option>
-              <option value="3">Tingkat 3 — Aturan Umum Masyarakat</option>
-              <option value="2">Tingkat 2 — Norma / Kebiasaan Lokal</option>
-              <option value="1">Tingkat 1 — Catatan Minor</option>
+              <option value="5">Tingkat 5: Hukum Mutlak Dunia (Sangat Kritis)</option>
+              <option value="4">Tingkat 4: Hukum Kota / Faksi Utama</option>
+              <option value="3">Tingkat 3: Aturan Umum Masyarakat</option>
+              <option value="2">Tingkat 2: Norma / Kebiasaan Lokal</option>
+              <option value="1">Tingkat 1: Catatan Minor</option>
             </select>
           </div>
 

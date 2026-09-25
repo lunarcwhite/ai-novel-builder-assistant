@@ -26,7 +26,7 @@ import type {
   Character,
   Location,
 } from "@/types";
-import { AlertCircle, Trash2, Star, Sparkles, Check, Link as LinkIcon } from "lucide-react";
+import { AlertCircle, Trash2, Star, BrainCircuit, Check, Link as LinkIcon } from "lucide-react";
 
 interface SceneOption {
   id: string;
@@ -155,7 +155,7 @@ export function MemoryFormDialog({
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="font-serif text-lg flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-primary" />
+            <BrainCircuit className="w-5 h-5 text-primary" />
             {isEditing ? "Edit Memori Cerita" : "Catat Memori Cerita Baru"}
           </DialogTitle>
           <p className="text-xs text-muted-foreground">

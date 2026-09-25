@@ -8,7 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import {
   Stethoscope,
   Loader2,
-  Sparkles,
+  BrainCircuit,
   ChevronDown,
   ChevronUp,
   BookOpen,
@@ -106,7 +106,7 @@ function ObservationCard({ obs }: { obs: StoryDoctorObservation }) {
       )}
       {obs.ai_enriched && (
         <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-          <Sparkles className="w-3 h-3" /> Diperkaya AI
+          <BrainCircuit className="w-3 h-3 text-primary" /> Diperkaya AI
         </div>
       )}
     </div>
@@ -191,7 +191,7 @@ export default function StoryDoctorView({ novelId }: { novelId: string }) {
         <div className="rounded-lg border border-dashed border-border/80 p-8 text-center text-xs text-muted-foreground space-y-2">
           <p>
             Story Doctor membaca struktur, karakter, plot threads, timeline, memori, dan temuan
-            konsistensi Anda — lalu memberi observasi ber-evidence, bukan skor.
+            konsistensi Anda, lalu memberi observasi ber-evidence, bukan skor.
           </p>
           <p className="opacity-70">
             Read-only: tidak ada naskah yang diubah. Keputusan selalu di tangan Anda.
@@ -203,7 +203,7 @@ export default function StoryDoctorView({ novelId }: { novelId: string }) {
         <>
           {total === 0 ? (
             <div className="rounded-lg border border-border/60 p-8 text-center text-xs text-muted-foreground">
-              Tidak ada observasi saat ini — struktur cerita terlihat tertata. Analisis ulang kapan
+              Tidak ada observasi saat ini. Struktur cerita terlihat tertata. Analisis ulang kapan
               saja setelah naskah bertambah.
             </div>
           ) : (

@@ -15,7 +15,7 @@ const serifFont = Lora({
 });
 
 export const metadata: Metadata = {
-  title: "Novel Builder — AI Novel Writing Workspace",
+  title: "Novel Builder: AI Novel Writing Workspace",
   description: "A creative, focused workspace for novelists with contextual story intelligence.",
 };
 
@@ -25,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${sansFont.variable} ${serifFont.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${sansFont.variable} ${serifFont.variable}`}>
       <body className="min-h-screen bg-background text-foreground antialiased selection:bg-accent/20">
         {children}
       </body>

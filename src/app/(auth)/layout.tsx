@@ -28,7 +28,7 @@ export default function AuthLayout({
             &ldquo;The author owns the story. The AI may assist the creative process, but never take ownership of it.&rdquo;
           </blockquote>
           <p className="text-xs text-muted-foreground tracking-wide uppercase">
-            — Filosofi Ruang Kerja Novel Builder
+            Prinsip Utama: Filosofi Ruang Kerja Novel Builder
           </p>
         </div>
 

@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ToastProvider } from "@/components/ui/toast";
 import CommandPaletteHost, { PaletteTriggerButton } from "@/components/command-palette";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { BookOpen, ChevronDown, LogOut } from "lucide-react";
 
 export default async function WorkspaceLayout({
@@ -20,6 +21,14 @@ export default async function WorkspaceLayout({
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
+      {/* Accessible skip link: allows keyboard users to bypass navigation */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-4 focus:z-[100] focus:px-3 focus:py-2 focus:rounded-md focus:bg-card focus:border focus:border-border focus:shadow-subtle focus:text-xs focus:font-medium focus:text-foreground"
+      >
+        Lewati ke konten utama
+      </a>
+
       {/* Top Application Workspace Header */}
       <header className="h-14 border-b border-border/70 px-6 flex items-center justify-between bg-card/60 backdrop-blur-sm sticky top-0 z-40">
         <div className="flex items-center gap-4">
@@ -34,8 +43,9 @@ export default async function WorkspaceLayout({
         </div>
 
         {/* User Profile & Session Actions */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <PaletteTriggerButton />
+          <ThemeToggle />
           <DropdownMenu
             label="Menu akun"
             trigger={
@@ -81,12 +91,6 @@ export default async function WorkspaceLayout({
       {/* Main Workspace Canvas */}
       <ToastProvider>
         <main id="main-content" className="flex-1 max-w-7xl mx-auto w-full p-6 md:p-8">
-          <a
-            href="#main-content"
-            className="sr-only focus:not-sr-only focus:absolute focus:top-16 focus:left-4 focus:z-[60] focus:px-3 focus:py-2 focus:rounded-md focus:bg-card focus:border focus:border-border focus:text-xs"
-          >
-            Lewati ke konten utama
-          </a>
           {children}
         </main>
         <CommandPaletteHost />

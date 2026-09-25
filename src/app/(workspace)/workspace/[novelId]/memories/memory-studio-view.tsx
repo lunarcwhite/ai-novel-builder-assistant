@@ -25,7 +25,6 @@ import {
   BrainCircuit,
   Plus,
   Search,
-  Sparkles,
   CheckCircle2,
   Clock,
   Archive,
@@ -251,7 +250,7 @@ export default function MemoryStudioView({
       <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-primary" />
+            <BrainCircuit className="w-4 h-4 text-primary" />
             <span className="font-semibold text-xs text-foreground">
               Uji Retrieval Semantik (Vector Search Sandbox)
             </span>
@@ -578,7 +577,7 @@ export default function MemoryStudioView({
                     </span>
 
                     {/* Embedding Indicator */}
-                    <span className="text-[9px] text-muted-foreground/80">
+                    <span className="text-[9px] text-muted-foreground">
                       Vector Indexed ✓
                     </span>
                   </div>
