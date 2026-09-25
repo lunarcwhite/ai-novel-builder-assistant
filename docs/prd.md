@@ -1,1060 +1,221 @@
-# PRD — AI Novel Writing Workspace
+# PRD: AI Novel Writing Workspace
 
-**Status:** Draft  
-**Version:** 0.1  
-**Product name:** TBD  
-**Working description:** AI-powered workspace for planning, writing, organizing, and analyzing novels.
-
----
-
-## 1. Product Vision
-
-Membangun aplikasi yang membantu penulis novel mengubah ide menjadi novel yang terstruktur dan konsisten.
-
-Aplikasi bukan sekadar AI text generator. Fokus utamanya adalah menjadi **workspace penulisan novel dengan story intelligence**:
-
-> Penulis tetap menjadi author. AI memahami cerita, mengingat konteks, membantu menulis, dan menjaga konsistensi.
+> **Product Requirements Document (PRD)**  
+> **Status:** Version 1.0 (Implemented & Verified)  
+> **Working Description:** AI-powered workspace for planning, writing, organizing, and analyzing novels.  
+> **Related Documents:** [`SOUL.md`](../SOUL.md) • [`AGENTS.md`](../AGENTS.md) • [`docs/architecture.md`](architecture.md) • [`docs/design.md`](design.md)
 
 ---
 
-## 2. Problem Statement
+## Daftar Isi (Table of Contents)
 
-Penulis novel biasanya menggunakan banyak alat terpisah:
-
-- notes untuk ide
-- dokumen untuk menulis
-- spreadsheet untuk karakter
-- aplikasi lain untuk timeline
-- chat AI untuk brainstorming
-- catatan manual untuk worldbuilding
-
-Akibatnya:
-
-1. informasi cerita tersebar;
-2. detail karakter mudah terlupakan;
-3. timeline dapat bertentangan;
-4. plot thread dapat terbengkalai;
-5. AI tidak memahami keseluruhan novel;
-6. revisi novel panjang menjadi sulit.
-
-Aplikasi ini menyatukan semuanya dalam satu workspace.
-
----
-
-## 3. Target Users
-
-### Primary Persona — Independent Novel Writer
-
-Penulis individu yang sedang:
-
-- membuat novel pertama;
-- menulis novel secara rutin;
-- mengembangkan cerita fantasy, romance, mystery, thriller, sci-fi, atau genre lain;
-- membutuhkan bantuan AI tetapi tetap ingin mengontrol cerita.
-
-### Secondary Persona — Experienced Writer
-
-Penulis yang sudah mempunyai workflow sendiri tetapi membutuhkan:
-
-- continuity checking;
-- character tracking;
-- timeline management;
-- story analysis;
-- AI-assisted revision.
+1. [Product Vision & Problem Statement](#1-product-vision--problem-statement)
+2. [Target Users & Personas](#2-target-users--personas)
+3. [Product Principles](#3-product-principles)
+4. [Core Product Loop & User Flow](#4-core-product-loop--user-flow)
+5. [Fitur Utama (Functional Scope)](#5-fitur-utama-functional-scope)
+   - [5.1 Autentikasi & Profil Pengguna](#51-autentikasi--profil-pengguna)
+   - [5.2 Manajemen Novel & Perpustakaan](#52-manajemen-novel--perpustakaan)
+   - [5.3 Struktur Naskah (Acts, Chapters, Scenes)](#53-struktur-naskah-acts-chapters-scenes)
+   - [5.4 TipTap Editorial Writing Studio](#54-tiptap-editorial-writing-studio)
+   - [5.5 Character Bible & Matriks Relasi](#55-character-bible--matriks-relasi)
+   - [5.6 Worldbuilding, Lore & World Rules](#56-worldbuilding-lore--world-rules)
+   - [5.7 Story Memory Architecture & Fact Extraction](#57-story-memory-architecture--fact-extraction)
+   - [5.8 Layered Context Retrieval Engine](#58-layered-context-retrieval-engine)
+   - [5.9 Consistency Checker](#59-consistency-checker)
+   - [5.10 Story Doctor Narrative Diagnosis](#510-story-doctor-narrative-diagnosis)
+   - [5.11 Plot Threads & Interactive Timeline](#511-plot-threads--interactive-timeline)
+   - [5.12 Version History & Manuscript Safety](#512-version-history--manuscript-safety)
+   - [5.13 Ekspor Naskah (TXT, Markdown, DOCX)](#513-ekspor-naskah-txt-markdown-docx)
+6. [Kebutuhan Non-Fungsional (NFR)](#6-kebutuhan-non-fungsional-nfr)
+7. [Tech Stack & Data Entities](#7-tech-stack--data-entities)
+8. [Batasan Ruang Lingkup (Scope Boundaries)](#8-batasan-ruang-lingkup-scope-boundaries)
+9. [Key Product Metrics & Visi Masa Depan](#9-key-product-metrics--visi-masa-depan)
 
 ---
 
-## 4. Product Principles
+## 1. Product Vision & Problem Statement
 
-### 4.1 Author First
+### 1.1 Visi Produk
+Membangun aplikasi yang membantu novelis mentransformasikan ide mentah menjadi novel yang terstruktur, kaya nuansa, dan konsisten. Aplikasi ini bukan sekadar pembuat teks AI instan, melainkan **ruang kerja kreatif terintegrasi dengan Story Intelligence**:
+> Penulis tetap memegang otoritas penuh. AI memahami dunia cerita, mengingat fakta lampau, mendampingi proses penulisan, dan menjaga konsistensi kontinuitas.
 
-AI tidak boleh mengambil alih kendali kreatif.
+### 1.2 Problem Statement
+Sebelumnya, seorang novelis harus mengelola banyak alat yang terfragmentasi:
+- Catatan acak untuk ide mentah;
+- Dokumen word terpisah untuk naskah bab;
+- Lembar kerja spreadsheet untuk profil karakter dan timeline;
+- Chatbot AI generik yang cepat lupa konteks naskah;
+- Buku catatan manual untuk aturan sihir / hukum dunia (*world rules*).
 
-### 4.2 Story Is the Source of Truth
-
-Informasi yang telah ditetapkan penulis menjadi sumber utama konteks AI.
-
-### 4.3 Structured + Creative
-
-Cerita harus dapat disimpan sebagai struktur terorganisir sekaligus teks bebas.
-
-### 4.4 Context-Aware AI
-
-AI harus mengetahui konteks novel, chapter, scene, karakter, timeline, dan worldbuilding yang relevan.
-
-### 4.5 Non-Destructive AI
-
-AI tidak boleh mengganti tulisan pengguna tanpa persetujuan.
-
-### 4.6 Explainable Suggestions
-
-Ketika AI mendeteksi masalah, AI harus menjelaskan alasan dan sumber konteksnya.
+**Dampaknya:** Informasi cerita tercerai-berai, detail tokoh mudah terlupakan, linimasa bertentangan, plot thread terbengkalai, dan AI generik sering kali berhalusinasi merusak suara asli penulis. Novel Builder menyatukan seluruh subsistem ini dalam satu ruang kerja yang koheren.
 
 ---
 
-# 5. Core Product Loop
+## 2. Target Users & Personas
+
+| Persona | Profil & Kebutuhan | Manfaat Novel Builder |
+|---|---|---|
+| **Primary: Independent Novelist** | Penulis mandiri (debutan atau reguler) yang sedang membangun novel lintas genre (fantasi, misteri, fiksi ilmiah, roman) dan ingin memanfaatkan AI tanpa kehilangan kontrol narasi. | Outline terstruktur, TipTap editor yang hening, character bible terintegrasi, dan memori cerita otomatis. |
+| **Secondary: Experienced Author** | Penulis berpengalaman dengan volume novel panjang (50–100+ bab) yang membutuhkan audit kontinuitas dan pemecahan kebuntuan alur. | Consistency Checker bukti naskah, Story Doctor tanpa skor fiktif, pelacak plot threads, dan ekspor multi-format. |
+
+---
+
+## 3. Product Principles
+
+1. **Author First:** AI tidak boleh mengambil alih kendali artistik dan keputusan kreatif.
+2. **Story Is the Source of Truth:** Naskah dan data terstruktur penulis adalah otoritas tertinggi, bukan kesimpulan sepihak AI.
+3. **Structured + Creative:** Fleksibilitas menulis bebas dipadukan dengan struktur data yang kokoh.
+4. **Context-Aware AI:** AI menerima konteks adegan, bab, tokoh, dan memori cerita yang terkurasi, bukan seluruh novel sekaligus.
+5. **Non-Destructive AI:** AI dilarang menimpa teks naskah secara diam-diam.
+6. **Explainable Findings:** Setiap temuan atau catatan kontinuitas wajib menyertakan bukti dan kutipan naskah asal.
+
+---
+
+## 4. Core Product Loop & User Flow
 
 ```text
-IDEA
+Ide Mentah
   ↓
-STORY DEVELOPMENT
+Fondasi Cerita & Premis
   ↓
-CHARACTERS + WORLD
+Character Bible & Worldbuilding
   ↓
-OUTLINE
+Struktur Babak (Acts) & Bab (Chapters)
   ↓
-SCENES
+Penyusunan Adegan (Scenes) dengan POV & Lokasi
   ↓
-WRITING
+Penulisan Naskah Editorial (TipTap + Autosave Debounced)
   ↓
-AI ASSISTANCE
+AI Companion (Eksplorasi Ide, Perluasan Dialog, Pertanyaan Pemantik)
   ↓
-STORY ANALYSIS
+Ekstraksi Fakta Baru ke Story Memory (Status: Proposed → Confirmed)
   ↓
-REVISION
+Pemeriksaan Kontinuitas (Consistency Checker)
   ↓
-FINISHED NOVEL
-```
-
----
-
-# 6. MVP Scope
-
-MVP harus fokus pada workflow inti.
-
-## 6.1 Authentication
-
-- Sign up
-- Login
-- Logout
-- Password reset
-- Basic profile
-
-## 6.2 Novel Management
-
-User dapat:
-
-- membuat novel;
-- mengubah judul;
-- mengubah genre;
-- mengubah premise;
-- mengubah tone;
-- mengubah theme;
-- menghapus novel;
-- melihat daftar novel.
-
-Novel memiliki status:
-
-- Planning
-- Writing
-- Revising
-- Completed
-- Archived
-
----
-
-# 7. Novel Overview
-
-Dashboard novel menampilkan:
-
-```text
-Novel Title
-Genre
-Status
-Word Count
-Chapter Count
-Character Count
-Last Updated
-```
-
-Selain itu:
-
-### Story Snapshot
-
-- premise
-- central conflict
-- theme
-- target tone
-
-### Writing Progress
-
-```text
-Words: 42,350
-Chapters: 18 / 40
-Progress: 45%
-```
-
----
-
-# 8. Character Management
-
-Setiap karakter memiliki:
-
-```text
-Name
-Role
-Age
-Occupation
-Description
-Personality
-Motivation
-Goal
-Fear
-Strength
-Weakness
-Secret
-Backstory
-Character Arc
-```
-
-### Character Relationships
-
-Relasi:
-
-```text
-Character A
-   ↓
-relationship
-   ↓
-Character B
-```
-
-Contoh:
-
-- friend
-- enemy
-- sibling
-- parent
-- romantic interest
-- mentor
-- rival
-- custom
-
-Relationship dapat memiliki:
-
-- description
-- history
-- current state
-- important events
-
----
-
-# 9. Worldbuilding
-
-World terdiri dari beberapa entity.
-
-### Locations
-
-```text
-Name
-Description
-Geography
-Atmosphere
-Important Events
-Characters Associated
-```
-
-### Factions
-
-```text
-Name
-Purpose
-Leader
-Members
-Allies
-Enemies
-```
-
-### World Rules
-
-Contoh:
-
-```text
-Magic can only be used by Moon Blood descendants.
-```
-
-Rules bersifat penting karena digunakan oleh consistency checker.
-
-### Lore
-
-Informasi bebas tentang:
-
-- history
-- religion
-- mythology
-- culture
-- technology
-- magic
-- politics
-
----
-
-# 10. Plot & Outline
-
-Struktur:
-
-```text
-Novel
- ├── Act
- │    ├── Chapter
- │    │    ├── Scene
- │    │    └── Scene
- │    └── Chapter
- └── Act
-```
-
-## Chapter
-
-Setiap chapter memiliki:
-
-- title
-- summary
-- objective
-- conflict
-- emotional beat
-- important events
-- outcome
-- chapter status
-
-## Scene
-
-Setiap scene memiliki:
-
-- title
-- summary
-- purpose
-- POV character
-- location
-- characters
-- conflict
-- emotional state
-- notes
-- scene content
-
----
-
-# 11. Writing Editor
-
-Editor adalah tempat utama penulis bekerja.
-
-Requirement:
-
-- rich text;
-- autosave;
-- word count;
-- chapter navigation;
-- scene navigation;
-- undo/redo;
-- version history;
-- focus mode;
-- keyboard shortcuts.
-
-AI actions:
-
-```text
-Continue
-Rewrite
-Expand
-Shorten
-Improve Prose
-Improve Dialogue
-Change Tone
-Show Don't Tell
-Summarize
-Critique
-```
-
-AI tidak langsung menimpa tulisan.
-
-Hasil AI harus dapat:
-
-- insert;
-- replace selected text;
-- copy;
-- discard.
-
----
-
-# 12. AI Assistant
-
-AI Assistant tersedia sebagai panel kontekstual.
-
-Jika user sedang berada di:
-
-```text
-Novel A
-→ Chapter 12
-→ Scene 3
-```
-
-AI mengetahui konteks tersebut.
-
-User dapat bertanya:
-
-> Apakah keputusan karakter ini konsisten dengan perkembangan sebelumnya?
-
-atau:
-
-> Berikan tiga kemungkinan konflik untuk scene berikutnya.
-
----
-
-# 13. Story Memory
-
-Ini merupakan salah satu fitur inti.
-
-Story memory menyimpan fakta yang dianggap penting bagi novel.
-
-Contoh:
-
-```text
-FACT
-
-Anna's brother died when Anna was 12.
-
-Source:
-Chapter 2
-```
-
-Jenis memory:
-
-- Character Fact
-- World Fact
-- Timeline Fact
-- Plot Fact
-- Relationship Fact
-- General Story Fact
-
-Setiap memory memiliki:
-
-```text
-content
-type
-importance
-source
-confidence
-created_at
-updated_at
-```
-
----
-
-# 14. AI Context Retrieval
-
-AI tidak menerima seluruh novel setiap kali.
-
-Context builder mengambil informasi relevan:
-
-```text
-User Request
-      ↓
-Context Resolver
-      ↓
-┌─────────────────────────┐
-│ Current Scene            │
-│ Current Chapter         │
-│ Characters               │
-│ World Rules              │
-│ Timeline Events          │
-│ Relevant Story Memories  │
-│ Previous Scenes          │
-└────────────┬────────────┘
-             ↓
-          LLM Prompt
-```
-
----
-
-# 15. Story Memory Architecture
-
-MVP menggunakan PostgreSQL + pgvector.
-
-Setiap memory dapat memiliki embedding.
-
-Contoh:
-
-```text
-story_memories
-----------------------------
-id
-novel_id
-type
-content
-source_type
-source_id
-importance
-embedding
-created_at
-updated_at
-```
-
-Semantic retrieval digunakan untuk menemukan fakta relevan.
-
----
-
-# 16. AI Memory Extraction
-
-Setelah user menulis atau mengubah scene, sistem dapat menganalisis apakah ada fakta baru.
-
-Contoh:
-
-User menulis:
-
-> Daniel had never visited the city before.
-
-AI dapat mengusulkan:
-
-```text
-New story fact detected:
-
-"Daniel has never visited the city before."
-
-[Save to Story Memory]
-[Ignore]
-```
-
-Untuk MVP, memory extraction sebaiknya membutuhkan persetujuan user untuk menghindari memory yang salah.
-
----
-
-# 17. Consistency Checker
-
-User dapat menjalankan:
-
-> Check Consistency
-
-Sistem mencari:
-
-### Character contradictions
-
-Contoh:
-
-```text
-Chapter 4:
-Daniel is described as an only child.
-
-Chapter 19:
-Daniel mentions his older sister.
-
-Potential contradiction.
-```
-
-### Timeline contradictions
-
-```text
-Chapter 12:
-The event happened three months ago.
-
-Timeline:
-Event occurred 18 days ago.
-```
-
-### World rule contradictions
-
-```text
-World Rule:
-Only Moon Blood descendants can use magic.
-
-Chapter 27:
-A non-descendant uses magic.
-
-Potential contradiction.
-```
-
-AI harus menggunakan bahasa seperti:
-
-> Potential inconsistency
-
-bukan langsung menyatakan cerita salah.
-
----
-
-# 18. Story Doctor
-
-Story Doctor adalah fitur post-MVP yang menganalisis novel secara keseluruhan.
-
-Kategori:
-
-### Plot
-
-- progression
-- escalation
-- climax
-- resolution
-
-### Character
-
-- motivation
-- character arc
-- development
-- consistency
-
-### Pacing
-
-- slow sections
-- rushed sections
-- chapter density
-
-### Plot Threads
-
-- active threads
-- resolved threads
-- potentially abandoned threads
-
-### Worldbuilding
-
-- rule consistency
-- unexplained concepts
-- contradictions
-
-Output harus berupa temuan dan evidence, bukan rating kualitas absolut.
-
----
-
-# 19. Timeline
-
-Timeline menyimpan event:
-
-```text
-Event
-Date / Relative Time
-Characters
-Location
-Description
-Source Chapter
-```
-
-Timeline dapat ditampilkan:
-
-```text
-Chapter 1
-   │
-   ├── Anna meets Daniel
-   │
-Chapter 4
-   │
-   ├── Anna discovers supernatural ability
-   │
-Chapter 9
-   │
-   └── Daniel reveals his secret
-```
-
----
-
-# 20. Relationship Map
-
-Visualisasi karakter:
-
-```text
-Anna
- ├── loves → Daniel
- ├── trusts → Maya
- └── fears → The Stranger
-```
-
-Relationship dapat berubah sepanjang cerita.
-
-Untuk MVP, data relationship disimpan terlebih dahulu. Visual graph dapat menjadi V2.
-
----
-
-# 21. Version History
-
-Setiap chapter dapat mempunyai versions:
-
-```text
-Version 1
-Version 2
-Version 3
-Current
-```
-
-User dapat:
-
-- compare;
-- restore;
-- view changes.
-
-AI edits juga harus dapat ditelusuri.
-
----
-
-# 22. Export
-
-MVP:
-
-- TXT
-- Markdown
-
-Implemented (Phase 11):
-
-- DOCX
-
-Post-MVP:
-
-- PDF
-- EPUB
-
----
-
-# 23. Non-Functional Requirements
-
-## Performance
-
-Target:
-
-- editor terasa realtime;
-- autosave tidak mengganggu pengetikan;
-- AI request memiliki loading state;
-- retrieval tetap cepat ketika novel sudah panjang.
-
-## Reliability
-
-- autosave;
-- database backup;
-- version history;
-- no destructive AI overwrite.
-
-## Privacy
-
-Novel merupakan data privat secara default.
-
-Aplikasi harus menjelaskan:
-
-- bagaimana novel diproses;
-- apakah data digunakan untuk training model;
-- bagaimana data dihapus.
-
----
-
-# 24. Recommended Technical Stack
-
-## Frontend
-
-- Next.js
-- TypeScript
-- Tailwind CSS
-- shadcn/ui
-- TipTap
-
-## Backend
-
-MVP:
-
-- Next.js server actions / API routes
-
-Tidak perlu microservices pada tahap awal.
-
-## Database
-
-- PostgreSQL
-- pgvector
-
-## Authentication
-
-- Auth.js atau Supabase Auth
-
-## Storage
-
-- Supabase Storage atau object storage yang kompatibel
-
-## AI
-
-Buat abstraction layer:
-
-```text
-AIProvider
- ├── OpenAI
- ├── Anthropic
- └── Other Provider
-```
-
-Dengan demikian aplikasi tidak terkunci pada satu provider.
-
----
-
-# 25. Initial Database Entities
-
-```text
-users
-
-novels
-
-characters
-character_relationships
-
-locations
-factions
-world_rules
-world_lore
-
-acts
-chapters
-scenes
-
-plot_threads
-plot_points
-
-timeline_events
-
-story_memories
-
-ai_conversations
-ai_messages
-
-document_versions
-```
-
----
-
-# 26. High-Level Data Relationship
-
-```text
-User
- │
- └── Novel
-      │
-      ├── Characters
-      │     └── Relationships
-      │
-      ├── World
-      │     ├── Locations
-      │     ├── Factions
-      │     ├── Rules
-      │     └── Lore
-      │
-      ├── Plot
-      │     ├── Acts
-      │     ├── Plot Points
-      │     └── Plot Threads
-      │
-      ├── Chapters
-      │     └── Scenes
-      │
-      ├── Timeline
-      │
-      ├── Story Memories
-      │
-      └── AI Conversations
-```
-
----
-
-# 27. MVP User Flow
-
-```text
-Sign Up
-   ↓
-Create Novel
-   ↓
-Enter Basic Story Idea
-   ↓
-Create Story Foundation
-   ↓
-Create Characters
-   ↓
-Create World
-   ↓
-Create Outline
-   ↓
-Create Chapter
-   ↓
-Create Scene
-   ↓
-Write
-   ↓
-Use AI Assistant
-   ↓
-Save Story Memories
-   ↓
-Check Consistency
-   ↓
-Revise
-```
-
----
-
-# 28. MVP Acceptance Criteria
-
-MVP dianggap usable apabila user dapat:
-
-- membuat akun;
-- membuat novel;
-- membuat karakter;
-- membuat world rules;
-- membuat outline;
-- membuat chapter;
-- membuat scene;
-- menulis novel;
-- menggunakan AI untuk membantu penulisan;
-- menyimpan story memory;
-- bertanya kepada AI berdasarkan konteks novel;
-- menjalankan basic consistency check;
-- melihat dan memulihkan version history;
-- mengekspor tulisan.
-
----
-
-# 29. Development Roadmap
-
-## Phase 0 — Foundation
-
-- repository
-- project setup
-- authentication
-- database
-- design system
-- AI provider abstraction
-
-## Phase 1 — Core Writing
-
-- novel CRUD
-- chapter CRUD
-- scene CRUD
-- TipTap editor
-- autosave
-- word count
-- version history
-
-## Phase 2 — Story Structure
-
-- characters
-- relationships
-- locations
-- world rules
-- plot
-- outline
-- timeline
-
-## Phase 3 — AI
-
-- AI chat
-- writing actions
-- context builder
-- story memory
-- semantic retrieval
-
-## Phase 4 — Intelligence
-
-- consistency checker
-- plot thread tracking
-- character arc analysis
-- Story Doctor
-
-## Phase 5 — Productization
-
-- export
-- sharing
-- collaboration
-- billing
-- usage limits
-- analytics
-
----
-
-# 30. MVP Deliberately Excluded
-
-Untuk menjaga scope:
-
-- social network;
-- public publishing platform;
-- real-time collaboration;
-- mobile native application;
-- marketplace;
-- AI image generation;
-- voice generation;
-- advanced analytics;
-- automated full-novel generation.
-
-Semua dapat dipertimbangkan setelah core writing workflow terbukti berguna.
-
----
-
-# 31. Key Product Metric
-
-Jangan menggunakan jumlah AI generations sebagai metric utama.
-
-Lebih penting:
-
-### Writing Activation
-
-Persentase user yang membuat novel dan menulis scene pertama.
-
-### Writing Retention
-
-Apakah user kembali menulis beberapa hari kemudian.
-
-### Novel Progress
-
-Jumlah chapter / words yang berkembang.
-
-### AI Helpfulness
-
-Apakah AI membantu user menyelesaikan pekerjaan, bukan sekadar menghasilkan banyak teks.
-
-### Story Integrity
-
-Jumlah consistency issues yang ditemukan dan diselesaikan.
-
----
-
-# 32. Product Philosophy
-
-Produk ini harus menghindari pola:
-
-```text
-User:
-"Write me a novel."
-
-AI:
-"Here is your novel."
-```
-
-Sebaliknya:
-
-```text
-Author
+Diagnosis Naratif (Story Doctor)
   ↓
-Idea
+Revisi Terarah & Snapshot Versi Aman
   ↓
-Structure
-  ↓
-Writing
-  ↓
-Reflection
-  ↓
-Revision
-  ↓
-Novel
+Ekspor Naskah Selesai (Markdown, Teks, Word DOCX)
 ```
-
-AI berada di sepanjang proses sebagai:
-
-- brainstorming partner;
-- writing assistant;
-- editor;
-- continuity checker;
-- story analyst.
-
-Tetapi keputusan kreatif tetap berada pada penulis.
 
 ---
 
-# 33. Future Direction
+## 5. Fitur Utama (Functional Scope)
 
-Jika MVP berhasil, produk dapat berkembang menjadi:
+### 5.1 Autentikasi & Profil Pengguna
+- Registrasi, Login email/password, dan Reset Password via Supabase Auth.
+- Mode **Masuk Cepat Demo Author (Lokal)** untuk kemudahan eksplorasi antarmuka saat offline / testing.
+- Isolasi tenant mutlak: setiap pengguna hanya dapat mengakses novel miliknya sendiri.
 
+### 5.2 Manajemen Novel & Perpustakaan
+- Manajemen koleksi novel: Judul, Slug unik, Genre, Premis, Nada (*Tone*), Target Pembaca, dan Status (`planning`, `writing`, `revising`, `completed`, `archived`).
+- Kartu ringkasan naskah: Jumlah kata aktual, estimasi durasi baca, persentase target, jumlah bab/tokoh, dan tanggal pembaruan.
+- Dialog hapus aman [`DeleteNovelDialog`](../src/features/novels/components/delete-novel-dialog.tsx) dengan konfirmasi modal untuk melindungi karya penulis.
+
+### 5.3 Struktur Naskah (Acts, Chapters, Scenes)
+- **Babak (Acts):** Pengelompokan makro struktur dramatik tiga babak (*Three-Act Structure*).
+- **Bab (Chapters):** Bab bertingkat dengan judul, sinopsis, target kata, status draft, dan nomor urut.
+- **Adegan (Scenes):** Unit penulisan terkecil dengan metadata kontekstual: karakter Sudut Pandang (POV), lokasi kejadian, karakter yang terlibat, tujuan adegan (*purpose*), dan ringkasan naratif.
+
+### 5.4 TipTap Editorial Writing Studio
+- Ruang penulisan bersih tanpa distraksi (*writing comes first*).
+- Autosave lokal ter-debounce (1-2 detik) dengan indikator visual tersimpan.
+- Mode Fokus layar penuh (*Distraction-Free Mode*) via shortcut `F11`.
+- Pelacak kata real-time dan estimasi menit membaca.
+
+### 5.5 Character Bible & Matriks Relasi
+- Profil mendalam: Peran (Protagonis, Antagonis, Pendukung), Usia, Pekerjaan, Ark Karakter, Motivasi, Ketakutan, Rahasia, dan Latar Belakang.
+- Peta relasi dua arah: Tipe relasi (Kawan, Rival, Keluarga, Asmara, Musuh) beserta deskripsi status dinamika hubungan.
+
+### 5.6 Worldbuilding, Lore & World Rules
+- **Lokasi:** Peta tempat kejadian, geografi, dan atmosfer.
+- **Faksi:** Kelompok masyarakat, pemimpin, tujuan, sekutu, dan musuh.
+- **Hukum Dunia (World Rules):** Aturan kausalitas dunia novel bergradasi (Tingkat 1 Catatan Minor s.d. Tingkat 5 Hukum Mutlak).
+- **Lore:** Catatan bebas mengenai sejarah, mitologi, sihir, dan teknologi.
+
+### 5.7 Story Memory Architecture & Fact Extraction
+- Penyimpanan memori cerita berbasis fakta teratribusi (sumber bab/adegan).
+- Klasifikasi status fakta: `confirmed` (diverifikasi penulis) vs `proposed` (usulan AI yang menunggu persetujuan).
+- Ekstraksi AI otomatis non-destruktif setelah penulisan adegan.
+
+### 5.8 Layered Context Retrieval Engine
+Penyusunan prompt AI secara berjenjang berdasarkan *Context Budget* yang terukur:
 ```text
-Novel Workspace
-       ↓
-Story Intelligence
-       ↓
-AI Writing Partner
-       ↓
-Publishing Workspace
+Selection Target → Current Scene → Current Chapter → Involved Characters →
+Confirmed Story Memories → World Rules → Timeline Events → Active Plot Threads
 ```
 
-Visi jangka panjang:
+### 5.9 Consistency Checker
+- Analisis naskah otomatis untuk mendeteksi kontradiksi fakta karakter, pelanggaran aturan dunia, dan dislokasi waktu.
+- Menyajikan temuan sebagai observasi berdasar bukti kutipan (*Evidence-based Observations*), menghormati teknik narator tak andal.
 
-> Satu tempat di mana seorang penulis dapat membawa sebuah ide mentah sampai menjadi novel yang selesai, tanpa kehilangan kendali atas cerita dan tanpa kehilangan detail yang telah dibangun sepanjang proses.
+### 5.10 Story Doctor Narrative Diagnosis
+- Analisis ritme pacing (adegan lambat vs tergesa-gesa).
+- Identifikasi plot threads yang terbengkalai.
+- Evaluasi motivasi tokoh tanpa memberikan skor angka subjektif.
+
+### 5.11 Plot Threads & Interactive Timeline
+- Pelacakan alur subplot: Diperkenalkan di bab mana, diselesaikan di bab mana, dan statusnya saat ini.
+- Garis waktu kronologis peristiwa dengan presisi fleksibel (tanggal absolut, waktu relatif, atau era).
+
+### 5.12 Version History & Manuscript Safety
+- Snapshot versi otomatis sebelum operasi penggantian AI (*Replace*).
+- Kemampuan perbandingan visual (*diff*) dan pemulihan draf (*restore*).
+
+### 5.13 Ekspor Naskah (TXT, Markdown, DOCX)
+- Kompilasi naskah editorial utuh ke format **Markdown (.md)**, **Teks Polos (.txt)**, dan **Word (.docx)**.
+
+---
+
+## 6. Kebutuhan Non-Fungsional (NFR)
+
+| Aspek | Spesifikasi & Standar |
+|---|---|
+| **Responsivitas Editor** | Keystroke pengetikan instan (< 16ms), tidak ada roundtrip jaringan per-karakter. |
+| **Aksesibilitas (a11y)** | Kepatuhan WCAG AA untuk kontras teks (minimal 4.5:1), navigasi keyboard penuh, dan pelabelan ARIA. |
+| **Keandalan Naskah** | Kegagalan koneksi atau timeout AI tidak boleh merusak atau menghapus naskah lokal. |
+| **Dukungan Novel Panjang** | Mampu menangani naskah 100+ bab, 1000+ adegan, dan puluhan tokoh melalui *hierarchical summaries*. |
+| **Privasi Data** | Naskah bersifat privat; data penulis tidak digunakan untuk pelatihan model AI publik. |
+
+---
+
+## 7. Tech Stack & Data Entities
+
+- **Frontend & App Server:** Next.js 15.1.7 (React 19, TypeScript), Tailwind CSS 3.4, shadcn/ui.
+- **Editor:** TipTap 2.11 (StarterKit, Link, Placeholder).
+- **Database & Retrieval:** PostgreSQL 15, pgvector, Supabase Auth.
+- **Validasi:** Zod 3.24 di seluruh batasan Server Action dan schema respons AI.
+- **Ekspor Dokumen:** Library native `docx` 9.7 untuk kompilasi berkas Microsoft Word.
+
+```text
+Entitas Utama:
+users ──< novels ──┬──< acts ──< chapters ──< scenes ──< scene_versions
+                   ├──< characters ──< character_relationships
+                   ├──< locations, factions, world_rules, world_lore
+                   ├──< plot_threads, timeline_events
+                   ├──< story_memories, consistency_findings
+                   └──< ai_conversations, ai_usage_logs
+```
+
+---
+
+## 8. Batasan Ruang Lingkup (Scope Boundaries)
+
+Untuk menjaga fokus dan keandalan sistem penulisan inti, fitur-fitur berikut **secara sengaja tidak disertakan pada MVP**:
+- Jejaring sosial dan platform penerbitan publik mandiri;
+- Kolaborasi multiplayer real-time bergaya Google Docs (ditargetkan untuk fase pasca-MVP);
+- Aplikasi native seluler terpisah (difokuskan pada web responsif prima);
+- Generator gambar AI atau sintesis suara AI;
+- Pembuatan novel otomatis penuh secara sepihak (*full-novel one-click generation*).
+
+---
+
+## 9. Key Product Metrics & Visi Masa Depan
+
+Bukan mengukur seberapa banyak kata yang diproduksi oleh bot AI, melainkan:
+1. **Writing Activation:** Penulis berhasil mendesain novel dan menyelesaikan adegan pertama mereka.
+2. **Writing Retention:** Penulis kembali menulis secara konsisten setiap minggu.
+3. **Story Integrity:** Inkonsistensi narasi berhasil terdeteksi dan diselesaikan oleh penulis sebelum diterbitkan.
+4. **Author Trust:** Penulis merasa aman mempercayakan naskah berharga mereka pada sistem.

@@ -1,921 +1,396 @@
-# SOUL.md — AI Novel Writing Workspace
+# SOUL.md: AI Novel Writing Workspace
 
-> The author owns the story.
-
-This document defines the character, philosophy, and non-negotiable principles of the product.
-
-It is not a technical specification.
-
-It exists so that every feature, AI behavior, interface, and implementation decision remains aligned with what this product is meant to be.
+> **"The author owns the story."**  
+> Dokumen ini mendefinisikan karakter, filosofi, dan prinsip non-negosiasi dari Novel Builder. Dokumen ini bukan spesifikasi teknis, melainkan kompas agar setiap fitur, perilaku AI, antarmuka, dan keputusan arsitektur tetap selaras dengan tujuan produk.
 
 ---
 
-# 1. What We Are Building
+## Daftar Isi (Table of Contents)
 
-We are building a creative workspace for novelists.
+- [I. Visi & Hubungan Penulis-AI](#i-visi--hubungan-penulis-ai)
+  - [1. What We Are Building](#1-what-we-are-building)
+  - [2. The Core Belief: The Author Owns the Story](#2-the-core-belief-the-author-owns-the-story)
+  - [3. What the AI Is (and Is Not)](#3-what-the-ai-is-and-is-not)
+  - [4. The Relationship Between Author and AI](#4-the-relationship-between-author-and-ai)
+  - [5. Protect the Author's Voice](#5-protect-the-authors-voice)
+- [II. Integritas Naskah & Memori Cerita](#ii-integritas-naskah--memori-cerita)
+  - [6. Never Silently Change the Manuscript](#6-never-silently-change-the-manuscript)
+  - [7. Story Facts Are Precious](#7-story-facts-are-precious)
+  - [8. Never Turn a Guess Into a Fact](#8-never-turn-a-guess-into-a-fact)
+  - [9. Story Memory Must Be Explainable](#9-story-memory-must-be-explainable)
+  - [10. The Story Is Bigger Than the Current Prompt](#10-the-story-is-bigger-than-the-current-prompt)
+  - [11. Context Must Be Relevant](#11-context-must-be-relevant)
+- [III. Filosofi Editorial & Bimbingan AI](#iii-filosofi-editorial--bimbingan-ai)
+  - [12. Do Not Manufacture Certainty](#12-do-not-manufacture-certainty)
+  - [13. Consistency Is Not the Same as Quality](#13-consistency-is-not-the-same-as-quality)
+  - [14. Story Doctor Should Diagnose, Not Dictate](#14-story-doctor-should-diagnose-not-dictate)
+  - [15. Preserve Creative Ambiguity](#15-preserve-creative-ambiguity)
+  - [16. Do Not Optimize Everything](#16-do-not-optimize-everything)
+  - [17. Writing Is Not Just Text Generation](#17-writing-is-not-just-text-generation)
+  - [18. Make Complexity Manageable](#18-make-complexity-manageable)
+- [IV. Pengalaman Antarmuka (UX)](#iv-pengalaman-antarmuka-ux)
+  - [19. The Interface Should Disappear During Writing](#19-the-interface-should-disappear-during-writing)
+  - [20. The Interface Should Become Structured During Planning](#20-the-interface-should-become-structured-during-planning)
+  - [21. AI Should Ask Good Questions](#21-ai-should-ask-good-questions)
+  - [22. Suggestions Should Be Options](#22-suggestions-should-be-options)
+  - [23. The Product Should Encourage Discovery](#23-the-product-should-encourage-discovery)
+- [V. Keamanan Data & Arsitektur Jangka Panjang](#v-keamanan-data--arsitektur-jangka-panjang)
+  - [24. Privacy Matters](#24-privacy-matters)
+  - [25. AI Provider Independence](#25-ai-provider-independence)
+  - [26. No Vendor Lock-In in the Story Model](#26-no-vendor-lock-in-in-the-story-model)
+  - [27. Build for Long Stories](#27-build-for-long-stories)
+  - [28. Performance Is Part of the Creative Experience](#28-performance-is-part-of-the-creative-experience)
+  - [29. Failure Should Never Destroy Creative Work](#29-failure-should-never-destroy-creative-work)
+  - [30. Build Small, But Build the Right Foundation](#30-build-small-but-build-the-right-foundation)
+- [VI. Kepribadian Produk & Panduan Keputusan](#vi-kepribadian-produk--panduan-keputusan)
+  - [31. Avoid Feature Theater](#31-avoid-feature-theater)
+  - [32. Product Personality](#32-product-personality)
+  - [33. The AI Should Sound Like a Good Writing Partner](#33-the-ai-should-sound-like-a-good-writing-partner)
+  - [34. Never Pretend to Understand More Than We Do](#34-never-pretend-to-understand-more-than-we-do)
+  - [35. Product North Star](#35-product-north-star)
+  - [36. Decision Filter](#36-decision-filter)
+  - [37. The Golden Rule](#37-the-golden-rule)
+  - [38. Final Principle](#38-final-principle)
 
-The product helps a writer move from:
+---
+
+## I. Visi & Hubungan Penulis-AI
+
+### 1. What We Are Building
+
+Kami membangun ruang kerja kreatif (*creative workspace*) untuk para novelis. Produk ini mendampingi penulis melintasi seluruh siklus kreatif:
 
 ```text
-idea
-  ↓
-story
-  ↓
-characters
-  ↓
-world
-  ↓
-plot
-  ↓
-scenes
-  ↓
-manuscript
-  ↓
-revision
-  ↓
-finished novel
+Ide → Struktur Cerita → Karakter → Dunia → Plot → Adegan → Naskah → Revisi → Novel Selesai
 ```
 
-The product is not primarily an AI text generator.
-
-It is a place where a writer can **think, build, write, remember, question, and revise**.
-
-AI is part of the experience, but the story belongs to the author.
+Produk ini **bukan sekadar generator teks AI otomatis**. Ini adalah tempat di mana penulis dapat **berpikir, membangun, menulis, mengingat, mempertanyakan, dan merevisi**. AI adalah bagian dari pengalaman tersebut, namun cerita seutuhnya milik penulis.
 
 ---
 
-# 2. The Core Belief
+### 2. The Core Belief: The Author Owns the Story
 
-## The author owns the story.
+Suara, selera, niat, tokoh, dunia, tema, keputusan, kesalahan, dan penemuan kreatif penulis adalah bagian yang tak terpisahkan dari karya seni mereka.
 
-The author's:
-
-- voice;
-- taste;
-- intentions;
-- characters;
-- world;
-- themes;
-- decisions;
-- mistakes;
-- discoveries;
-
-are all part of the creative process.
-
-The AI may assist that process.
-
-It must never quietly take ownership of it.
+AI boleh mendampingi proses tersebut, tetapi **tidak boleh diam-diam mengambil alih kepemilikan cerita**.
 
 ---
 
-# 3. What the AI Is
+### 3. What the AI Is (and Is Not)
 
-The AI can be:
-
-- a brainstorming partner;
-- a writing assistant;
-- a reader;
-- a continuity checker;
-- a story analyst;
-- a critic;
-- a question asker;
-- a research assistant;
-- a source of alternatives.
-
-The AI is not:
-
-- the author;
-- the final authority on the story;
-- the owner of creative decisions;
-- a replacement for the writer's voice.
+| Yang BISA Dilakukan AI | Yang BUKAN Merupakan AI |
+|---|---|
+| Mitra *brainstorming* & eksplorasi ide | Bukan sang pengarang novel |
+| Asisten penulisan & perluasan adegan | Bukan otoritas penentu kebenaran cerita |
+| Pembaca kritis & pemeriksa kontinuitas | Bukan pemilik keputusan artistik |
+| Asisten riset & analis struktur cerita | Bukan pengganti suara unik penulis |
+| Penyedia opsi arah naratif alternatif | Bukan evaluator yang menghakimi |
 
 ---
 
-# 4. The Relationship Between Author and AI
+### 4. The Relationship Between Author and AI
 
-The desired relationship is:
+Hubungan yang benar adalah kemitraan yang menempatkan penulis sebagai pengendali:
 
 ```text
-Author
-  │
-  │ asks
-  ▼
-AI
-  │
-  │ understands
-  ▼
-Story Context
-  │
-  │ suggests
-  ▼
-Author
-  │
-  │ decides
-  ▼
-Story
+Penulis ──(bertanya)──> AI ──(memahami)──> Konteks Cerita ──(menyarankan)──> Penulis ──(memutuskan)──> Naskah
 ```
 
-Not:
-
+Bukan pola di mana penulis direduksi menjadi editor dari teks buatan mesin:
 ```text
-Author
-  │
-  ▼
-AI
-  │
-  ▼
-Story
-```
-
-The second model turns the author into an editor of machine-generated text.
-
-That is not our goal.
-
----
-
-# 5. Protect the Author's Voice
-
-The application should help the writer become a better version of their own writerly voice.
-
-It should not constantly replace that voice with a generic "AI writing style".
-
-When rewriting text, AI should preserve where possible:
-
-- tone;
-- narrative perspective;
-- vocabulary;
-- rhythm;
-- emotional intention;
-- characterization;
-- point of view.
-
-When uncertainty exists, ask or provide alternatives rather than silently deciding.
-
----
-
-# 6. Never Silently Change the Manuscript
-
-This is non-negotiable.
-
-AI must not silently:
-
-- rewrite a scene;
-- delete text;
-- change character facts;
-- alter timeline events;
-- change world rules;
-- modify plot structure;
-- overwrite the author's manuscript.
-
-AI-generated changes must be visible and reversible.
-
-Preferred flow:
-
-```text
-AI Suggestion
-     ↓
-Review
-     ↓
-Accept / Insert / Replace / Dismiss
-```
-
-The author must remain in control.
-
----
-
-# 7. Story Facts Are Precious
-
-A novel contains many details that may look insignificant individually but become important later.
-
-Examples:
-
-```text
-Anna is left-handed.
-Daniel has never visited the city.
-The ring belonged to Anna's mother.
-Magic requires Moon Blood.
-The hospital incident happened on Day 47.
-```
-
-These details should not be casually invented, merged, or changed.
-
-The system should distinguish:
-
-```text
-Author-defined fact
-Confirmed story fact
-Proposed fact
-Character belief
-Possibility
-AI inference
-```
-
-They are not the same thing.
-
----
-
-# 8. Never Turn a Guess Into a Fact
-
-If the manuscript says:
-
-> Daniel might be the killer.
-
-The system must not store:
-
-> Daniel is the killer.
-
-as a confirmed fact.
-
-The difference between:
-
-```text
-fact
-belief
-suspicion
-possibility
-revelation
-```
-
-is fundamental to storytelling.
-
----
-
-# 9. Story Memory Must Be Explainable
-
-When the application remembers something, the author should be able to ask:
-
-> Where did this come from?
-
-Every important memory should preferably have a source:
-
-```text
-Memory:
-Anna's brother died when Anna was 12.
-
-Source:
-Chapter 2
-```
-
-AI memory should not become an invisible black box.
-
----
-
-# 10. The Story Is Bigger Than the Current Prompt
-
-A writer may ask:
-
-> "Help me write this dialogue."
-
-But the application should understand that this dialogue exists inside:
-
-```text
-Novel
- ├── Theme
- ├── Plot
- ├── Character arcs
- ├── World rules
- ├── Timeline
- ├── Previous events
- └── Current scene
-```
-
-The AI should use context intelligently.
-
-It should not blindly retrieve everything.
-
----
-
-# 11. Context Must Be Relevant
-
-More context does not automatically mean better context.
-
-The system should prefer:
-
-```text
-Current scene
-↓
-Current chapter
-↓
-Relevant characters
-↓
-Relevant memories
-↓
-Relevant world rules
-↓
-Relevant timeline
-↓
-Relevant plot threads
-```
-
-over dumping the entire novel into every AI request.
-
----
-
-# 12. Do Not Manufacture Certainty
-
-When the story is ambiguous, preserve the ambiguity.
-
-Use language such as:
-
-```text
-This may suggest...
-One possible interpretation is...
-I found a potential contradiction...
-The manuscript does not currently establish...
-```
-
-Avoid:
-
-```text
-This is definitely what happened.
-The character clearly feels...
-The correct interpretation is...
-```
-
-unless the story explicitly establishes it.
-
----
-
-# 13. Consistency Is Not the Same as Quality
-
-A contradiction can be intentional.
-
-A strange character decision can be intentional.
-
-An unreliable narrator can be intentional.
-
-A timeline that appears impossible can be intentional.
-
-Therefore the application should say:
-
-> Potential inconsistency
-
-rather than:
-
-> Your story is wrong.
-
-The system identifies evidence.
-
-The author decides whether it is a problem.
-
----
-
-# 14. Story Doctor Should Diagnose, Not Dictate
-
-The Story Doctor may identify:
-
-- pacing observations;
-- unresolved threads;
-- character motivation gaps;
-- possible continuity conflicts;
-- underdeveloped setups;
-- abrupt transitions.
-
-But it should not behave as though there is one objectively correct novel.
-
-Instead:
-
-```text
-Observation
-+
-Evidence
-+
-Possible interpretation
-+
-Optional suggestions
-```
-
-The author decides what to do.
-
----
-
-# 15. Preserve Creative Ambiguity
-
-Some stories are supposed to leave questions unanswered.
-
-The system should not automatically resolve:
-
-- mysteries;
-- relationships;
-- symbolism;
-- character motivations;
-- endings;
-- supernatural explanations.
-
-Sometimes:
-
-```text
-unknown
-```
-
-is a valid story state.
-
----
-
-# 16. Do Not Optimize Everything
-
-Not every chapter needs to be:
-
-- faster;
-- more dramatic;
-- more emotional;
-- more marketable;
-- more concise.
-
-Not every sentence needs to be optimized.
-
-The product exists to help the author create the story they want.
-
-Optimization is a tool, not the goal.
-
----
-
-# 17. Writing Is Not Just Text Generation
-
-A novel is made from more than prose.
-
-It includes:
-
-```text
-ideas
-characters
-relationships
-conflicts
-choices
-consequences
-world rules
-themes
-symbols
-memories
-timing
-silence
-```
-
-The application must therefore support thinking and planning, not only writing.
-
----
-
-# 18. Make Complexity Manageable
-
-A long novel can become overwhelming.
-
-The application should make complexity visible without making it frightening.
-
-Prefer:
-
-```text
-7 active plot threads
-3 unresolved questions
-2 potential continuity issues
-```
-
-over:
-
-```text
-ERROR: STORY INCONSISTENT
-```
-
-The application is a guide, not a judge.
-
----
-
-# 19. The Interface Should Disappear During Writing
-
-When a writer is deeply focused, the application should become quiet.
-
-The editor should not compete with the manuscript.
-
-Writing mode should prioritize:
-
-```text
-words
-space
-focus
-flow
-```
-
-Everything else can wait.
-
----
-
-# 20. The Interface Should Become Structured During Planning
-
-When the writer is planning, structure becomes useful.
-
-The application should make it easy to see:
-
-```text
-characters
-chapters
-scenes
-plot
-timeline
-world
-relationships
-```
-
-The experience should therefore change naturally:
-
-```text
-Planning Mode
-→ structure
-
-Writing Mode
-→ immersion
-
-Analysis Mode
-→ reflection
+Penulis ──> AI ──> Naskah (Salah: Penulis hanya mengoreksi output otomatis AI)
 ```
 
 ---
 
-# 21. AI Should Ask Good Questions
+### 5. Protect the Author's Voice
 
-Sometimes the best AI response is not an answer.
+Aplikasi harus membantu penulis menjadi versi terbaik dari suara kepenulisan mereka sendiri, bukan menggantikannya dengan gaya tulisan AI yang generik.
 
-For example:
+Saat menyarankan penulisan ulang (*rewrite*), AI wajib menghormati:
+- Nada (*tone*) dan ritme kalimat;
+- Kosakata dan sudut pandang naratif (POV);
+- Niat emosional dan karakterisasi tokoh.
 
-> "Why doesn't Anna tell Daniel the truth?"
-
-Instead of immediately inventing an explanation, AI may ask:
-
-> "Do you want Anna to hide the truth because she fears Daniel's reaction, because she doesn't trust him yet, or because revealing it would put him in danger?"
-
-Questions can help the author discover their own story.
+Jika ada keraguan, AI harus bertanya atau memberikan beberapa opsi, bukan memutuskan sendiri.
 
 ---
 
-# 22. Suggestions Should Be Options
+## II. Integritas Naskah & Memori Cerita
 
-Prefer:
+### 6. Never Silently Change the Manuscript
 
+> [!CAUTION]
+> **Prinsip Non-Negosiasi Mutlak:**  
+> AI tidak boleh secara diam-diam menulis ulang adegan, menghapus teks, mengubah fakta tokoh, menggeser linimasa, atau menimpa naskah penulis. Setiap modifikasi AI harus tampak jelas di antarmuka dan bersifat reversibel (*Tinjau → Terima / Sisipkan / Ganti / Tolak*).
+
+---
+
+### 7. Story Facts Are Precious
+
+Sebuah novel memuat ribuan detail kecil yang tampak sepele namun sangat krusial di bab-bab selanjutnya (misal: *Anna kidal*, *Segel perunggu bereaksi pada garis darah*, *Insiden terjadi pada Hari ke-47*).
+
+Sistem harus membedakan dengan tegas antara:
+- **Author-defined fact** (fakta sah yang ditetapkan penulis);
+- **Confirmed story fact** (fakta naskah yang telah diverifikasi);
+- **Proposed fact** (usulan AI yang belum disetujui);
+- **Character belief** (keyakinan tokoh yang belum tentu benar);
+- **AI inference** (dugaan atau kesimpulan sementara AI).
+
+---
+
+### 8. Never Turn a Guess Into a Fact
+
+Jika naskah menuliskan: *"Daniel mungkin pelakunya"*, sistem **DILARANG** menyimpannya sebagai fakta terkonfirmasi: *"Daniel adalah pelakunya"*. Perbedaan antara fakta, praduga, kecurigaan, dan wahyu adalah inti dari seni bercerita.
+
+---
+
+### 9. Story Memory Must Be Explainable
+
+Ketika sistem mengingat sebuah fakta, penulis berhak mengetahui asal-usulnya:
 ```text
-Option A
-A quiet emotional confrontation.
-
-Option B
-A sudden external interruption.
-
-Option C
-Anna lies, creating a later complication.
+Memori: Kakak Anna gugur saat Anna berusia 12 tahun.
+Sumber: Bab 2, Adegan 1
 ```
+Memori AI tidak boleh menjadi kotak hitam yang misterius (*black box*).
 
-rather than:
+---
 
+### 10. The Story Is Bigger Than the Current Prompt
+
+Saat penulis meminta: *"Bantu saya menulis dialog ini"*, sistem harus menyadari bahwa dialog tersebut hidup di dalam konteks novel yang utuh: tema besar, busur emosi karakter, aturan dunia, peristiwa sebelumnya, dan tujuan adegan. AI harus memanfaatkan konteks ini secara cerdas, bukan membabi buta menyerap seluruh isi buku.
+
+---
+
+### 11. Context Must Be Relevant
+
+Lebih banyak konteks tidak serta-merta berarti hasil yang lebih baik. Sistem memprioritaskan lapisan konteks yang relevan:
 ```text
-This is what should happen next.
-```
-
----
-
-# 23. The Product Should Encourage Discovery
-
-Writing is often exploratory.
-
-A writer may not know:
-
-- the ending;
-- the antagonist;
-- the exact theme;
-- why a character behaves a certain way.
-
-That is okay.
-
-The application should support:
-
-```text
-I don't know yet.
-```
-
-as a legitimate state.
-
----
-
-# 24. Privacy Matters
-
-A novel can represent years of creative work.
-
-Treat manuscript data as private by default.
-
-The product should be transparent about:
-
-- where data is stored;
-- how AI processing works;
-- which AI provider receives content;
-- retention;
-- deletion;
-- whether content is used for model training.
-
-Never hide these decisions behind vague language.
-
----
-
-# 25. AI Provider Independence
-
-The product should not become philosophically dependent on one AI provider.
-
-The application owns:
-
-```text
-story structure
-story memory
-manuscript
-context
-relationships
-timeline
-```
-
-The model is replaceable.
-
-The story should not be.
-
----
-
-# 26. No Vendor Lock-In in the Story Model
-
-If the AI provider changes tomorrow, the author's novel should remain completely usable.
-
-The database and domain model must remain provider-neutral.
-
----
-
-# 27. Build for Long Stories
-
-A good experience for Chapter 1 should still work for Chapter 100.
-
-Do not build architecture that only works when a novel is small.
-
-The system must anticipate:
-
-- hundreds of chapters;
-- thousands of scenes;
-- many characters;
-- large worldbuilding databases;
-- extensive story memory.
-
----
-
-# 28. Performance Is Part of the Creative Experience
-
-If the writer types:
-
-```text
-"She opened the door..."
-```
-
-the application should not make them wait for an API request before saving the text.
-
-Writing must remain responsive.
-
-AI can be asynchronous.
-
-The editor cannot be.
-
----
-
-# 29. Failure Should Never Destroy Creative Work
-
-If:
-
-- AI fails;
-- network fails;
-- database request fails;
-- generation times out;
-
-the manuscript must remain safe whenever possible.
-
-A failure should look like:
-
-> AI request failed. Your writing is safe.
-
-Never:
-
-> Something went wrong.
-
-with no indication of what happened to the manuscript.
-
----
-
-# 30. Build Small, But Build the Right Foundation
-
-Do not build every feature immediately.
-
-A strong first version can be:
-
-```text
-Novel
- ↓
-Chapter
- ↓
-Scene
- ↓
-Editor
- ↓
-Character
- ↓
-World Rule
- ↓
-AI Assistant
-```
-
-But the architecture should leave room for:
-
-```text
-Story Memory
-Timeline
-Consistency
-Story Doctor
-Collaboration
-Export
+Adegan Saat Ini → Bab Saat Ini → Karakter Terlibat → Memori Relevan → Aturan Dunia → Linimasa Terkait
 ```
 
 ---
 
-# 31. Avoid Feature Theater
+## III. Filosofi Editorial & Bimbingan AI
 
-Do not build features just because they look impressive.
+### 12. Do Not Manufacture Certainty
 
-Examples of feature theater:
+Ketika ada ambiguitas dalam cerita, pertahankan ambiguitas tersebut. Gunakan bahasa yang santun dan terbuka:
+- *"Bagian ini mungkin mengindikasikan..."*
+- *"Salah satu kemungkinan interpretasi adalah..."*
+- *"Ditemukan potensi kontradiksi pada..."*
 
-- meaningless story scores;
-- decorative AI graphs;
-- excessive dashboards;
-- fake "AI intelligence" badges;
-- arbitrary productivity scores.
-
-Every feature should answer:
-
-> Does this help the writer understand, create, organize, or improve their story?
-
-If not, reconsider it.
+Hindari bahasa vonis mutlak seperti: *"Karakter ini jelas-jelas merasa..."* atau *"Ini kesalahan fatal"*.
 
 ---
 
-# 32. Product Personality
+### 13. Consistency Is Not the Same as Quality
 
-The product should feel:
+Kontradiksi bisa jadi disengaja. Karakter yang tidak konsisten bisa jadi merupakan narator yang tidak andal (*unreliable narrator*). Oleh karena itu, sistem hanya menyajikan: **"Potensi inkonsistensi"** beserta buktinya, dan membiarkan penulis memutuskan apakah hal tersebut merupakan masalah atau bagian dari dinamika sastra.
+
+---
+
+### 14. Story Doctor Should Diagnose, Not Dictate
+
+Story Doctor menyajikan analisis naratif (ritme pacing, busur karakter, plot thread terbuka) dalam pola editorial yang bermartabat:
+```text
+Observasi Naskah + Bukti Kutipan + Kemungkinan Interpretasi + Opsi Saran
+```
+Sistem tidak bertindak seolah hanya ada satu jenis novel yang "benar".
+
+---
+
+### 15. Preserve Creative Ambiguity
+
+Sebagian cerita sengaja membiarkan misteri tetap terbuka. Sistem tidak boleh secara otomatis "menyelesaikan" misteri, motif tersembunyi, atau akhir cerita yang sengaja dibuat menggantung oleh penulis. Status *unknown* adalah status naratif yang sah.
+
+---
+
+### 16. Do Not Optimize Everything
+
+Tidak setiap bab harus dibuat lebih cepat, lebih dramatis, atau lebih ringkas. Optimalisasi adalah alat bantu, bukan tujuan akhir kepenulisan.
+
+---
+
+### 17. Writing Is Not Just Text Generation
+
+Novel dibangun dari jalinan ide, karakter, relasi, aturan kausalitas, simbol, waktu, dan keheningan. Workspace ini mendukung proses perenungan dan perancangan, bukan sekadar pengetikan kata.
+
+---
+
+### 18. Make Complexity Manageable
+
+Saat novel berkembang menjadi ratusan halaman, sistem merapikan kompleksitas cerita secara tenang tanpa menimbulkan kepanikan:
+- Menyajikan ringkasan: *"7 plot threads aktif, 3 pertanyaan terbuka, 2 potensi catatan kontinuitas"*.
+- Bukan peringatan agresif: *"ERROR: CERITA ANDA RUSAK"*.
+
+---
+
+## IV. Pengalaman Antarmuka (UX)
+
+### 19. The Interface Should Disappear During Writing
+
+Saat penulis berada dalam kondisi *flow* yang mendalam, antarmuka harus senyap dan tenang. Panel AI, toolbar, dan navigasi tidak boleh bersaing merebut perhatian dari naskah.
+
+---
+
+### 20. Structured During Planning, Focused During Writing
+
+Pengalaman aplikasi beradaptasi secara alami:
+- **Mode Perencanaan:** Struktur terlihat jelas (peta bab, karakter, lore, linimasa).
+- **Mode Penulisan:** Imersif, hening, mengutamakan ruang dan kata.
+- **Mode Analisis:** Reflektif, menyajikan wawasan editorial secara obyektif.
+
+---
+
+### 21. AI Should Ask Good Questions
+
+Respons terbaik dari AI sering kali bukan berupa jawaban siap saji, melainkan pertanyaan pemantik:
+> *"Apakah Anda ingin Anna menyembunyikan rahasia itu karena takut kehilangan Daniel, atau karena ingin melindunginya dari bahaya?"*
+
+Pertanyaan yang tepat membantu penulis menemukan jalan ceritanya sendiri.
+
+---
+
+### 22. Suggestions Should Be Options
+
+Sajikan saran dalam bentuk opsi alternatif (Opsi A, B, atau C) dengan berbagai konsekuensinya, bukan instruksi tunggal yang kaku.
+
+---
+
+### 23. The Product Should Encourage Discovery
+
+Menulis adalah proses eksplorasi. Jika penulis belum mengetahui akhir cerita atau motif pelaku, sistem memperlakukan *"Saya belum tahu"* sebagai kondisi yang wajar dan terhormat.
+
+---
+
+## V. Keamanan Data & Arsitektur Jangka Panjang
+
+### 24. Privacy Matters
+
+Naskah adalah hasil kerja keras bertahun-tahun. Data naskah bersifat privat secara default. Sistem harus transparan mengenai lokasi penyimpanan data dan memastikan naskah penulis tidak digunakan untuk melatih model AI umum tanpa izin.
+
+---
+
+### 25. AI Provider Independence
+
+Produk tidak boleh bergantung secara filosofis maupun teknis pada satu vendor AI tertentu. Model LLM dapat diganti kapan saja; naskah dan struktur cerita penulis harus tetap abadi.
+
+---
+
+### 26. No Vendor Lock-In in the Story Model
+
+Skema database, struktur bab, character bible, dan memori cerita dirancang secara netral (*provider-agnostic*).
+
+---
+
+### 27. Build for Long Stories
+
+Pengalaman menulis di Bab 1 harus tetap cepat dan andal saat naskah mencapai Bab 100, ribuan adegan, dan puluhan tokoh, didukung oleh arsitektur *hierarchical context rollups*.
+
+---
+
+### 28. Performance Is Part of the Creative Experience
+
+Pengetikan naskah harus instan tanpa latensi jaringan. Autosave berjalan di latar belakang secara lokal dan ter-debounce.
+
+---
+
+### 29. Failure Should Never Destroy Creative Work
+
+Jika jaringan internet putus atau API AI mengalami timeout, naskah lokal tetap utuh dan aman. Pesan kegagalan harus transparan: *"Gagal terhubung ke AI. Naskah Anda tetap tersimpan aman secara lokal."*
+
+---
+
+### 30. Build Small, But Build the Right Foundation
+
+Fokus pada fondasi yang kokoh (naskah, babak, bab, karakter, memori) sebelum membangun fitur-fitur kompleks berikutnya.
+
+---
+
+## VI. Kepribadian Produk & Panduan Keputusan
+
+### 31. Avoid Feature Theater
+
+Hindari membangun fitur sekadar untuk terlihat canggih: metrik skor cerita sembarangan, grafik AI dekoratif tanpa makna, atau badge intelegensi palsu. Setiap fitur harus menjawab: *"Apakah ini benar-benar membantu penulis memahami, merancang, atau menyempurnakan cerita mereka?"*
+
+---
+
+### 32. Product Personality
+
+| Karakter yang Dihadirkan | Karakter yang Dihindari |
+|---|---|
+| Penuh pertimbangan (*thoughtful*) | Agresif & menuntut |
+| Tenang & menghormati | Bising & gamified |
+| Cerdas & privat | Terlalu terotomatisasi sepihak |
+| Objektif & tidak menghakimi | Mekanikal & dingin |
+
+---
+
+### 33. Sound Like a Good Writing Partner
+
+Bukan menghakimi: *"Skor kualitas bab Anda 72%"*.  
+Melainkan mengamati dan mendampingi: *"Ada tensi menarik di adegan ini. Daniel berkata ia tidak percaya Anna, namun di bab berikutnya ia mempertaruhkan nyawa untuknya. Jika perubahan ini disengaja, Anda mungkin ingin menyisipkan momen kecil yang memperlihatkan titik balik perasaannya."*
+
+---
+
+### 34. Never Pretend to Understand More Than We Do
+
+Jika konteks tidak cukup, katakan dengan jujur. Jika ada dua fakta yang bertentangan, tampilkan keduanya. Kejujuran dan keandalan jauh lebih berharga daripada ilusi kecerdasan buatan.
+
+---
+
+### 35. Product North Star
+
+> **"Membantu penulis membuat kemajuan nyata pada novel yang benar-benar ingin mereka tulis."**
+
+Kemajuan dapat berupa menulis 1.000 kata, memecahkan kebuntuan plot, memahami motivasi tokoh, atau merapikan outline yang berantakan.
+
+---
+
+### 36. Decision Filter
+
+Sebelum menambahkan atau menyetujui sebuah fitur, ajukan 6 pertanyaan ini:
+1. Apakah ini benar-benar membantu penulis?
+2. Apakah ini mempertahankan kendali penulis?
+3. Apakah ini menjaga integritas cerita?
+4. Apakah ini mengurangi beban kognitif yang tidak perlu?
+5. Apakah ini membuat sistem semakin dapat dipercaya?
+6. Apakah ini tetap masuk akal untuk novel berisi 100+ bab?
+
+Jika sebagian besar jawabannya tidak, tinjau kembali fitur tersebut.
+
+---
+
+### 37. The Golden Rule
+
+> [!IMPORTANT]
+> **"Jangan pernah memaksa penulis bertarung melawan alat kerjanya."**  
+> Penulis tidak boleh merasa bahwa mereka harus mengelola database sebelum diizinkan menulis. Struktur cerita harus muncul secara alami dari alur kerja kreatif mereka.
+
+---
+
+### 38. Final Principle
+
+Aplikasi melayani cerita. AI melayani penulis. Antarmuka melayani proses kreatif. Dan teknologi bertugas menjaga ketiganya tetap aman dan andal.
 
 ```text
-Thoughtful
-Calm
-Intelligent
-Respectful
-Creative
-Reliable
-Private
-Non-judgmental
+                 PENULIS
+                    │
+                    ▼
+                  CERITA
+                    │
+                    ▼
+                APLIKASI
+           ┌────────┴────────┐
+           ▼                 ▼
+        ALAT KERJA           AI
+           │                 │
+           └────────┬────────┘
+                    ▼
+               KARYA SENI
 ```
 
-It should not feel:
-
-```text
-Aggressive
-Gamified
-Noisy
-Over-automated
-Corporate
-Mechanical
-```
-
----
-
-# 33. The AI Should Sound Like a Good Writing Partner
-
-Not:
-
-> "Your story has a 72% quality score."
-
-Prefer:
-
-> "There's an interesting tension here. Daniel says he doesn't trust Anna, but he risks himself to protect her two chapters later. If that change is intentional, you may want to give the reader one small moment showing when his feelings shifted."
-
-The difference is important.
-
-The first judges.
-
-The second observes and helps.
-
----
-
-# 34. Never Pretend to Understand More Than We Do
-
-If the system cannot determine something:
-
-Say so.
-
-If context is missing:
-
-Say so.
-
-If two story facts conflict:
-
-Show the conflict.
-
-If the AI is making an inference:
-
-Label it as an inference.
-
-Trust is more important than appearing intelligent.
-
----
-
-# 35. Product North Star
-
-The north star is not:
-
-> "Generate more words."
-
-It is:
-
-> **Help writers make progress on the novel they actually want to write.**
-
-Progress may mean:
-
-- writing 1,000 words;
-- solving a plot problem;
-- discovering a character motivation;
-- fixing a continuity issue;
-- organizing a messy outline;
-- deciding what not to write.
-
-All of these are meaningful progress.
-
----
-
-# 36. Decision Filter
-
-When making a product or technical decision, ask:
-
-### Question 1
-
-Does this help the author?
-
-### Question 2
-
-Does it preserve author control?
-
-### Question 3
-
-Does it preserve story integrity?
-
-### Question 4
-
-Does it reduce unnecessary cognitive load?
-
-### Question 5
-
-Does it make the system more trustworthy?
-
-### Question 6
-
-Will it still make sense for a novel with 100+ chapters?
-
-If the answer is mostly no, reconsider the feature.
-
----
-
-# 37. The Golden Rule
-
-> **Never make the author fight the tool.**
-
-The application should make writing easier, not turn writing into data entry.
-
-The writer should never feel:
-
-> "I have to maintain the database before I can write my story."
-
-Structured information should emerge naturally from the writing workflow whenever possible.
-
----
-
-# 38. Final Principle
-
-The application exists to serve the story.
-
-The AI exists to serve the author.
-
-The interface exists to serve the creative process.
-
-The technology exists to make all three reliable.
-
-```text
-                 AUTHOR
-                   │
-                   ▼
-                 STORY
-                   │
-                   ▼
-              APPLICATION
-                   │
-          ┌────────┴────────┐
-          ▼                 ▼
-        TOOLS              AI
-          │                 │
-          └────────┬────────┘
-                   ▼
-             CREATIVE WORK
-```
-
-And the final rule remains:
+Dan prinsip pamungkas yang tidak akan pernah berubah:
 
 > **The author owns the story.**

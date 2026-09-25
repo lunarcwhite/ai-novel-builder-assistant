@@ -1,1125 +1,199 @@
-# DESIGN.md — AI Novel Writing Workspace
+# DESIGN.md: AI Novel Writing Workspace
 
-**Status:** Draft  
-**Version:** 0.1  
-**Related document:** `prd.md`
-
----
-
-# 1. Design Vision
-
-Aplikasi harus terasa seperti **creative workspace**, bukan dashboard bisnis dan bukan chatbot.
-
-Tujuan visual:
-
-> Membuat penulis merasa bahwa mereka sedang masuk ke ruang kerja pribadi untuk membangun sebuah dunia.
-
-Karakter desain:
-
-- calm
-- elegant
-- editorial
-- focused
-- immersive
-- minimal
-- warm
-- sophisticated
-
-Interface harus menghilangkan distraksi ketika menulis, tetapi tetap menyediakan struktur yang kuat ketika penulis sedang merencanakan cerita.
+> **Design System, Visual Direction & User Experience (UX)**  
+> **Status:** Version 1.0 (Implemented & Verified)  
+> **Related Documents:** [`SOUL.md`](../SOUL.md) • [`AGENTS.md`](../AGENTS.md) • [`docs/prd.md`](prd.md) • [`docs/architecture.md`](architecture.md)
 
 ---
 
-# 2. Design Principles
+## Daftar Isi (Table of Contents)
 
-## 2.1 Writing Comes First
-
-Editor adalah pusat pengalaman.
-
-Jangan membuat UI terasa seperti admin panel.
-
-Hindari terlalu banyak:
-
-- cards
-- badges
-- charts
-- colored indicators
-- buttons
-
-ketika user sedang menulis.
+1. [Visi Desain & Prinsip Utama](#1-visi-desain--prinsip-utama)
+2. [Sistem Warna & Dukungan Tema (Dark / Light)](#2-sistem-warna--dukungan-tema-dark--light)
+3. [Tipografi Editorial & Hierarki](#3-tipografi-editorial--hierarki)
+4. [Sistem Spasi & Layout Shell](#4-sistem-spasi--layout-shell)
+5. [Desain Editor Naskah & Focus Mode](#5-desain-editor-naskah--focus-mode)
+6. [Desain Interaksi AI (Non-Destruktif)](#6-desain-interaksi-ai-non-destruktif)
+7. [Desain Modul Story Bible & Perencanaan](#7-desain-modul-story-bible--perencanaan)
+   - [7.1 Character Studio & Matriks Relasi](#71-character-studio--matriks-relasi)
+   - [7.2 World Studio (Lokasi, Faksi, Rules)](#72-world-studio-lokasi-faksi-rules)
+   - [7.3 Plot Threads & Linimasa Interaktif](#73-plot-threads--linimasa-interaktif)
+8. [Desain Analisis & Kecerdasan Cerita](#8-desain-analisis--kecerdasan-cerita)
+   - [8.1 Consistency Checker UI](#81-consistency-checker-ui)
+   - [8.2 Story Doctor UI](#82-story-doctor-ui)
+   - [8.3 Story Memory Studio UI](#83-story-memory-studio-ui)
+9. [Aksesibilitas (WCAG AA), Animasi & Responsivitas](#9-aksesibilitas-wcag-aa-animasi--responsivitas)
+10. [Daftar Design Tokens & Primitif Komponen](#10-daftar-design-tokens--primitif-komponen)
 
 ---
 
-## 2.2 Progressive Complexity
+## 1. Visi Desain & Prinsip Utama
 
-Informasi sederhana ditampilkan terlebih dahulu.
+Aplikasi harus terasa seperti **studio kreatif pribadi seorang penulis**, bukan dashboard analitik bisnis dan bukan antarmuka chatbot generik.
 
-Fitur advanced muncul ketika dibutuhkan.
+### 1.1 Karakter Visual
+- **Calm & Focused:** Menghilangkan distraksi saat menulis.
+- **Editorial & Warm:** Menggunakan latar bernuansa kertas (*paper tone*), tipografi serif sastra, dan aksen hangat.
+- **Progressive Complexity:** Menampilkan informasi secara bertingkat; fitur analisis mendalam hanya muncul saat dibutuhkan.
 
-Contoh:
+### 1.2 Prinsip Desain
+1. **Writing Comes First:** Editor naskah adalah pusat pengalaman. UI tidak boleh menyaingi teks novel.
+2. **Contextual AI:** AI hadir sebagai pendamping kontekstual yang senyap, bukan chatbot yang mendominasi layar.
+3. **Author Ownership:** Setiap saran AI wajib memiliki alur eksplisit: `Accept`, `Insert`, `Replace`, `Dismiss`.
+
+---
+
+## 2. Sistem Warna & Dukungan Tema (Dark / Light)
+
+Palet warna dirancang dengan kontras tinggi yang ramah mata untuk sesi penulisan panjang (kepatuhan WCAG AA minimal 4.5:1 untuk teks normal).
+
+### 2.1 Mode Terang (Editorial Paper)
+| Token | Nilai Hex | Penggunaan | Kontras pada Background |
+|---|---|---|---|
+| `background` | `#F8F7F4` | Latar utama kanvas penulisan (warm paper) | N/A |
+| `surface / card` | `#FFFFFF` | Permukaan kartu dan dialog | 1.05:1 |
+| `foreground` | `#1F1F1F` | Teks utama naskah dan heading | **15.2:1** (Lolos AAA) |
+| `muted-foreground` | `#6B6964` | Teks sekunder, metadata, placeholder | **4.89:1** (Lolos AA) |
+| `border` | `#E7E4DE` | Garis batas tipis pemisah panel | 1.18:1 |
+| `accent / primary`| `#6D5A45` | Warna aksen hangat / status aktif | **5.4:1** (Lolos AA) |
+
+### 2.2 Mode Gelap (Midnight Studio)
+| Token | Nilai Hex | Penggunaan | Kontras pada Background |
+|---|---|---|---|
+| `background` | `#151515` | Latar gelap terfokus | N/A |
+| `surface / card` | `#1D1D1D` | Permukaan panel editor gelap | 1.08:1 |
+| `foreground` | `#F1F0EC` | Teks utama naskah di ruang gelap | **14.8:1** (Lolos AAA) |
+| `muted-foreground` | `#A5A29B` | Teks sekunder mode gelap | **7.1:1** (Lolos AAA) |
+| `border` | `#30302E` | Garis pemisah panel gelap | 1.4:1 |
+| `accent / primary`| `#B49A78` | Aksen emas hangat di latar gelap | **7.3:1** (Lolos AAA) |
+
+---
+
+## 3. Tipografi Editorial & Hierarki
 
 ```text
-Chapter
- └── Scene
-      └── Writing
-           └── AI
-                └── Advanced Context
+UI & Navigasi  ──> Font Sans-Serif (Inter / Geist)  ──> Bersih, ringkas, fungsional
+Naskah Cerita  ──> Font Serif (Lora / Source Serif) ──> Elegan, nyaman dibaca lama
 ```
+
+| Tingkat Tipografi | Ukuran | Bobot | Line Height | Penggunaan |
+|---|---|---|---|---|
+| **Manuscript H1** | `2.25rem (36px)` | Normal (400) | `1.25` | Judul bab naskah utama |
+| **Manuscript Body** | `1.125rem (18px)` | Normal (400) | `1.8` | Isi teks naskah TipTap |
+| **Heading UI H2** | `1.5rem (24px)` | Medium (500) | `1.3` | Judul studio / workspace |
+| **Heading UI H3** | `1.125rem (18px)`| Medium (500) | `1.4` | Judul kartu & tab section |
+| **Body UI** | `0.875rem (14px)` | Normal (400) | `1.5` | Teks formulir & dialog |
+| **Caption / Meta** | `0.75rem (12px)`  | Medium (500) | `1.4` | Metadata kata, POV, status |
 
 ---
 
-## 2.3 Calm Interface
+## 4. Sistem Spasi & Layout Shell
 
-Gunakan whitespace yang cukup.
-
-Elemen UI tidak boleh bersaing dengan teks novel.
+### 4.1 Shell Tiga Panel Terintegrasi
+```text
+┌──────────────────────────────────────────────────────────┐
+│ [Logo] Novel Title          [ThemeToggle] [Search] [User]│
+├───────────────┬──────────────────────────────┬───────────┤
+│ OUTLINE TREE  │      MANUSCRIPT CANVAS       │ AI STUDIO │
+│ Babak & Bab   │                              │           │
+│ Adegan & POV  │      Teks Naskah TipTap      │ Saran AI  │
+│ [Collapse ◄]  │     (Autosave Debounced)     │ [► Hide]  │
+└───────────────┴──────────────────────────────┴───────────┘
+```
+- **Panel Kiri (Outline):** Navigasi struktur babak, bab, dan adegan. Dapat ditutup (*collapsible*).
+- **Panel Tengah (Canvas):** Area penulisan utama dengan lebar maksimal terfokus (maks. 720px untuk ergonomi mata).
+- **Panel Kanan (AI Studio):** Bantuan editorial yang dapat disembunyikan kapan saja agar tidak mengganggu konsentrasi.
 
 ---
 
-## 2.4 Contextual AI
+## 5. Desain Editor Naskah & Focus Mode
 
-AI harus terasa seperti bagian dari workspace.
+### 5.1 Editor TipTap Editorial
+- Margin dan padding luas untuk menciptakan ruang pernapasan visual (*generous whitespace*).
+- Indikator status autosave yang tenang: `Menyimpan...` → `Tersimpan secara lokal`.
+- Jika jaringan offline: `Anda offline; draf lokal aman` dengan tombol `Coba Lagi`.
 
-Jangan membuat pengalaman:
-
-```text
-ChatGPT clone
-```
-
-Sebaliknya:
-
-```text
-Writing Workspace
-             │
-             └── AI Companion
-```
+### 5.2 Distraction-Free Focus Mode (`F11`)
+- Menyembunyikan sidebar navigasi, header atas, dan panel AI.
+- Memusatkan naskah di tengah layar dengan pencahayaan tenang.
+- Membuka kembali antarmuka penuh dengan menekan tombol `Esc` atau ikon keluar fokus.
 
 ---
 
-## 2.5 Author Ownership
+## 6. Desain Interaksi AI (Non-Destruktif)
 
-AI suggestion selalu bersifat reversible.
-
-Tidak boleh:
-
-```text
-AI → silently modifies manuscript
-```
-
-Harus:
-
-```text
-AI Suggestion
-   ↓
-Review
-   ↓
-Accept / Insert / Replace / Dismiss
-```
-
----
-
-# 3. Visual Direction
-
-## Overall Style
-
-Referensi karakter visual:
-
-- modern editorial software
-- digital writing studio
-- premium note-taking application
-- subtle literary atmosphere
-
-Tidak menggunakan aesthetic "AI neon".
-
-Hindari:
-
-- excessive gradients
-- glowing borders
-- futuristic neon
-- overly rounded cards
-- excessive glassmorphism
-
----
-
-# 4. Color System
-
-Gunakan warna netral sebagai fondasi.
-
-### Light Mode
-
-```text
-Background
-#F8F7F4
-
-Surface
-#FFFFFF
-
-Primary Text
-#1F1F1F
-
-Secondary Text
-#6B6A67
-
-Border
-#E7E4DE
-
-Muted
-#F0EEE9
-
-Accent
-#6D5A45
-```
-
-Accent digunakan secukupnya.
-
-### Dark Mode
-
-```text
-Background
-#151515
-
-Surface
-#1D1D1D
-
-Primary Text
-#F1F0EC
-
-Secondary Text
-#A5A29B
-
-Border
-#30302E
-
-Muted
-#242422
-
-Accent
-#B49A78
-```
-
-Dark mode harus terasa seperti writing environment, bukan dashboard gelap.
-
----
-
-# 5. Typography
-
-Gunakan kombinasi sans-serif + serif.
-
-## UI
-
-Contoh:
-
-- Inter
-- Geist
-- Manrope
-
-## Manuscript
-
-Gunakan serif yang nyaman dibaca:
-
-- Source Serif 4
-- Literata
-- Lora
-- Georgia sebagai fallback
-
-Prinsip:
-
-```text
-UI → Sans Serif
-Writing → Serif
-```
-
----
-
-# 6. Spacing
-
-Base spacing:
-
-```text
-4px
-8px
-12px
-16px
-24px
-32px
-48px
-64px
-```
-
-Editor membutuhkan whitespace lebih besar daripada UI management.
-
----
-
-# 7. Application Shell
-
-Layout utama:
+> [!IMPORTANT]
+> AI tidak pernah mengubah naskah secara sepihak. Seluruh saran AI ditampilkan di panel kartu tersendiri dengan 4 tombol tindakan yang jelas:
 
 ```text
 ┌──────────────────────────────────────────────────────────┐
-│ Logo       Novel Name                     Search  Avatar │
-├───────────────┬──────────────────────────────┬───────────┤
-│               │                              │           │
-│ NAVIGATION    │       MAIN CONTENT           │ AI PANEL  │
-│               │                              │           │
-│ Story         │                              │           │
-│ Writing       │                              │           │
-│ Characters    │                              │           │
-│ World         │                              │           │
-│ Timeline      │                              │           │
-│               │                              │           │
-│ Analysis      │                              │           │
-│               │                              │           │
-└───────────────┴──────────────────────────────┴───────────┘
-```
-
-Sidebar dapat collapse.
-
-AI panel juga dapat collapse.
-
----
-
-# 8. Main Navigation
-
-Navigation utama:
-
-```text
-NOVEL
-
-Overview
-Outline
-Chapters
-
-STORY
-
-Characters
-Relationships
-World
-Timeline
-
-TOOLS
-
-AI Assistant
-Story Doctor
-Consistency
-
-SYSTEM
-
-Settings
-```
-
-Gunakan grouping daripada daftar panjang.
-
----
-
-# 9. Dashboard / Novel Overview
-
-Tujuan halaman ini bukan menampilkan analytics sebanyak mungkin.
-
-Tujuannya:
-
-> Memberikan gambaran singkat tentang keadaan novel.
-
-Layout:
-
-```text
-┌─────────────────────────────────────────────────────┐
-│ The Name of the Novel                               │
-│ Fantasy · Mystery · Draft                           │
-│                                                     │
-│ "A young woman discovers..."                       │
-│                                                     │
-│ [Continue Writing]                                  │
-└─────────────────────────────────────────────────────┘
-
-┌──────────────┬──────────────┬──────────────┐
-│ 42,350       │ 18           │ 63%          │
-│ Words        │ Chapters     │ Progress     │
-└──────────────┴──────────────┴──────────────┘
-
-Recent Activity
-
-Chapter 18
-Updated 10 minutes ago
-
-Chapter 17
-Updated yesterday
+│ BrainCircuit  Saran AI: Perluasan Dialog                 │
+├──────────────────────────────────────────────────────────┤
+│ "Daniel ragu sejenak sebelum meletakkan kuncinya..."     │
+├──────────────────────────────────────────────────────────┤
+│ [Terima (Insert)]  [Ganti Seleksi]  [Salin]  [Tolak]     │
+└──────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-# 10. Outline View
+## 7. Desain Modul Story Bible & Perencanaan
 
-Outline harus terasa seperti struktur cerita.
+### 7.1 Character Studio & Matriks Relasi
+- Kartu tokoh dengan badge status peran (`Protagonist`, `Antagonist`, `Supporting`).
+- Ark karakter divisualisasikan dengan ikon `Flame` dan deskripsi tujuan emosional.
+- Matriks relasi dua arah memperlihatkan dinamika hubungan antar tokoh (misal: *Aliansi rapuh*, *Rival akademis*).
 
-```text
-Novel
-│
-├── ACT I — The Beginning
-│   ├── Chapter 1
-│   │   ├── Scene 1
-│   │   └── Scene 2
-│   │
-│   ├── Chapter 2
-│   └── Chapter 3
-│
-├── ACT II — Discovery
-│   ├── Chapter 4
-│   └── Chapter 5
-│
-└── ACT III — Resolution
-```
+### 7.2 World Studio (Lokasi, Faksi, Rules)
+- Pengelompokan tab rapi: Lokasi, Faksi, Aturan Kausalitas (World Rules), dan Lore.
+- Badge tingkat kepentingan aturan dunia:
+  - `Tingkat 5: Hukum Mutlak Dunia`
+  - `Tingkat 4: Hukum Kota / Faksi Utama`
+  - `Tingkat 3: Aturan Umum Masyarakat`
 
-Interaction:
-
-- drag & drop
-- collapse / expand
-- rename
-- add chapter
-- add scene
-- duplicate
-- move
+### 7.3 Plot Threads & Linimasa Interaktif
+- Pelacakan subplot dengan status jelas: `Planned`, `Active`, `Resolved`.
+- Linimasa peristiwa dengan penanda waktu fleksibel dan tautan langsung ke bab/lokasi terkait.
 
 ---
 
-# 11. Chapter Workspace
+## 8. Desain Analisis & Kecerdasan Cerita
 
-Ketika user membuka chapter:
+### 8.1 Consistency Checker UI
+- Temuan disajikan sebagai **Observasi Berbasis Bukti**, bukan vonis kesalahan.
+- Kartu temuan menyandingkan:
+  - Sumber A: *"Bab 4: Daniel anak tunggal"*
+  - Sumber B: *"Bab 19: Daniel menemui kakak perempuannya"*
+- Tombol tindakan: `Abaikan (Sengaja)` atau `Tandai Selesai`.
 
-```text
-┌─────────────────────────────────────────────────────────┐
-│ ← Chapters                     Chapter 12       ⋮        │
-├─────────────┬───────────────────────────┬───────────────┤
-│ SCENES      │                           │               │
-│             │                           │               │
-│ Scene 1     │      Chapter Title        │ AI            │
-│ Scene 2     │                           │               │
-│ Scene 3 ●   │  Manuscript text...       │ Context       │
-│ Scene 4     │                           │               │
-│             │  Manuscript text...       │ Suggestions   │
-│ + Add Scene │                           │               │
-│             │                           │               │
-└─────────────┴───────────────────────────┴───────────────┘
-```
+### 8.2 Story Doctor UI
+- Tampilan wawasan editorial yang mendiagnosis ritme cerita tanpa skor angka fiktif.
+- Kategori analisis: Pacing bab, plot thread terbengkalai, dan motivasi karakter.
+
+### 8.3 Story Memory Studio UI
+- Menampilkan memori fakta cerita terkonfirmasi (`confirmed`) dan usulan AI (`proposed`).
+- Sumber rujukan bab/adegan tertaut secara transparan.
 
 ---
 
-# 12. Writing Editor
+## 9. Aksesibilitas (WCAG AA), Animasi & Responsivitas
 
-Editor harus menjadi area paling bersih.
-
-Default:
-
-```text
-                    Chapter Twelve
-
-         Anna stopped at the end of the hallway.
-
-         Something was wrong.
-
-         She could hear someone breathing...
-```
-
-Toolbar tidak selalu terlihat.
-
-Muncul ketika text dipilih:
-
-```text
-Rewrite | Expand | Improve | Dialogue | AI
-```
+1. **Aksesibilitas Keyboard:**
+   - Tautan lompat langsung (*Skip to content*) di baris pertama sebelum header.
+   - Pemicu Command Palette via shortcut `Ctrl+K` di desktop dan tombol ikon `Search` di ponsel.
+   - Visible focus ring (`ring-1 ring-ring`) pada setiap elemen interaktif.
+2. **Desain Responsif:**
+   - **Desktop (> 1024px):** Layout 3-kolom penuh.
+   - **Tablet (768px - 1024px):** Panel samping otomatis menjadi drawer slide-over.
+   - **Mobile (< 768px):** Navigasi berbasis tab bawah / bottom-sheet dengan target sentuh minimal 36px.
+3. **Animasi Halus:** Transisi cepat (150ms-200ms) tanpa efek gerak yang memusingkan (*reduced motion friendly*).
 
 ---
 
-# 13. Focus Mode
-
-Focus mode menghilangkan:
-
-- sidebar
-- AI panel
-- navigation
-- unnecessary toolbar
-
-Menjadi:
-
-```text
-┌─────────────────────────────────────────────┐
-│                                             │
-│                                             │
-│             Chapter Twelve                  │
-│                                             │
-│       Anna stopped walking.                 │
-│                                             │
-│       Something was wrong.                  │
-│                                             │
-│                                             │
-└─────────────────────────────────────────────┘
-```
-
-Escape untuk kembali.
-
----
-
-# 14. AI Assistant
-
-AI panel:
-
-```text
-┌───────────────────────────────┐
-│ AI Assistant                  │
-│                               │
-│ Context                       │
-│ Chapter 12 · Scene 3          │
-│                               │
-│ ───────────────────────────   │
-│                               │
-│ How can I help?               │
-│                               │
-│ [ Ask about this scene... ]   │
-│                               │
-│ Suggestions                   │
-│                               │
-│ Continue scene                │
-│ Improve dialogue              │
-│ Check character consistency   │
-│ Find possible conflict        │
-└───────────────────────────────┘
-```
-
----
-
-# 15. AI Response Design
-
-AI jangan menampilkan response seperti chat biasa jika sedang melakukan editing.
-
-Contoh:
-
-```text
-AI Suggestion
-
-The dialogue could be made more tense by
-reducing exposition and allowing the characters
-to imply what they already know.
-
-[Insert suggestion]
-[Replace selection]
-[Copy]
-[Dismiss]
-```
-
----
-
-# 16. Character Studio
-
-Character page:
-
-```text
-┌──────────────────────────────────────────────────┐
-│ Anna                                              │
-│ Protagonist · 21                                  │
-├──────────────────────┬───────────────────────────┤
-│ Profile              │ Character Arc             │
-│                      │                           │
-│ Motivation           │ Beginning                 │
-│ Fear                 │     ↓                     │
-│ Goal                 │ Discovery                 │
-│ Secret               │     ↓                     │
-│ Personality          │ Acceptance                │
-│                      │                           │
-└──────────────────────┴───────────────────────────┘
-```
-
-Tabs:
-
-```text
-Overview
-Arc
-Relationships
-Appearances
-Notes
-```
-
----
-
-# 17. Character Relationship View
-
-Simple graph:
-
-```text
-                 Daniel
-                    │
-                  loves
-                    │
-                    ▼
-Anna ─────────── trusts ─────────── Maya
- │
- │ fears
- ▼
-The Stranger
-```
-
-Relationship edge dapat diklik.
-
----
-
-# 18. World Studio
-
-World page menggunakan tab:
-
-```text
-Overview
-Locations
-Factions
-Rules
-Lore
-```
-
-Contoh World Rule:
-
-```text
-MAGIC RULE #04
-
-Only Moon Blood descendants can use magic.
-
-Source:
-Author-defined rule
-
-Used by:
-7 characters
-12 scenes
-```
-
-Ini juga membantu menunjukkan bahwa rule benar-benar dipakai oleh cerita.
-
----
-
-# 19. Timeline UI
-
-Timeline horizontal:
-
-```text
-Chapter 1       Chapter 5       Chapter 12
-   │                │                │
-   ●────────────────●────────────────●
-   │                │                │
-Meet Daniel     First fight      Hospital
-```
-
-Event card:
-
-```text
-Hospital Incident
-
-Day 47
-
-Characters:
-Anna · Daniel
-
-Location:
-St. Mary's Hospital
-```
-
----
-
-# 20. Consistency UI
-
-Jangan tampilkan sebagai "score".
-
-Gunakan findings.
-
-```text
-Consistency Check
-
-3 potential issues found
-
-──────────────────────────────
-
-Potential Timeline Conflict
-
-Chapter 31 says:
-"The incident happened three months ago."
-
-Timeline says:
-18 days ago.
-
-[Review]
-
-──────────────────────────────
-
-Potential Character Conflict
-
-Chapter 4:
-Daniel is described as an only child.
-
-Chapter 19:
-Daniel mentions his sister.
-
-[Review]
-```
-
----
-
-# 21. Story Doctor UI
-
-Story Doctor menggunakan sections:
-
-```text
-Story Analysis
-
-Plot
-Character Arcs
-Pacing
-Plot Threads
-Worldbuilding
-Unresolved Questions
-```
-
-Temuan:
-
-```text
-Pacing Observation
-
-Chapters 18–22 contain significantly fewer
-major events than the surrounding chapters.
-
-Evidence:
-Chapter 17
-Chapter 18
-Chapter 19
-Chapter 20
-Chapter 21
-Chapter 22
-Chapter 23
-
-[Inspect Chapters]
-```
-
-Tidak menggunakan:
-
-```text
-Story Score: 72/100
-```
-
-karena cerita bersifat subjektif.
-
----
-
-# 22. Story Memory UI
-
-Memory harus transparan.
-
-```text
-Story Memory
-
-Character Fact
-──────────────────────────
-Anna's brother died when
-Anna was 12.
-
-Source:
-Chapter 2
-
-[Edit] [Delete]
-```
-
-Untuk AI-generated memory:
-
-```text
-New memory detected
-
-"Daniel has never visited the city before."
-
-Source:
-Chapter 14
-
-[Save]
-[Ignore]
-```
-
----
-
-# 23. Search
-
-Global search harus mencari:
-
-- chapter
-- scene
-- character
-- location
-- world rule
-- timeline event
-- story memory
-
-Command palette:
-
-```text
-⌘ K
-
-Search your novel...
-
-Chapter 12
-Anna
-Hospital
-Moon Blood
-"Daniel has never..."
-```
-
----
-
-# 24. Empty States
-
-Empty state harus membantu user mulai bekerja.
-
-Contoh:
-
-```text
-No characters yet.
-
-Your story will become easier to manage
-once its characters have a place to live.
-
-[Create Character]
-[Let AI Help]
-```
-
-Hindari:
-
-> No data found.
-
----
-
-# 25. Interaction Patterns
-
-## Save
-
-Autosave:
-
-```text
-Saving...
-Saved ✓
-```
-
-Tidak perlu tombol Save besar.
-
-## Destructive Action
-
-Delete harus membutuhkan confirmation.
-
-## AI Action
-
-Semua AI modification dapat di-undo.
-
----
-
-# 26. Responsive Design
-
-Desktop-first karena novel writing membutuhkan layar besar.
-
-### Desktop
-
-3-column workspace:
-
-```text
-Sidebar | Editor | AI
-```
-
-### Tablet
-
-```text
-Sidebar | Editor
-         AI drawer
-```
-
-### Mobile
-
-Mobile bukan full writing environment pada MVP.
-
-Fokus:
-
-- reading
-- outline
-- notes
-- quick edits
-- AI brainstorming
-
-Editor mobile tetap tersedia tetapi bukan primary experience.
-
----
-
-# 27. Component Architecture
-
-Recommended UI structure:
-
-```text
-components/
-├── layout/
-│   ├── AppShell
-│   ├── Sidebar
-│   ├── Topbar
-│   └── CommandPalette
-│
-├── editor/
-│   ├── NovelEditor
-│   ├── EditorToolbar
-│   ├── SceneNavigator
-│   └── FocusMode
-│
-├── ai/
-│   ├── AIPanel
-│   ├── AIMessage
-│   ├── AISuggestion
-│   └── AIAction
-│
-├── story/
-│   ├── CharacterCard
-│   ├── RelationshipGraph
-│   ├── Timeline
-│   └── StoryMemory
-│
-└── analysis/
-    ├── ConsistencyFinding
-    ├── StoryDoctor
-    └── PlotThread
-```
-
----
-
-# 28. Design Tokens
-
-Gunakan centralized tokens:
-
-```text
---color-background
---color-surface
---color-text
---color-muted
---color-border
---color-accent
-
---font-ui
---font-editor
-
---radius-sm
---radius-md
---radius-lg
-
---space-xs
---space-sm
---space-md
---space-lg
---space-xl
-```
-
-Jangan hardcode style di setiap component.
-
----
-
-# 29. Accessibility
-
-Target minimal:
-
-- keyboard navigation;
-- visible focus;
-- sufficient contrast;
-- semantic HTML;
-- screen-reader labels;
-- resizable editor text;
-- reduced motion support.
-
-Keyboard shortcuts:
-
-```text
-Cmd/Ctrl + K     Command palette
-Cmd/Ctrl + S     Save state / force sync
-Cmd/Ctrl + Shift + F  Focus mode
-Cmd/Ctrl + /     AI assistant
-Esc              Close panel
-```
-
----
-
-# 30. Motion
-
-Animation sangat minimal.
-
-Gunakan untuk:
-
-- opening panel;
-- modal;
-- drag & drop;
-- save state;
-- AI loading.
-
-Durasi:
-
-```text
-150–250ms
-```
-
-Tidak menggunakan animated backgrounds.
-
----
-
-# 31. Loading States
-
-AI:
-
-```text
-Thinking...
-Retrieving story context...
-```
-
-Editor:
-
-```text
-Saving...
-```
-
-Story Doctor:
-
-```text
-Analyzing your story...
-Checking timeline...
-Checking character consistency...
-```
-
----
-
-# 32. Error States
-
-Contoh:
-
-```text
-We couldn't complete the AI request.
-
-Your writing is safe.
-
-[Try Again]
-```
-
-Jangan menghapus draft ketika request gagal.
-
----
-
-# 33. Design Priority
-
-Urutan prioritas UX:
-
-```text
-1. Writing
-2. Story organization
-3. AI assistance
-4. Story intelligence
-5. Analytics
-```
-
-Jika harus memilih antara dashboard cantik dan editor yang nyaman:
-
-**Editor menang.**
-
----
-
-# 34. MVP Screens
-
-Minimal screens:
-
-```text
-01 Login
-02 Sign Up
-03 Novel Library
-04 Create Novel
-05 Novel Overview
-06 Outline
-07 Chapter Workspace
-08 Character List
-09 Character Detail
-10 World
-11 Timeline
-12 AI Assistant
-13 Consistency Check
-14 Settings
-```
-
----
-
-# 35. Future Screens
-
-Post-MVP:
-
-```text
-Story Doctor
-Relationship Graph
-Plot Thread Manager
-Research Workspace
-Export Center
-Version Comparison
-Collaboration
-```
-
----
-
-# 36. Design Success Criteria
-
-Design dianggap berhasil apabila:
-
-1. User dapat mulai menulis dalam kurang dari beberapa menit.
-2. Editor terasa lebih dominan daripada UI.
-3. User dapat memahami struktur novel tanpa membuka banyak halaman.
-4. AI terasa mengetahui novel, bukan chatbot generik.
-5. AI tidak mengambil alih kontrol.
-6. Informasi story memory dapat dilihat dan dikoreksi.
-7. Consistency findings dapat ditelusuri ke sumbernya.
-8. Workspace tetap nyaman ketika novel mencapai puluhan chapter.
-
----
-
-# 37. Final Design Direction
-
-Produk harus terasa seperti:
-
-```text
-          ┌─────────────────────────────┐
-          │        CREATIVE SPACE       │
-          │                             │
-          │   Plan → Write → Reflect   │
-          │                             │
-          │       Your story.           │
-          │       Your world.           │
-          │       Your voice.            │
-          │                             │
-          └─────────────────────────────┘
-```
-
-Bukan:
-
-```text
-AI
-AI
-AI
-Generate
-Generate
-Generate
-```
-
-AI adalah **invisible intelligence underneath the writing experience**.
-
----
-
-# 38. Next Technical Step
-
-Setelah design ini, tahap berikutnya adalah `ARCHITECTURE.md`.
-
-Dokumen tersebut harus mendefinisikan:
-
-- PostgreSQL schema;
-- table relationships;
-- indexes;
-- pgvector;
-- story memory;
-- embedding strategy;
-- context retrieval;
-- AI provider abstraction;
-- prompt architecture;
-- AI action pipeline;
-- consistency detection pipeline;
-- versioning;
-- API structure;
-- folder structure;
-- deployment architecture.
+## 10. Daftar Design Tokens & Primitif Komponen
+
+- `Button`: Varian `default`, `outline`, `ghost`, `secondary`, `destructive`.
+- `Badge`: Varian `default`, `secondary`, `outline`, `accent`.
+- `Card`: Background card dengan border tipis dan bayangan kertas lembut (`shadow-subtle` / `shadow-paper`).
+- `Dialog`: Modal konfirmasi Radix UI dengan fokus otomatis dan penutupan via tombol `Escape`.
+- `Input & Textarea`: Field formulir elegan dengan border netral dan ring fokus jelas.

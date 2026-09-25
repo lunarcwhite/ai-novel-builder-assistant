@@ -1,1285 +1,609 @@
-# AGENTS.md — AI Novel Writing Workspace
+# AGENTS.md: AI Novel Writing Workspace
 
-This document defines how coding agents must work on this repository.
-
-It is an operational guide for AI coding agents.
-
-For product philosophy and behavioral principles, read `SOUL.md`.
-
-For requirements, read:
-
-- `docs/prd.md`
-- `docs/design.md`
-- `docs/architecture.md`
-- `docs/database-schema.md`
+> **Operational Guide for Coding Agents**  
+> For product philosophy and behavioral principles, read [`SOUL.md`](SOUL.md).  
+> For technical specifications, read: [`docs/prd.md`](docs/prd.md) • [`docs/design.md`](docs/design.md) • [`docs/architecture.md`](docs/architecture.md) • [`docs/database-schema.md`](docs/database-schema.md).
 
 ---
 
-# 1. Mission
+## Daftar Isi (Table of Contents)
 
-Build a reliable, maintainable novel-writing workspace.
-
-The product must prioritize:
-
-1. author control;
-2. manuscript safety;
-3. story integrity;
-4. writing experience;
-5. maintainable architecture;
-6. useful AI assistance.
-
-Do not optimize for code volume or number of features.
+- [Bagian I: Misi & Fondasi Dasar](#bagian-i-misi--fondasi-dasar)
+  - [1. Mission](#1-mission)
+  - [2. Mandatory Reading](#2-mandatory-reading)
+  - [3. General Coding Principles](#3-general-coding-principles)
+  - [4. Before Implementing a Feature](#4-before-implementing-a-feature)
+- [Bagian II: Database & Keselamatan Naskah](#bagian-ii-database--keselamatan-naskah)
+  - [5. Database Rules](#5-database-rules)
+  - [6. Manuscript Safety](#6-manuscript-safety)
+  - [26. Database Testing](#26-database-testing)
+  - [27. Migration Safety](#27-migration-safety)
+  - [43. Database Provider Changes](#43-database-provider-changes)
+- [Bagian III: AI & Story Memory Architecture](#bagian-iii-ai--story-memory-architecture)
+  - [7. AI Rules](#7-ai-rules)
+  - [8. Story Memory Rules](#8-story-memory-rules)
+  - [9. Context Retrieval Rules](#9-context-retrieval-rules)
+  - [10. Never Treat Vector Search as Truth](#10-never-treat-vector-search-as-truth)
+  - [11. Prompt Architecture](#11-prompt-architecture)
+  - [12. Structured AI Responses](#12-structured-ai-responses)
+  - [13. AI Context Privacy](#13-ai-context-privacy)
+  - [25. AI Testing](#25-ai-testing)
+  - [29. Story Context Performance](#29-story-context-performance)
+  - [30. Long Novel Support](#30-long-novel-support)
+  - [31. Source Attribution](#31-source-attribution)
+  - [32. Consistency Checker](#32-consistency-checker)
+  - [33. Story Doctor](#33-story-doctor)
+  - [34. No Fake Intelligence](#34-no-fake-intelligence)
+  - [42. AI Provider Changes](#42-ai-provider-changes)
+  - [45. AI Feature Development Pattern](#45-ai-feature-development-pattern)
+- [Bagian IV: Editor, Autosave & UX Penulisan](#bagian-iv-editor-autosave--ux-penulisan)
+  - [14. Editor Rules](#14-editor-rules)
+  - [15. Autosave](#15-autosave)
+  - [16. Version History](#16-version-history)
+  - [17. UI Rules](#17-ui-rules)
+  - [18. Writing Experience](#18-writing-experience)
+  - [19. Accessibility](#19-accessibility)
+  - [20. Components](#20-components)
+  - [48. Preserve Existing Behavior](#48-preserve-existing-behavior)
+- [Bagian V: Kualitas Kode, Validasi & Pengujian](#bagian-v-kualitas-kode-validasi--pengujian)
+  - [21. Server / Client Boundary](#21-server--client-boundary)
+  - [22. Validation](#22-validation)
+  - [23. Error Handling](#23-error-handling)
+  - [24. Testing](#24-testing)
+  - [28. Performance](#28-performance)
+  - [41. Dependencies](#41-dependencies)
+  - [44. Feature Development Pattern](#44-feature-development-pattern)
+  - [46. When Requirements Are Ambiguous](#46-when-requirements-are-ambiguous)
+  - [47. Avoid Premature Refactoring](#47-avoid-premature-refactoring)
+- [Bagian VI: Standar Bahasa, Git & Checklist Akhir](#bagian-vi-standar-bahasa-git--checklist-akhir)
+  - [35. Documentation](#35-documentation)
+  - [36. Git Practices](#36-git-practices)
+  - [37. Pull Request Discipline](#37-pull-request-discipline)
+  - [38. Before Finishing a Task](#38-before-finishing-a-task)
+  - [39. Never Commit Secrets](#39-never-commit-secrets)
+  - [40. Environment Variables](#40-environment-variables)
+  - [49. Product Language](#49-product-language)
+  - [50. UX Language](#50-ux-language)
+  - [51. Final Agent Checklist](#51-final-agent-checklist)
+  - [52. Final Rule](#52-final-rule)
 
 ---
 
-# 2. Mandatory Reading
+## Bagian I: Misi & Fondasi Dasar
 
-Before making substantial changes, inspect the relevant documentation.
+### 1. Mission
 
-Always understand:
+Membangun workspace penulisan novel yang andal, aman, dan mudah dirawat.
 
+Prioritas produk (secara berurutan):
+1. **Author control** (kendali penuh di tangan penulis)
+2. **Manuscript safety** (keamanan data naskah mutlak)
+3. **Story integrity** (integritas fakta cerita)
+4. **Writing experience** (pengalaman menulis yang tenang & fokus)
+5. **Maintainable architecture** (arsitektur modular yang bersih)
+6. **Useful AI assistance** (bantuan AI yang solutif & non-intrusif)
+
+> [!NOTE]
+> Jangan mengoptimalkan kode semata-mata untuk memperbanyak volume baris atau jumlah fitur. Kualitas dan keandalan jauh lebih utama.
+
+---
+
+### 2. Mandatory Reading & Conflict Resolution
+
+Sebelum membuat perubahan substansial, selalu pelajari dokumentasi terkait:
+- [`SOUL.md`](SOUL.md) — Karakter & perilaku produk.
+- [`docs/prd.md`](docs/prd.md) — Kebutuhan produk.
+- [`docs/design.md`](docs/design.md) — Desain antarmuka & UX.
+- [`docs/architecture.md`](docs/architecture.md) — Arsitektur sistem.
+- [`docs/database-schema.md`](docs/database-schema.md) — Skema database.
+
+Jika terjadi kontradiksi kebutuhan, gunakan hierarki kedaulatan berikut:
 ```text
 SOUL.md
-```
-
-For product behavior.
-
-Then read the relevant technical documents:
-
-```text
+  ↓
 docs/prd.md
-docs/design.md
+  ↓
 docs/architecture.md
-docs/database-schema.md
+  ↓
+docs/design.md
+  ↓
+Detail Implementasi Teknis
 ```
+Jika konflik tidak dapat diselesaikan sendiri, **berhenti dan tanyakan pada penulis**, jangan membuat asumsi sepihak.
 
-Do not invent requirements that contradict these documents.
+---
 
-If requirements conflict, prefer:
+### 3. General Coding Principles
 
+#### 3.1 Prefer Simple Solutions
+Gunakan solusi arsitektur paling sederhana yang memenuhi kebutuhan. Jangan memperkenalkan microservices, Redis, Kafka, Elasticsearch, atau event bus kompleks kecuali beban kerja sistem saat ini benar-benar mewajibkannya.
+
+#### 3.2 Modular Monolith First
+Arsitektur standar repositori ini adalah:
 ```text
-SOUL.md
-→ PRD
-→ Architecture
-→ Design
-→ implementation detail
+Next.js (App Router) + PostgreSQL + pgvector + AI Provider
 ```
+Pertahankan batas-batas domain secara rapi tanpa memecah service secara prematur.
 
-If the conflict cannot be resolved, stop and ask rather than silently choosing.
-
----
-
-# 3. General Coding Principles
-
-## 3.1 Prefer Simple Solutions
-
-Use the simplest architecture that satisfies the requirement.
-
-Do not introduce:
-
-- microservices;
-- Redis;
-- Kafka;
-- Elasticsearch;
-- complex event buses;
-- unnecessary abstractions;
-
-unless the current workload genuinely requires them.
-
----
-
-## 3.2 Modular Monolith First
-
-The default architecture is:
-
-```text
-Next.js
-+
-PostgreSQL
-+
-pgvector
-+
-AI Provider
-```
-
-Keep domain boundaries clear without prematurely splitting services.
-
----
-
-## 3.3 Feature-Oriented Code
-
-Prefer:
-
+#### 3.3 Feature-Oriented Code
+Gunakan pengelompokan berbasis fitur domain di `src/features/`:
 ```text
 features/
-├── novels/
-├── chapters/
-├── scenes/
-├── characters/
-├── world/
-├── timeline/
-├── plot/
-├── memories/
-├── ai/
-└── consistency/
+├── novels/         ├── scenes/        ├── timeline/      ├── ai/
+├── chapters/       ├── characters/    ├── plot/          └── consistency/
+└── world/          └── memories/
 ```
-
-over giant generic folders.
-
-Avoid turning:
-
-```text
-utils/
-helpers/
-services/
-```
-
-into dumping grounds.
+Hindari menjadikan folder `utils/`, `helpers/`, atau `services/` sebagai tempat pembuangan kode generik.
 
 ---
 
-# 4. Before Implementing a Feature
+### 4. Before Implementing a Feature
 
-Follow:
-
-```text
-1. Read requirements.
-2. Inspect existing code.
-3. Identify affected domain.
-4. Identify database impact.
-5. Identify authorization impact.
-6. Implement the smallest coherent change.
-7. Add or update tests.
-8. Run validation.
-9. Review the diff.
-```
-
-Do not immediately start editing files without understanding the existing implementation.
+Ikuti urutan disiplin kerja berikut sebelum menulis kode:
+1. Baca kebutuhan (requirements).
+2. Periksa kode yang sudah ada (inspect existing code).
+3. Identifikasi domain yang terdampak.
+4. Identifikasi dampak skema database.
+5. Identifikasi dampak otorisasi & keamanan.
+6. Terapkan perubahan terkecil yang koheren.
+7. Tambahkan atau perbarui unit/integration tests.
+8. Jalankan validasi (typecheck, test, lint).
+9. Tinjau kembali `git diff`.
 
 ---
 
-# 5. Database Rules
+## Bagian II: Database & Keselamatan Naskah
 
-## 5.1 Never Modify Schema Without Migration
+### 5. Database Rules
 
-Do not manually alter production schema.
+#### 5.1 Never Modify Schema Without Migration
+Dilarang mengubah skema database produksi secara manual. Setiap perubahan struktur tabel wajib memiliki berkas migrasi SQL versi terurut.
 
-Every schema change must have a migration.
+#### 5.2 Foreign Keys Matter
+Gunakan Foreign Key untuk relasi kepemilikan data:
+- `ON DELETE CASCADE`: Saat entitas anak tidak memiliki arti tanpa induknya (misal: adegan di dalam bab).
+- `ON DELETE SET NULL`: Saat entitas anak harus tetap bertahan jika referensinya dihapus.
+
+#### 5.3 Tenant / Ownership Safety
+Setiap novel dimiliki oleh user. Setiap entitas cerita harus dapat dirunut jalurnya:
+```text
+entity → novel → user
+```
+Jangan pernah mempercayai ID dari input klien. Selalu verifikasi kepemilikan di sisi server.
 
 ---
 
-## 5.2 Foreign Keys Matter
+### 6. Manuscript Safety
 
-Use foreign keys for actual ownership relationships.
-
-Prefer:
-
-```text
-on delete cascade
-```
-
-when the child has no meaning without the parent.
-
-Prefer:
-
-```text
-on delete set null
-```
-
-when the child should survive deletion of the reference.
+> [!CAUTION]
+> **Data Naskah Adalah Sakral:**
+> - **DILARANG** menimpa konten naskah secara sepihak/otomatis.
+> - **DILARANG** menghapus teks naskah sebagai bagian dari operasi AI.
+> - **DILARANG** menjalankan migrasi destruktif tanpa rencana migrasi cadangan yang aman.
+> - Sebelum operasi penggantian AI (*replacement*), buat snapshot versi terlebih dahulu:
+>   ```text
+>   create version → apply replacement
+>   ```
 
 ---
 
-## 5.3 Tenant / Ownership Safety
+### 26. Database Testing
 
-Every novel belongs to a user.
-
-Every story entity must ultimately be reachable through:
-
-```text
-entity
- ↓
-novel
- ↓
-user
-```
-
-Never trust client-provided IDs.
-
-Always verify ownership server-side.
+Sebelum mengubah skema:
+1. Buat berkas migrasi SQL.
+2. Terapkan migrasi di lingkungan lokal.
+3. Uji rollback jika didukung.
+4. Seed data representatif.
+5. Uji integritas foreign keys & cascade behavior.
+6. Uji otorisasi tenant per-penulis.
 
 ---
 
-# 6. Manuscript Safety
+### 27. Migration Safety
 
-Manuscript data is sacred.
-
-Never:
-
-- silently overwrite manuscript content;
-- delete content as part of an AI operation;
-- perform destructive migrations without a safe migration plan;
-- replace text without versioning when the operation is destructive.
-
-Before an AI replacement:
-
+Untuk migrasi data dalam skala besar, gunakan pola:
 ```text
-create version
-→ apply replacement
+expand → migrate → verify → contract
 ```
+Jangan pernah menghapus kolom produksi atau mengubah tipe enum tanpa memeriksa data riil yang ada.
 
 ---
 
-# 7. AI Rules
+### 43. Database Provider Changes
 
-## 7.1 AI Must Be Provider-Agnostic
-
-Application code should use:
-
-```text
-AIProvider
-```
-
-rather than directly calling a provider SDK everywhere.
+Jangan menyebarkan API khusus vendor database ke seluruh aplikasi. Selalu bungkus akses database di balik abstraksi repository atau service domain.
 
 ---
 
-## 7.2 AI API Keys Stay Server-Side
+## Bagian III: AI & Story Memory Architecture
 
-Never expose:
+### 7. AI Rules
 
-```text
-AI_API_KEY
-```
-
-to the browser.
-
-Never use secret keys in:
-
-```text
-NEXT_PUBLIC_*
-```
-
-environment variables.
+- **7.1 Provider-Agnostic:** Kode aplikasi wajib menggunakan interface `AIProvider`, bukan memanggil SDK vendor AI secara langsung di sembarang file.
+- **7.2 API Keys Stay Server-Side:** Kunci rahasia API AI tidak boleh bocor ke browser atau diawali dengan `NEXT_PUBLIC_`.
+- **7.3 AI Output Is Not Automatically Truth:** Fakta cerita hasil generasi AI harus berstatus `proposed` sampai dikonfirmasi oleh penulis (`confirmed`).
+- **7.4 AI Must Not Silently Modify Manuscript:** Antarmuka harus selalu menyediakan opsi eksplisit: `Accept`, `Insert`, `Replace`, `Dismiss`.
 
 ---
 
-## 7.3 AI Output Is Not Automatically Truth
+### 8. Story Memory Rules
 
-AI-generated story facts are not confirmed facts.
-
-Use:
-
-```text
-proposed
-```
-
-until author confirmation when appropriate.
+Story Memory adalah domain tingkat pertama (*first-class domain*). Setiap memori wajib memiliki:
+- `type` (misal: fakta karakter, world rule, timeline event)
+- `content` (isi fakta ringkas)
+- `status` (`confirmed` atau `proposed`)
+- `source` (atribusi bab atau adegan asal)
 
 ---
 
-## 7.4 AI Must Not Silently Modify the Manuscript
+### 9. Context Retrieval Rules
 
-The UI must allow:
-
-```text
-Accept
-Insert
-Replace
-Dismiss
-```
-
-AI modifications must be reversible.
-
----
-
-# 8. Story Memory Rules
-
-Story Memory is a first-class domain.
-
-Every memory should have:
-
-```text
-type
-content
-status
-source
-```
-
-Prefer:
-
-```text
-confirmed
-```
-
-only when explicitly established by the author or confirmed by the author.
-
-AI-generated candidates should generally begin as:
-
-```text
-proposed
-```
-
----
-
-# 9. Context Retrieval Rules
-
-Do not send the entire novel to the LLM by default.
-
-Build context in layers:
-
+Jangan mengirim seluruh isi novel ke model AI. Bangun konteks secara bertingkat (*layered context*):
 ```text
 Current selection
-↓
+  ↓
 Current scene
-↓
+  ↓
 Current chapter
-↓
+  ↓
 Relevant characters
-↓
+  ↓
 Relevant memories
-↓
-World rules
-↓
-Timeline
-↓
-Plot threads
-```
-
-Use retrieval to find relevant information.
-
----
-
-# 10. Never Treat Vector Search as Truth
-
-Vector search is a retrieval mechanism.
-
-It is not an authority.
-
-Retrieved information must still be interpreted in context.
-
-Author-defined structured data has higher authority than AI inference.
-
----
-
-# 11. Prompt Architecture
-
-Prompts should be versioned or centralized.
-
-Do not scatter long prompts across React components.
-
-Prefer:
-
-```text
-server/ai/prompts/
-```
-
-or equivalent feature-specific modules.
-
-Operations should be explicit:
-
-```text
-continue_scene
-rewrite
-expand
-improve_prose
-improve_dialogue
-critique
-summarize
-consistency_check
-memory_extraction
-story_analysis
+  ↓
+World rules & Lore
+  ↓
+Timeline & Plot threads
 ```
 
 ---
 
-# 12. Structured AI Responses
+### 10. Never Treat Vector Search as Truth
 
-For machine-consumed operations, prefer structured output.
-
-Example:
-
-```json
-{
-  "findings": [],
-  "memories": [],
-  "suggestions": []
-}
-```
-
-Validate AI output with a schema.
-
-Recommended:
-
-```text
-Zod
-```
-
-Never blindly trust JSON returned by an LLM.
+Vector search hanyalah mekanisme pengambilan data (*retrieval*), bukan otoritas kebenaran cerita. Data terstruktur yang ditentukan langsung oleh penulis memiliki otoritas lebih tinggi daripada inferensi AI.
 
 ---
 
-# 13. AI Context Privacy
+### 11. Prompt Architecture
 
-Do not unnecessarily log:
+Prompt wajib dipusatkan dan memiliki versioning di folder `src/server/ai/prompts.ts` atau modul domain terkait. Jangan menyebarkan string prompt panjang di dalam komponen React.
 
-- full manuscript;
-- full prompts;
-- full AI responses.
-
-Logs should prefer metadata:
-
-```text
-operation
-model
-latency
-token counts
-status
-cost
-```
+Operasi AI harus eksplisit:
+`continue_scene`, `rewrite`, `expand`, `improve_prose`, `improve_dialogue`, `critique`, `summarize`, `consistency_check`, `memory_extraction`, `story_analysis`.
 
 ---
 
-# 14. Editor Rules
+### 12. Structured AI Responses
 
-The editor must remain responsive.
-
-Do not make every keystroke depend on:
-
-```text
-API request
-AI request
-database roundtrip
-```
-
-Use local state and debounced persistence.
+Untuk operasi yang dikonsumsi oleh mesin, gunakan structured output (JSON) dan validasi selalu menggunakan **Zod Schema**. Jangan pernah mempercayai output LLM tanpa validasi batas (*boundary validation*).
 
 ---
 
-# 15. Autosave
+### 13. AI Context Privacy
 
-Expected flow:
-
-```text
-typing
- ↓
-local editor state
- ↓
-debounce
- ↓
-server persistence
- ↓
-saved indicator
-```
-
-If save fails:
-
-```text
-preserve local content
-show recoverable error
-```
-
-Never discard unsaved content.
+Hindari pencatatan log (*logging*) berlebihan yang memuat teks naskah utuh atau prompt penuh. Log sistem harus berfokus pada metadata:
+`operation`, `model`, `latency`, `token counts`, `status`, `cost`.
 
 ---
 
-# 16. Version History
+### 25. AI Testing
 
-Create a meaningful version when:
-
-- user explicitly saves a version;
-- AI performs a replacement;
-- user restores an older version;
-- a major edit operation occurs.
-
-Do not create a database version for every keystroke.
+Pengujian AI tidak hanya menguji apakah AI mengembalikan teks. Uji pula:
+- Validitas schema structured output;
+- Inklusi konteks relevan & eksklusi konteks non-relevan;
+- Atribusi sumber data;
+- Kepatuhan status `proposed`;
+- Pencegahan modifikasi naskah destruktif.
 
 ---
 
-# 17. UI Rules
+### 29. Story Context Performance
 
-Follow `docs/design.md`.
-
-Prefer:
-
-- calm layouts;
-- clear hierarchy;
-- whitespace;
-- subtle interactions;
-- accessible controls.
-
-Avoid:
-
-- unnecessary cards;
-- excessive gradients;
-- dashboard clutter;
-- meaningless scores;
-- decorative AI effects.
+Optimalkan context retrieval dengan context budget yang terukur, metadata filtering, dan ranking relevansi. Hindari mengambil seluruh data novel sekaligus ke dalam prompt.
 
 ---
 
-# 18. Writing Experience
+### 30. Long Novel Support
 
-When working on editor UI:
-
-> The manuscript is more important than the interface around it.
-
-Do not allow:
-
-- AI panels;
-- toolbars;
-- navigation;
-- analytics;
-
-to visually overpower the writing area.
+Arsitektur aplikasi harus mampu mendukung novel panjang: 100+ bab, 1000+ adegan, banyak karakter, dan memori cerita besar melalui ringkasan hierarkis (*hierarchical context rollups*).
 
 ---
 
-# 19. Accessibility
+### 31. Source Attribution
 
-Every interactive component should support:
-
-- keyboard navigation;
-- visible focus;
-- semantic labels;
-- screen-reader compatibility;
-- sufficient contrast.
-
-Do not rely on color alone to communicate state.
+Setiap fitur yang menyatakan referensi cerita ("Cerita Anda menyebutkan bahwa...") wajib menyertakan sumbernya (misal: *Chapter 12, Scene 3*). Ini berlaku mutlak pada **Story Memory**, **Consistency Checker**, dan **Story Doctor**.
 
 ---
 
-# 20. Components
+### 32. Consistency Checker
 
-Prefer reusable components when there is a real pattern.
-
-Do not prematurely create abstractions for one-off elements.
-
-Good:
-
-```text
-AISuggestion
-SceneNavigator
-CharacterCard
-ConsistencyFinding
-```
-
-Avoid:
-
-```text
-UniversalMegaCard
-UniversalContentRenderer
-UniversalDataThing
-```
-
-without a demonstrated need.
+Temuan inkonsistensi harus disajikan sebagai observasi berbasis bukti:
+- Gunakan frasa: `Potensi Masalah / Observasi`
+- Jangan gunakan: `Error / Kesalahan Penulis`
+- Sadari bahwa kontradiksi yang disengaja (narator tidak andal, misteri, perubahan karakter) adalah teknik sastra yang sah.
 
 ---
 
-# 21. Server / Client Boundary
+### 33. Story Doctor
 
-Keep server-only logic server-side.
-
-Server code may contain:
-
-- database access;
-- secret keys;
-- AI provider calls;
-- authorization;
-- embedding generation.
-
-Client components should receive only what they need.
-
----
-
-# 22. Validation
-
-Validate user input at the boundary.
-
-Recommended:
-
+Hindari menciptakan skor buatan seperti "Story Quality Score: 85/100". Sajikan masukan editorial dalam struktur:
 ```text
-Zod
-```
-
-Validate:
-
-- forms;
-- server actions;
-- API payloads;
-- AI structured output.
-
----
-
-# 23. Error Handling
-
-Errors should be:
-
-- meaningful;
-- recoverable when possible;
-- safe to expose.
-
-Bad:
-
-```text
-Something went wrong.
-```
-
-Better:
-
-```text
-We couldn't save this scene.
-Your recent changes are still available locally.
-Try again.
-```
-
-Do not expose:
-
-- stack traces;
-- API secrets;
-- database credentials;
-- internal infrastructure details.
-
----
-
-# 24. Testing
-
-Every meaningful domain feature should have tests.
-
-## Unit
-
-Examples:
-
-```text
-word count
-memory deduplication
-context ranking
-timeline logic
-authorization
-```
-
-## Integration
-
-Examples:
-
-```text
-create novel
-create chapter
-create scene
-save scene
-create version
-retrieve story context
-```
-
-## E2E
-
-Critical flows:
-
-```text
-sign up
-→ create novel
-→ create chapter
-→ write scene
-→ reload
-→ verify content
+Observasi → Bukti Naskah → Kemungkinan Interpretasi → Saran Perbaikan
 ```
 
 ---
 
-# 25. AI Testing
+### 34. No Fake Intelligence
 
-Do not only test whether AI returns text.
-
-Test:
-
-- structured output validity;
-- context inclusion;
-- context exclusion;
-- source attribution;
-- memory status;
-- manuscript safety;
-- contradiction detection.
-
-Use deterministic fixtures where possible.
+Jangan menambahkan ornamen visual atau metrik fiktif hanya agar aplikasi tampak "canggih". Setiap fitur AI harus memiliki nilai guna praktis bagi proses kreatif penulis.
 
 ---
 
-# 26. Database Testing
+### 42. AI Provider Changes
 
-Before changing schema:
-
-1. create migration;
-2. apply migration locally;
-3. test rollback if supported;
-4. seed representative data;
-5. test foreign keys;
-6. test authorization;
-7. inspect generated SQL where necessary.
+Jika mengganti provider AI, perbarui implementasi pada `AIProvider`. Jangan menulis ulang logika aplikasi di sekitar SDK vendor tertentu.
 
 ---
 
-# 27. Migration Safety
+### 45. AI Feature Development Pattern
 
-Never:
-
-- drop production data casually;
-- rename columns without migration;
-- change enum values without checking existing data;
-- make destructive schema changes without a migration plan.
-
-For large migrations:
-
+Alur baku pengembangan fitur AI:
 ```text
-expand
-→ migrate
-→ verify
-→ contract
+Aksi Pengguna → Definisi Operasi → Context Resolver → Context Builder →
+Prompt → AI Provider → Zod Validation → Domain Action → Review Penulis
 ```
 
 ---
 
-# 28. Performance
+## Bagian IV: Editor, Autosave & UX Penulisan
 
-Measure before optimizing.
+### 14. Editor Rules
 
-Watch:
-
-- editor save latency;
-- database query latency;
-- context retrieval latency;
-- AI latency;
-- page load;
-- large chapter rendering.
-
-Avoid N+1 queries.
-
-Use indexes based on actual query patterns.
+Editor naskah harus tetap responsif dan lancar (*typing latency* minimal). Keystroke pengetikan dilarang bergantung secara langsung pada request API, inferensi AI, atau roundtrip database.
 
 ---
 
-# 29. Story Context Performance
-
-Do not retrieve:
+### 15. Autosave Flow
 
 ```text
-everything
+Pengetikan (typing)
+  ↓
+State lokal editor (TipTap)
+  ↓
+Debounce timer (1-2 detik)
+  ↓
+Persistensi server (Server Action)
+  ↓
+Indikator tersimpan (Saved)
 ```
 
-Retrieve:
-
-```text
-what is relevant
-```
-
-Use:
-
-- metadata filters;
-- vector search;
-- keyword search;
-- ranking;
-- context budgets.
+> [!IMPORTANT]
+> Jika penyimpanan ke server gagal: pertahankan draf lokal, tampilkan status offline/error yang dapat dicoba ulang (*retry*), dan jangan pernah membuang tulisan penulis.
 
 ---
 
-# 30. Long Novel Support
+### 16. Version History
 
-Do not assume:
+Buat snapshot versi (*version snapshot*) bermakna pada saat:
+- Penulis secara eksplisit menyimpan versi;
+- AI melakukan operasi penggantian teks (*Replace*);
+- Penulis me-restore versi terdahulu;
+- Terjadi operasi editorial mayor.
 
-```text
-10 chapters
-```
-
-is the maximum.
-
-The architecture should support:
-
-```text
-100+
-chapters
-1000+
-scenes
-many characters
-large story memory
-```
-
-Use summaries and hierarchical context.
+Jangan membuat entri versi database untuk setiap ketukan tombol.
 
 ---
 
-# 31. Source Attribution
+### 17. UI Rules
 
-Whenever a feature claims:
-
-> "Your story says..."
-
-it should ideally know the source.
-
-Example:
-
-```text
-Chapter 12
-Scene 3
-```
-
-This applies particularly to:
-
-- Story Memory;
-- Consistency Checker;
-- Story Doctor.
+Patuhi pedoman [`docs/design.md`](docs/design.md):
+- Tata letak tenang, visual editorial, whitespace luas, dan kontras terbaca (WCAG AA).
+- Hindari cards bertumpuk, gradasi neon berlebihan, efek animasi heboh, atau dashboard bisnis.
 
 ---
 
-# 32. Consistency Checker
+### 18. Writing Experience
 
-Findings must be presented as evidence-based observations.
+> **Naskah lebih penting daripada antarmuka di sekelilingnya.**
 
-Use:
-
-```text
-Potential inconsistency
-```
-
-instead of:
-
-```text
-Error
-```
-
-unless the system is dealing with an objectively invalid data state.
-
-Do not assume intentional ambiguity is a bug.
+Panel AI, navigasi, toolbar, dan statistik tidak boleh mendominasi atau mengganggu area penulisan naskah utama.
 
 ---
 
-# 33. Story Doctor
+### 19. Accessibility
 
-Do not implement arbitrary:
-
-```text
-Story Quality Score
-```
-
-unless there is a clear product requirement.
-
-Prefer:
-
-```text
-Observation
-Evidence
-Possible interpretation
-Suggestion
-```
+Setiap komponen interaktif wajib mendukung:
+- Navigasi keyboard penuh (`Tab`, `Enter`, `Escape`);
+- Visible focus outline;
+- Atribut semantik (`aria-label`, `<span className="sr-only">`);
+- Rasio kontras warna standar WCAG AA (minimal 4.5:1 untuk teks normal).
 
 ---
 
-# 34. No Fake Intelligence
+### 20. Components
 
-Do not add features merely to make the product appear more AI-powered.
+Buat komponen modular untuk pola yang berulang secara nyata (`SceneNavigator`, `CharacterCard`, `ConsistencyFinding`). Hindari membuat mega-abstraksi generik yang tidak dibutuhkan.
 
-Every AI feature should have a meaningful purpose.
+---
 
-Bad:
+### 48. Preserve Existing Behavior
 
+Sebelum mengubah kode bersama (*shared code*): identifikasi pemanggil, pahami perilaku saat ini, dan lakukan perubahan terkecil yang aman tanpa merusak fitur lain.
+
+---
+
+## Bagian V: Kualitas Kode, Validasi & Pengujian
+
+### 21. Server / Client Boundary
+
+Pertahankan isolasi logika server: akses database, API keys, dan embedding generator harus berada di server. Komponen klien hanya menerima data yang dibutuhkan.
+
+---
+
+### 22. Validation
+
+Validasi seluruh input data di perbatasan (*boundary*) menggunakan **Zod**:
+- Formulir input pengguna;
+- Server actions & API routes;
+- Respons terstruktur dari AI.
+
+---
+
+### 23. Error Handling
+
+Pesan kesalahan harus bermakna, solutif, dan aman:
+- Jangan tampilkan stack trace internal atau kredensial database kepada pengguna.
+- Berikan instruksi pemulihan (misal: "Draf lokal Anda tetap aman. Coba lagi").
+
+---
+
+### 24. Testing
+
+Setiap modul domain wajib memiliki pengujian otomatis (`npm run test`):
+- **Unit:** kalkulasi kata, deduplikasi memori, perankingan konteks, logika linimasa.
+- **Integration:** alur pembuatan novel, bab, adegan, autosave, dan context retrieval.
+
+---
+
+### 28. Performance
+
+Ukur sebelum melakukan optimasi. Pantau latensi autosave, latensi query database, dan rendering dokumen panjang. Hindari N+1 query dengan index yang tepat.
+
+---
+
+### 41. Dependencies
+
+Sebelum menambahkan package baru, pastikan:
+1. Apakah fungsinya benar-benar esensial?
+2. Apakah dapat dibuat dengan utilitas yang sudah ada?
+3. Apakah meningkatkan bundle size secara berlebihan?
+4. Lebih baik meminimalkan jumlah dependensi pihak ketiga.
+
+---
+
+### 44. Feature Development Pattern
+
+Alur baku penambahan fitur domain:
 ```text
-AI Story Score: 83
-```
-
-Good:
-
-```text
-Three unresolved plot threads may deserve review.
+Kebutuhan (PRD) → Model Domain → Skema Database & Migrasi →
+Service Domain → Server Action / API → Antarmuka Pengguna (UI) → Automated Tests
 ```
 
 ---
 
-# 35. Documentation
+### 46. Ambiguity Protocol
 
-When changing architecture or behavior, update the relevant documentation.
-
-Examples:
-
-```text
-new database entity
-→ database-schema.md
-
-new architectural subsystem
-→ architecture.md
-
-new product capability
-→ prd.md
-
-new UX pattern
-→ design.md
-```
-
-Do not allow documentation to become permanently stale.
+Untuk detail teknis kecil, pilih opsi paling sederhana dan konsisten. Untuk keputusan tingkat produk (kepemilikan cerita, keamanan naskah, operasi destruktif), **selalu tanyakan pada penulis**.
 
 ---
 
-# 36. Git Practices
+### 47. Avoid Premature Refactoring
 
-Use small, coherent commits.
-
-Prefer:
-
-```text
-feat: add novel creation flow
-feat: add chapter editor
-fix: preserve draft when autosave fails
-feat: add story memory model
-```
-
-Avoid:
-
-```text
-update stuff
-changes
-fix
-final
-```
-
-Do not mix unrelated features in one commit.
+Fokus pada fitur yang sedang dikerjakan. Jangan merefaktor kode yang tidak terkait di tengah pengerjaan sebuah tugas.
 
 ---
 
-# 37. Pull Request Discipline
+## Bagian VI: Standar Bahasa, Git & Checklist Akhir
 
-A PR should ideally answer:
+### 35. Documentation
 
-```text
-What changed?
-Why?
-What files changed?
-How was it tested?
-Any migration?
-Any breaking change?
-```
-
-Do not hide significant architectural changes in unrelated PRs.
+Ketika arsitektur, skema database, atau perilaku produk berubah, perbarui dokumen terkait:
+- Entitas database baru → `docs/database-schema.md`
+- Subsistem baru → `docs/architecture.md`
+- Kemampuan produk baru → `docs/prd.md`
+- Pola UX baru → `docs/design.md`
 
 ---
 
-# 38. Before Finishing a Task
+### 36. Git Practices
 
-Run the appropriate checks.
+Gunakan commit kecil dan deskriptif berbasis Conventional Commits:
+- `feat: add character arc visualizer`
+- `fix: preserve local draft when autosave network fails`
+- `test: add context retrieval budget tests`
 
-At minimum for code changes:
-
-```text
-TypeScript
-Lint
-Tests
-Build
-```
-
-Also inspect:
-
-```text
-git diff
-```
-
-Look for:
-
-- accidental files;
-- debug logs;
-- secrets;
-- unrelated changes;
-- broken imports;
-- temporary code.
+Jangan mencampuradukkan perubahan yang tidak terkait ke dalam satu commit.
 
 ---
 
-# 39. Never Commit Secrets
+### 37. Pull Request Discipline
 
-Never commit:
-
-```text
-.env
-.env.local
-API keys
-service-role keys
-database passwords
-tokens
-```
-
-Use:
-
-```text
-.env.example
-```
-
-with placeholders.
+Setiap PR harus menjelaskan: apa yang berubah, mengapa berubah, berkas yang terdampak, cara pengujian, dan apakah ada perubahan skema database.
 
 ---
 
-# 40. Environment Variables
+### 38. Before Finishing a Task
 
-Public variables may use:
-
-```text
-NEXT_PUBLIC_
-```
-
-Only genuinely public configuration belongs there.
-
-Secrets never do.
-
----
-
-# 41. Dependencies
-
-Before adding a package, ask:
-
-1. Is it necessary?
-2. Is the functionality already available?
-3. Is the package maintained?
-4. Does it increase bundle size?
-5. Does it introduce security or licensing concerns?
-6. Does it make deployment harder?
-
-Prefer fewer dependencies.
-
----
-
-# 42. AI Provider Changes
-
-If changing AI providers:
-
-- do not rewrite the application around the provider SDK;
-- update the provider implementation;
-- preserve `AIProvider`;
-- update configuration;
-- update tests.
-
-The domain model should remain unchanged.
-
----
-
-# 43. Database Provider Changes
-
-Similarly, do not spread provider-specific database APIs throughout the application.
-
-Keep database access behind repositories/services where practical.
-
----
-
-# 44. Feature Development Pattern
-
-Preferred:
-
-```text
-Requirement
-   ↓
-Domain model
-   ↓
-Database
-   ↓
-Service
-   ↓
-Server action/API
-   ↓
-UI
-   ↓
-Tests
-```
-
-Do not start with UI and invent the domain afterward for complex features.
-
----
-
-# 45. AI Feature Development Pattern
-
-Preferred:
-
-```text
-User action
-   ↓
-Operation definition
-   ↓
-Context resolver
-   ↓
-Context builder
-   ↓
-Prompt
-   ↓
-AI provider
-   ↓
-Structured validation
-   ↓
-Domain action
-   ↓
-User review
+Sebelum menyelesaikan tugas, jalankan verifikasi:
+```bash
+npm run typecheck    # tsc --noEmit
+npm run test         # test suite lengkap
+npm run build        # validasi build produksi
+git diff             # tinjau perubahan
 ```
 
 ---
 
-# 46. When Requirements Are Ambiguous
+### 39. Never Commit Secrets
 
-Do not silently invent important product behavior.
-
-For small implementation details:
-
-```text
-choose the simplest consistent option
-```
-
-For product-level decisions:
-
-```text
-ask for clarification
-```
-
-Especially when the decision affects:
-
-- story ownership;
-- manuscript behavior;
-- memory semantics;
-- privacy;
-- destructive operations;
-- database architecture.
+> [!CAUTION]
+> Dilarang memasukkan berkas `.env`, `.env.local`, API keys, password database, atau access tokens ke dalam git history. Gunakan `.env.example` dengan placeholder kosong.
 
 ---
 
-# 47. Avoid Premature Refactoring
+### 40. Environment Variables
 
-Do not refactor unrelated code while implementing a feature.
-
-If existing code is problematic:
-
-```text
-fix the smallest necessary area
-```
-
-Create a separate refactoring task for broader cleanup.
+Variabel publik diizinkan menggunakan prefix `NEXT_PUBLIC_`. Variabel rahasia (API key, service role key) dilarang menggunakan prefix tersebut.
 
 ---
 
-# 48. Preserve Existing Behavior
+### 49. Product Language
 
-Before changing shared code:
-
-1. identify callers;
-2. understand current behavior;
-3. add tests if behavior is undocumented;
-4. make the smallest safe change.
-
-Do not break unrelated features for architectural purity.
+Gunakan terminologi domain yang konsisten:
+`Novel`, `Act`, `Chapter`, `Scene`, `Character`, `Relationship`, `Location`, `World Rule`, `World Lore`, `Plot Thread`, `Timeline Event`, `Story Memory`, `Consistency Finding`, `Story Doctor`.
 
 ---
 
-# 49. Product Language
+### 50. UX Language
 
-Use consistent terminology.
-
-Preferred:
-
-```text
-Novel
-Act
-Chapter
-Scene
-Character
-Relationship
-Location
-World Rule
-World Lore
-Plot Thread
-Timeline Event
-Story Memory
-Consistency Finding
-Story Doctor
-```
-
-Avoid randomly switching terms.
-
-For example, do not use:
-
-```text
-Episode
-Section
-Segment
-```
-
-when the domain concept is `Chapter` or `Scene`.
+Aplikasi dirancang untuk mendukung penulis, bukan menghakimi. Hindari bahasa yang meremehkan (*shaming*):
+- Hindari: `Tulisan lemah`, `Plot gagal`, `Karakter salah`
+- Gunakan: `Observasi`, `Potensi masalah`, `Thread belum terselesaikan`, `Saran perbaikan`
 
 ---
 
-# 50. UX Language
-
-The product should not shame writers.
-
-Avoid:
+### 51. Final Agent Checklist
 
 ```text
-Bad chapter
-Weak writer
-Story failed
-Wrong character
-Incorrect creativity
-```
-
-Prefer:
-
-```text
-Potential issue
-Observation
-Possible contradiction
-Unresolved thread
-Suggestion
+[ ] Membaca dokumentasi relevan
+[ ] Memeriksa kode yang ada
+[ ] Mengidentifikasi domain yang terdampak
+[ ] Memeriksa dampak database & migrasi
+[ ] Memeriksa otorisasi kepemilikan tenant
+[ ] Menjaga keselamatan naskah (non-destruktif)
+[ ] Menambahkan validasi batas (Zod)
+[ ] Menambahkan automated tests
+[ ] Memastikan lint & typecheck lolos
+[ ] Memastikan npm test lolos 100%
+[ ] Memastikan build produksi berhasil
+[ ] Memeriksa git diff (bersih dari debug log / secrets)
+[ ] Memperbarui dokumentasi terkait
 ```
 
 ---
 
-# 51. Final Agent Checklist
+### 52. Final Rule
 
-Before declaring a task complete:
-
+Saat menghadapi keraguan, pilihlah:
 ```text
-[ ] Read relevant documentation
-[ ] Inspected existing code
-[ ] Identified affected domain
-[ ] Checked database implications
-[ ] Checked authorization
-[ ] Preserved manuscript safety
-[ ] Added validation
-[ ] Added tests where appropriate
-[ ] Ran lint
-[ ] Ran typecheck
-[ ] Ran tests
-[ ] Ran build when appropriate
-[ ] Reviewed git diff
-[ ] Updated documentation if needed
-[ ] No secrets committed
-[ ] No debug code left behind
+Sederhana • Aman • Reversibel • Terjelaskan • Dikendalikan Penulis
 ```
+daripada:
+```text
+Canggih Otomatis • Destruktif • Opaque • Over-Engineered
+```
+Tujuannya bukan untuk membangun sistem AI yang paling memukau, melainkan alat kerja yang dapat dipercaya sepenuhnya oleh seorang novelis untuk menjaga cerita yang mereka cintai.
 
 ---
-
-# 52. Final Rule
-
-When uncertain, prefer:
-
-```text
-simple
-safe
-reversible
-explainable
-author-controlled
-```
-
-over:
-
-```text
-clever
-automatic
-destructive
-opaque
-over-engineered
-```
-
-The goal is not to build the most impressive AI system.
-
-The goal is to build a tool that a novelist can trust with a story they care about.
 
 <!-- antislop:start -->
 ## antislop
